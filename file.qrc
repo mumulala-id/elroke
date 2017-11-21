@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/usr/share/elroke">
+        <file>file/font/Xolonium.ttf</file>
+        <file>file/background/background.jpg</file>
+        <file>file/icon/next.png</file>
+        <file>file/icon/left.png</file>
+        <file>file/icon/play.png</file>
+        <file>file/icon/clear.png</file>
+        <file>file/icon/backspace.png</file>
+        <file>file/icon/mute.png</file>
+        <file>file/icon/minus.png</file>
+        <file>file/icon/plus.png</file>
+        <file>file/icon/unmute.png</file>
+        <file>file/icon/keyboard.png</file>
+        <file>file/icon/menu.png</file>
+        <file>file/icon/stereo.png</file>
+        <file>file/icon/right.png</file>
+        <file>file/icon/up.png</file>
+        <file>file/icon/down.png</file>
+        <file>file/icon/delete.png</file>
+         <file>file/icon/lock.png</file>
+        <file>file/LICENSE</file>
+    </qresource>
+</RCC>
