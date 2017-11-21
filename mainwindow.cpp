@@ -863,7 +863,8 @@ void mainWindow::addToDatabase(){
 
 void mainWindow::dialogSavePlaylist(){
 
-    QDialog *dialog_save_playlist = new QDialog(this);
+    QDialog *dialog_save_playlist = new QDialog(NULL);
+    qDebug()<<"alamat"<<&dialog_save_playlist;
 
     QVBoxLayout *lo_main = new QVBoxLayout;
 
@@ -872,6 +873,8 @@ void mainWindow::dialogSavePlaylist(){
     lo_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
     lo_main->addWidget(le_playlist_name);
 
+
+
     QHBoxLayout *lo_btn = new QHBoxLayout;
 
     QPushButton *btn_close = new QPushButton("Cancel", dialog_save_playlist);
@@ -879,18 +882,25 @@ void mainWindow::dialogSavePlaylist(){
 
     QPushButton *btn_save = new QPushButton("Save", dialog_save_playlist);
     connect(btn_save,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(accept()));
+    Keyboard *key = new Keyboard(dialog_save_playlist);
+    lo_main->addWidget(key);
 
     lo_btn->addWidget(btn_close);
     lo_btn->addStretch();
     lo_btn->addWidget(btn_save);
 
     lo_main->addLayout(lo_btn);
-
     dialog_save_playlist->setLayout(lo_main);
 
    dialog_save_playlist->setWindowFlags( Qt::FramelessWindowHint);
-   dialog_save_playlist->setAttribute(Qt::WA_TintedBackground);
-   dialog_save_playlist->setMinimumSize(300,100);
+   dialog_save_playlist->setAttribute(Qt::WA_DeleteOnClose);
+
+   le_playlist_name->setFocus();
+
+
+
+
+
 
    if(dialog_save_playlist->exec()==QDialog::Accepted){
 
@@ -898,6 +908,7 @@ void mainWindow::dialogSavePlaylist(){
 
    }
 
+   qDebug()<<"alamat"<<&dialog_save_playlist;
 }
 
 void mainWindow::dialogLoadPlaylist(){
