@@ -290,7 +290,7 @@ void addtodatabase::saveToDatabase(){
             qDebug()<<"failed"<<namefile<<title<<singer;
         }
 
-        //set_title.insert(title);
+
         set_singer.insert(singer);
         set_language.insert(language);
         set_category.insert(category);

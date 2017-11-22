@@ -29,6 +29,8 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_singer = new QGroupBox("Singer", this);
     list_singer = new QListWidget(this);
     list_singer->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/singer"));
+
+    connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
 
     check_singer = new QCheckBox("Filter Singer", this);
@@ -176,7 +178,8 @@ managedb::managedb(QWidget *parent) :
     QPushButton *button_selectall = new QPushButton("Select All", this);
     connect(button_selectall,&QPushButton::clicked,table,&QTableView::selectAll);
 
-
+QPushButton *button_unselect = new QPushButton("Unselect", this);
+connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection);
     QPushButton *button_delete_selected = new QPushButton("Delete Selected", this);
     connect(button_delete_selected,&QPushButton::clicked,this,&managedb::deleteItem);
 
@@ -203,7 +206,8 @@ managedb::managedb(QWidget *parent) :
     glo_button->addWidget(button_selectall,7,1);
     glo_button->addWidget(button_delete_selected,7,0);
     glo_button->addWidget(button_save,8,0);
-    glo_button->addWidget(button_close,8,1);
+    glo_button->addWidget(button_unselect,8,1);
+    glo_button->addWidget(button_close,9,0);
     glo_button->setMargin(0);
     frame_left_bottom->setLayout(glo_button);
 
@@ -220,6 +224,7 @@ managedb::managedb(QWidget *parent) :
     table->verticalHeader()->hide();
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::MultiSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
 
@@ -271,7 +276,7 @@ managedb::managedb(QWidget *parent) :
     setLayout(lo_main);
     setWindowTitle("Manage Database");
 
-
+setWindowFlags(Qt::FramelessWindowHint);
     showMaximized();
 
 
@@ -299,13 +304,11 @@ void managedb::swapItem(int column1, int column2){
 
 }
 
-
 void managedb::swapSingerLanguage(){
 
     swapItem(2,3);
 
 }
-
 
 void managedb::swapTitleLanguage(){
 
@@ -338,8 +341,6 @@ void managedb::setitem(QString text, int column){
         sql_model->setData(sql_model->index(indexes.row(), column), text);
 
     }
-
-
 
 }
 
@@ -408,105 +409,6 @@ void managedb::save(){
 
 }
 
-//QList<QString> managedb::getSingers(){
-
-//    QFile file(QDir::homePath()+"/.config/elroke/meta/singer");
-
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        qDebug()<<"cant read singer";
-////        return;
-//    }
-
-//    QTextStream stream(&file);
-
-//    QString singer = stream.readLine();
-//    QList<QString> sngr;
-
-//    while(singer!=NULL){
-
-//        sngr<<singer;
-//        singer=stream.readLine();
-//    }
-//        return sngr;
-
-
-
-
-
-//}
-
-//QList<QString> managedb::getLanguages(){
-
-//    QFile file(QDir::homePath()+"/.config/elroke/meta/language");
-
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        qDebug()<<"cant read singer";
-////        return;
-//    }
-
-//    QTextStream stream(&file);
-
-//    QString language = stream.readLine();
-//    QList<QString> lang;
-
-//    while(language!=NULL){
-
-//        lang<<language;
-//        language=stream.readLine();
-//    }
-//        return lang;
-
-
-
-//}
-
-//QList<QString> managedb::getCategories(){
-//    QFile file(QDir::homePath()+"/.config/elroke/meta/category");
-
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        qDebug()<<"cant read singer";
-////        return;
-//    }
-
-//    QTextStream stream(&file);
-
-//    QString category = stream.readLine();
-//    QList<QString> cat;
-
-//    while(category!=NULL){
-
-//        cat<<category;
-//        category=stream.readLine();
-//    }
-//        return cat;
-
-
-//}
-
-//QList<QString> managedb::getPaths(){
-
-//    QFile file(QDir::homePath()+"/.config/elroke/meta/path");
-
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-//        qDebug()<<"cant read singer";
-////        return;
-//    }
-
-//    QTextStream stream(&file);
-
-//    QString path = stream.readLine();
-//    QList<QString> p;
-
-//    while(path!=NULL){
-
-//        p<<path;
-//        path=stream.readLine();
-//    }
-//        return p;
-
-
-//}
-
 QList<QString> managedb::readListOfFile(const QString &filename){
 
     QFile file(filename);
@@ -527,6 +429,22 @@ QList<QString> managedb::readListOfFile(const QString &filename){
         line=stream.readLine();
     }
         return list;
+
+
+}
+
+
+void managedb::onListWidgetClicked(QListWidgetItem *item){
+
+table->clearSelection();
+    QString text=item->text();
+
+    for(int i=0; i<sql_model->rowCount();i++){
+        if(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString()==text)
+
+    table->selectRow(i);
+}
+
 
 
 }

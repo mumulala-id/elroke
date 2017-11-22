@@ -16,23 +16,9 @@ public:
     explicit managedb(QWidget *parent=0);
 
 private :
-    QListWidget *list_singer;
-    QListWidget *list_language;
-    QListWidget *list_genre;
-    QListWidget *list_folder;
-    QCheckBox *check_singer;
-    QCheckBox *check_language;
-    QCheckBox *check_genre;
-    QCheckBox *check_genre_folder;
-    QLineEdit *le_singer;
-    QLineEdit *le_language;
-    QLineEdit *le_genre;
-    QLineEdit *le_folder;
-    QLineEdit *le_title_fixed;
-    QLineEdit *le_set_title;
-    QLineEdit *le_set_language;
-    QLineEdit *le_set_singer;
-    QLineEdit *le_set_category;
+    QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
+    QCheckBox *check_singer,  *check_language,  *check_genre,   *check_genre_folder;
+    QLineEdit *le_singer, *le_language, *le_genre, *le_folder, *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
     QTableView *table;
     ProxyModel *proxy_model;
     QSqlTableModel *sql_model;
@@ -53,11 +39,8 @@ private slots:
     void swapLanguageCategory();
     void deleteItem();
     void save();
-//    QList<QString> getSingers();
-//     QList<QString> getLanguages();
-//     QList<QString>getCategories();
-//    QList<QString> getPaths();
     QList<QString>readListOfFile(const QString &file);
+    void onListWidgetClicked(QListWidgetItem *);
 
 };
 
