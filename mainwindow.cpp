@@ -864,7 +864,6 @@ void mainWindow::addToDatabase(){
 void mainWindow::dialogSavePlaylist(){
 
     QDialog *dialog_save_playlist = new QDialog(NULL);
-    qDebug()<<"alamat"<<&dialog_save_playlist;
 
     QVBoxLayout *lo_main = new QVBoxLayout;
 
@@ -872,8 +871,6 @@ void mainWindow::dialogSavePlaylist(){
 
     lo_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
     lo_main->addWidget(le_playlist_name);
-
-
 
     QHBoxLayout *lo_btn = new QHBoxLayout;
 
@@ -897,19 +894,13 @@ void mainWindow::dialogSavePlaylist(){
 
    le_playlist_name->setFocus();
 
-
-
-
-
-
    if(dialog_save_playlist->exec()==QDialog::Accepted){
 
        writePlaylist(le_playlist_name->text());
 
    }
 
-   qDebug()<<"alamat"<<&dialog_save_playlist;
-}
+   }
 
 void mainWindow::dialogLoadPlaylist(){
 

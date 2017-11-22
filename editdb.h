@@ -53,6 +53,11 @@ private slots:
     void swapLanguageCategory();
     void deleteItem();
     void save();
+//    QList<QString> getSingers();
+//     QList<QString> getLanguages();
+//     QList<QString>getCategories();
+//    QList<QString> getPaths();
+    QList<QString>readListOfFile(const QString &file);
 
 };
 

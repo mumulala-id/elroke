@@ -57,6 +57,7 @@ private slots:
      void setSingerFirst(bool);
      void setTitleFirst(bool);
      void grabMetadata(const QSet<QString> &singer, const QSet<QString> &language, const QSet<QString> &category, const QSet<QString> &path);
+
      void getDrive();
      bool isAutomatic()const{return automatic;}
      bool isManual()const{return manual;}

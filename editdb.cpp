@@ -28,6 +28,7 @@ managedb::managedb(QWidget *parent) :
 
     QGroupBox *grup_singer = new QGroupBox("Singer", this);
     list_singer = new QListWidget(this);
+    list_singer->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/singer"));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
 
     check_singer = new QCheckBox("Filter Singer", this);
@@ -44,6 +45,7 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_language = new QGroupBox("Language", this);
 
     list_language = new QListWidget(this);
+    list_language->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/language"));
 
     check_language = new QCheckBox("Filter Language", this);
 
@@ -51,6 +53,7 @@ managedb::managedb(QWidget *parent) :
     QHBoxLayout *lo_cb_language = new QHBoxLayout;
     lo_cb_language->addWidget(check_language);
     lo_cb_language->addWidget(button_replace_language);
+
     le_language = new QLineEdit(this);
     QVBoxLayout *lo_grup_language = new QVBoxLayout;
     lo_grup_language->addWidget(list_language);
@@ -60,6 +63,8 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
     list_genre = new QListWidget(this);
+    list_genre->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/category"));
+
     check_genre = new QCheckBox("Filter Genre", this);
     QPushButton *button_replace_genre = new QPushButton("Replace", this);
     QHBoxLayout *lo_cb_genre = new QHBoxLayout;
@@ -75,6 +80,7 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
     list_folder = new QListWidget(this);
+    list_folder->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/path"));
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
 
     QHBoxLayout *lo_cb_folder = new QHBoxLayout;
@@ -402,3 +408,125 @@ void managedb::save(){
 
 }
 
+//QList<QString> managedb::getSingers(){
+
+//    QFile file(QDir::homePath()+"/.config/elroke/meta/singer");
+
+//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        qDebug()<<"cant read singer";
+////        return;
+//    }
+
+//    QTextStream stream(&file);
+
+//    QString singer = stream.readLine();
+//    QList<QString> sngr;
+
+//    while(singer!=NULL){
+
+//        sngr<<singer;
+//        singer=stream.readLine();
+//    }
+//        return sngr;
+
+
+
+
+
+//}
+
+//QList<QString> managedb::getLanguages(){
+
+//    QFile file(QDir::homePath()+"/.config/elroke/meta/language");
+
+//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        qDebug()<<"cant read singer";
+////        return;
+//    }
+
+//    QTextStream stream(&file);
+
+//    QString language = stream.readLine();
+//    QList<QString> lang;
+
+//    while(language!=NULL){
+
+//        lang<<language;
+//        language=stream.readLine();
+//    }
+//        return lang;
+
+
+
+//}
+
+//QList<QString> managedb::getCategories(){
+//    QFile file(QDir::homePath()+"/.config/elroke/meta/category");
+
+//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        qDebug()<<"cant read singer";
+////        return;
+//    }
+
+//    QTextStream stream(&file);
+
+//    QString category = stream.readLine();
+//    QList<QString> cat;
+
+//    while(category!=NULL){
+
+//        cat<<category;
+//        category=stream.readLine();
+//    }
+//        return cat;
+
+
+//}
+
+//QList<QString> managedb::getPaths(){
+
+//    QFile file(QDir::homePath()+"/.config/elroke/meta/path");
+
+//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+//        qDebug()<<"cant read singer";
+////        return;
+//    }
+
+//    QTextStream stream(&file);
+
+//    QString path = stream.readLine();
+//    QList<QString> p;
+
+//    while(path!=NULL){
+
+//        p<<path;
+//        path=stream.readLine();
+//    }
+//        return p;
+
+
+//}
+
+QList<QString> managedb::readListOfFile(const QString &filename){
+
+    QFile file(filename);
+
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug()<<"cant read singer";
+//        return;
+    }
+
+    QTextStream stream(&file);
+
+    QString line = stream.readLine();
+    QList<QString>list;
+
+    while(line!=NULL){
+
+        list<<line;
+        line=stream.readLine();
+    }
+        return list;
+
+
+}

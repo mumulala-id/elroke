@@ -314,18 +314,11 @@ void addtodatabase::saveToDatabase(){
 
                                          qDebug()<<"sql not ok";
 
-
-
-//  //  qDebug()<<"title"<<set_title;
-//    qDebug()<<"artist"<<set_singer;
-//    qDebug()<<"lang"<<set_language;
-//    qDebug()<<"cat"<<set_category;
-//    qDebug()<<"folder"<<set_folder;
     grabMetadata(set_singer, set_language, set_category, set_folder);
 
-                                                 setCursor(Qt::ArrowCursor);
+     setCursor(Qt::ArrowCursor);
 
-                                                  this->accept();
+      this->accept();
 
  }
 
@@ -523,3 +516,4 @@ QString addtodatabase::getSplitter(const QString &filename){
     
     
 }
+
