@@ -868,6 +868,9 @@ void mainWindow::dialogSavePlaylist(){
     QVBoxLayout *lo_main = new QVBoxLayout;
 
     QLineEdit *le_playlist_name = new QLineEdit(dialog_save_playlist);
+    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/file/icon/backspace.png"), "", this);
+    le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
+    connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
     lo_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
     lo_main->addWidget(le_playlist_name);
@@ -998,6 +1001,7 @@ void mainWindow::loadPlaylist(){
 void mainWindow::loadPlaylist(const QString &s){
 
     model_playlist->setRowCount(0);
+
     QFile file(QDir::homePath()+"/.config/elroke/playlist/"+s+".elp");
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))

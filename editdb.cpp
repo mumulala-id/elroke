@@ -16,6 +16,7 @@
 #include <QSizePolicy>
 #include <QSqlError>
 #include <QMessageBox>
+#include <QtAlgorithms>   // for qSort()
 
 
 managedb::managedb(QWidget *parent) :
@@ -27,7 +28,8 @@ managedb::managedb(QWidget *parent) :
     QHBoxLayout *lo_top = new QHBoxLayout;
 
     QGroupBox *grup_singer = new QGroupBox("Singer", this);
-    list_singer = new QListWidget(this);
+
+   list_singer = new QListWidget(this);
     list_singer->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/singer"));
 
     connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
@@ -46,8 +48,9 @@ managedb::managedb(QWidget *parent) :
 
     QGroupBox *grup_language = new QGroupBox("Language", this);
 
-    list_language = new QListWidget(this);
+  list_language = new QListWidget(this);
     list_language->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/language"));
+    connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_language = new QCheckBox("Filter Language", this);
 
@@ -64,8 +67,9 @@ managedb::managedb(QWidget *parent) :
     grup_language->setLayout(lo_grup_language);
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
-    list_genre = new QListWidget(this);
+   list_genre = new QListWidget(this);
     list_genre->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/category"));
+     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_genre = new QCheckBox("Filter Genre", this);
     QPushButton *button_replace_genre = new QPushButton("Replace", this);
@@ -81,8 +85,10 @@ managedb::managedb(QWidget *parent) :
     grup_genre->setLayout(lo_grup_genre);
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
-    list_folder = new QListWidget(this);
+   list_folder = new QListWidget(this);
     list_folder->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/path"));
+     connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
 
     QHBoxLayout *lo_cb_folder = new QHBoxLayout;
@@ -415,7 +421,7 @@ QList<QString> managedb::readListOfFile(const QString &filename){
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
         qDebug()<<"cant read singer";
-//        return;
+
     }
 
     QTextStream stream(&file);
@@ -428,6 +434,8 @@ QList<QString> managedb::readListOfFile(const QString &filename){
         list<<line;
         line=stream.readLine();
     }
+
+    qSort(list.begin(), list.end());
         return list;
 
 
@@ -436,15 +444,39 @@ QList<QString> managedb::readListOfFile(const QString &filename){
 
 void managedb::onListWidgetClicked(QListWidgetItem *item){
 
-table->clearSelection();
+    setCursor(Qt::WaitCursor);
+
+    table->clearSelection();
+    QObject *obj = sender();
     QString text=item->text();
 
-    for(int i=0; i<sql_model->rowCount();i++){
-        if(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString()==text)
+    int column=0;
 
-    table->selectRow(i);
+    if (obj==list_singer)
+        column=2;
+    else if(obj==list_language)
+        column=3;
+    else if(obj==list_genre)
+        column=4;
+    else if(obj==list_folder)
+            column=6;
+
+
+
+    for(int i=0; i<sql_model->rowCount();i++){
+        if(column==6){
+            if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString().startsWith(text))
+                table->selectRow(i);
+        }
+        else{
+            if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString()==text)
+
+        table->selectRow(i);
+
+        }
 }
 
 
+    setCursor(Qt::ArrowCursor);
 
 }
