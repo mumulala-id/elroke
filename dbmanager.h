@@ -17,7 +17,7 @@ private:
     dbcontype contype;
     QSqlDatabase db;
    QString dbname;
-    QString dbdir = QDir::homePath()+"/.config/elroke";
+    QString dbdir = QDir::homePath()+"/.elroke";
     QString conname="";
 
 public slots:

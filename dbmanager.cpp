@@ -117,7 +117,7 @@ void dbmanager::setDBName(const QString &name){
 
 void dbmanager::setDBDir(const QString &dirname){
 
-    dbdir = QDir::homePath()+"/.config/elroke/"+dirname;
+    dbdir = QDir::homePath()+"/.elroke/"+dirname;
 
 
 }

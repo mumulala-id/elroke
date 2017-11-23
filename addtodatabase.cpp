@@ -14,7 +14,7 @@
 #include <QSqlError>
 #include <QVariantList>
 //#include <QScrollBar>
-
+#include <QtAlgorithms>//qSort
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
@@ -314,7 +314,20 @@ void addtodatabase::saveToDatabase(){
 
                                          qDebug()<<"sql not ok";
 
-    grabMetadata(set_singer, set_language, set_category, set_folder);
+    QList<QString>list_singer=set_singer.toList();
+    QList<QString>list_language= set_language.toList();
+    QList<QString>list_genre=set_category.toList();
+    QList<QString>list_path = set_folder.toList();
+
+    qSort(list_singer.begin(), list_singer.end());
+    qSort(list_language.begin(), list_language.end());
+    qSort(list_genre.begin(), list_genre.end());
+//    grabMetadata(set_singer, set_language, set_category, set_folder);
+
+    writeTextStream(QDir::homePath()+"/.elroke/meta/singer", list_singer);
+     writeTextStream(QDir::homePath()+"/.elroke/meta/language", list_language);
+      writeTextStream(QDir::homePath()+"/.elroke/meta/category", list_genre);
+       writeTextStream(QDir::homePath()+"/.elroke/meta/path", list_path);
 
      setCursor(Qt::ArrowCursor);
 
@@ -323,69 +336,30 @@ void addtodatabase::saveToDatabase(){
  }
 
 
-void addtodatabase::grabMetadata(const QSet<QString> &singer, const QSet<QString> &language, const QSet<QString> &category, const QSet<QString> &path){
-    
-    QString dir = QDir::homePath()+"/.config/elroke/meta";
-    
-    if(!QDir(dir).exists())
-        QDir().mkpath(dir);
 
 
-    QFile file_singer(dir+"/singer");
-    QFile file_language(dir+"/language");
-    QFile file_category(dir+"/category");
-    QFile file_path(dir+"/path");
+void addtodatabase::writeTextStream(const QString &file, QList<QString>set){
+    QFileInfo info;
+    info.setFile(file);
+    if(!info.dir().exists())
+        QDir().mkdir(info.path());
 
-
-    if(!file_singer.open(QIODevice::WriteOnly | QIODevice::Text)){
-         qDebug()<<"cannot write singer";
+    QFile f(file);
+        
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)){
+         qDebug()<<"cannot write stream";
     }
     else{
-          QTextStream stream(&file_singer);
-          for(int i=0; i<singer.size(); i++){
-                stream << singer.values().at(i)<<'\n';}
-
+          QTextStream stream(&f);
+        
+          for(int i=0; i<set.size(); i++){
+                stream << set.at(i)<<'\n';
+          }
     }
+         f.close();
 
-         file_singer.close();
-
-         if(!file_language.open(QIODevice::WriteOnly | QIODevice::Text)){
-              qDebug()<<"cannot write singer";
-         }
-         else{
-               QTextStream stream(&file_language);
-               for(int i=0; i<language.size(); i++){
-                     stream << language.values().at(i)<<'\n';
-               }
-         }
-              file_language.close();
-
-              if(!file_category.open(QIODevice::WriteOnly | QIODevice::Text)){
-                   qDebug()<<"cannot write singer";
-              }
-              else{
-                    QTextStream stream(&file_category);
-                    for(int i=0; i<category.size(); i++){
-                          stream << category.values().at(i)<<'\n';
-                    }
-              }
-                   file_category.close();
-
-
-                   if(!file_path.open(QIODevice::WriteOnly | QIODevice::Text)){
-                        qDebug()<<"cannot write singer";
-                   }
-                   else{
-                         QTextStream stream(&file_path);
-                         for(int i=0; i<path.size(); i++){
-                               stream << path.values().at(i)<<'\n';
-                         }
-                   }
-                        file_path.close();
-
-
+         
 }
-
 
 void addtodatabase::setSingerFirst(bool p){
 

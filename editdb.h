@@ -41,6 +41,7 @@ private slots:
     void save();
     QList<QString>readListOfFile(const QString &file);
     void onListWidgetClicked(QListWidgetItem *);
+    void updateList();
 
 };
 

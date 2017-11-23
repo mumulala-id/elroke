@@ -56,18 +56,13 @@ private slots:
      void saveToDatabase();
      void setSingerFirst(bool);
      void setTitleFirst(bool);
-     void grabMetadata(const QSet<QString> &singer, const QSet<QString> &language, const QSet<QString> &category, const QSet<QString> &path);
-
      void getDrive();
      bool isAutomatic()const{return automatic;}
      bool isManual()const{return manual;}
      void setToAuto(bool);
      void setToManual(bool);
      QString getSplitter(const QString &);
-
-public slots:
-
-
+     void writeTextStream(const QString &file, QList<QString> set);
 
 protected :
 

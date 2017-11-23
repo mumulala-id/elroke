@@ -909,7 +909,7 @@ void mainWindow::dialogLoadPlaylist(){
 
     auto *dialog_load_playlist = new QDialog(this);
 
-    QDirIterator it(QDir::homePath()+"/.config/elroke/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
+    QDirIterator it(QDir::homePath()+"/.elroke/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
 
     QList<QString> list_play;
 
@@ -970,7 +970,7 @@ void mainWindow::writePlaylist(const QString &playlistname){
     if(playlistname==NULL)
         return;
 
-    QString dir_playlist = QDir::homePath()+"/.config/elroke/playlist";
+    QString dir_playlist = QDir::homePath()+"/.elroke/playlist";
 
     if(!QDir(dir_playlist).exists())
         QDir().mkpath(dir_playlist);
@@ -1002,7 +1002,7 @@ void mainWindow::loadPlaylist(const QString &s){
 
     model_playlist->setRowCount(0);
 
-    QFile file(QDir::homePath()+"/.config/elroke/playlist/"+s+".elp");
+    QFile file(QDir::homePath()+"/.elroke/playlist/"+s+".elp");
 
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         qDebug() << "cant read playlist" << s;

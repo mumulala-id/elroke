@@ -30,7 +30,7 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_singer = new QGroupBox("Singer", this);
 
    list_singer = new QListWidget(this);
-    list_singer->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/singer"));
+    list_singer->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/singer"));
 
     connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
@@ -49,7 +49,7 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_language = new QGroupBox("Language", this);
 
   list_language = new QListWidget(this);
-    list_language->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/language"));
+    list_language->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_language = new QCheckBox("Filter Language", this);
@@ -68,7 +68,7 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
    list_genre = new QListWidget(this);
-    list_genre->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/category"));
+    list_genre->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/category"));
      connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_genre = new QCheckBox("Filter Genre", this);
@@ -86,7 +86,7 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
    list_folder = new QListWidget(this);
-    list_folder->addItems(readListOfFile(QDir::homePath()+"/.config/elroke/meta/path"));
+    list_folder->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/path"));
      connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
@@ -360,18 +360,21 @@ void managedb::setSinger(){
 
     if(!le_set_singer->text().isEmpty())
     setitem(le_set_singer->text(), 2);
+    updateList();
 
 }
 void managedb::setLanguage(){
 
     if(!le_set_language->text().isEmpty())
     setitem(le_set_language->text(), 3);
+    updateList();
 
 }
 void managedb::setCategory(){
 
     if(!le_set_category->text().isEmpty())
     setitem(le_set_category->text(), 4);
+    updateList();
 
 }
 
@@ -400,7 +403,7 @@ void managedb::deleteItem(){
         table->hideRow(proxy_model->mapToSource(ind).row());
         sql_model->removeRow(proxy_model->mapToSource(ind).row());
     }
-
+updateList();
 }
 
 
@@ -475,6 +478,50 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
 
         }
 }
+
+
+    setCursor(Qt::ArrowCursor);
+
+}
+
+void managedb::updateList(){
+
+    setCursor(Qt::WaitCursor);
+    QSet<QString>set_singer;
+    QSet<QString>set_language;
+    QSet<QString>set_category;
+    QSet<QString>set_folder;
+
+    for(int i=0; i<sql_model->rowCount(); i++){
+
+        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString());
+         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
+          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
+          QFileInfo info;
+          info.setFile(sql_model->data(sql_model->index(i,6),Qt::DisplayRole).toString());
+           set_folder.insert(info.path());
+
+
+    }
+
+    QList<QString>singer= set_singer.toList();
+    QList<QString>lang = set_language.toList();
+    QList<QString>cat = set_category.toList();
+    QList<QString>path= set_folder.toList();
+
+    qSort(singer.begin(), singer.end());
+    qSort(lang.begin(), lang.end());
+    qSort(cat.begin(),cat.end());
+    qSort(path.begin(), path.end());
+
+    list_singer->clear();
+    list_singer->addItems(singer);
+    list_language->clear();
+    list_language->addItems(lang);
+    list_genre->clear();
+    list_genre->addItems(cat);
+    list_folder->clear();
+    list_folder->addItems(path);
 
 
     setCursor(Qt::ArrowCursor);
