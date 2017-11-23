@@ -14,6 +14,7 @@ class managedb : public QDialog
     Q_OBJECT
 public:
     explicit managedb(QWidget *parent=0);
+    ~managedb();
 
 private :
     QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
@@ -42,6 +43,7 @@ private slots:
     QList<QString>readListOfFile(const QString &file);
     void onListWidgetClicked(QListWidgetItem *);
     void updateList();
+    void writeTextStream(const QString &file, QList<QString>set);
 
 };
 

@@ -360,7 +360,7 @@ void managedb::setSinger(){
 
     if(!le_set_singer->text().isEmpty())
     setitem(le_set_singer->text(), 2);
-    updateList();
+
 
 }
 void managedb::setLanguage(){
@@ -374,7 +374,7 @@ void managedb::setCategory(){
 
     if(!le_set_category->text().isEmpty())
     setitem(le_set_category->text(), 4);
-    updateList();
+
 
 }
 
@@ -403,7 +403,7 @@ void managedb::deleteItem(){
         table->hideRow(proxy_model->mapToSource(ind).row());
         sql_model->removeRow(proxy_model->mapToSource(ind).row());
     }
-updateList();
+
 }
 
 
@@ -415,7 +415,7 @@ void managedb::save(){
     sql_model->select();
     count_item->setText(QString::number(sql_model->rowCount()));
 
-
+updateList();
 }
 
 QList<QString> managedb::readListOfFile(const QString &filename){
@@ -487,6 +487,54 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
 void managedb::updateList(){
 
     setCursor(Qt::WaitCursor);
+
+    //QSET FOR REMOVE DUPPLICATE
+    QSet<QString>set_singer;
+    QSet<QString>set_language;
+    QSet<QString>set_category;
+    QSet<QString>set_folder;
+
+    for(int i=0; i<sql_model->rowCount(); i++){
+
+        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString());
+         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
+          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
+          QFileInfo info;
+          info.setFile(sql_model->data(sql_model->index(i,6),Qt::DisplayRole).toString());
+           set_folder.insert(info.path());
+
+
+    }
+
+    QList<QString>singer= set_singer.toList();
+    QList<QString>lang = set_language.toList();
+    QList<QString>cat = set_category.toList();
+    QList<QString>path= set_folder.toList();
+
+
+    //SORT LIST
+    qSort(singer.begin(), singer.end());
+    qSort(lang.begin(), lang.end());
+    qSort(cat.begin(),cat.end());
+    qSort(path.begin(), path.end());
+
+    list_singer->clear();
+    list_singer->addItems(singer);
+    list_language->clear();
+    list_language->addItems(lang);
+    list_genre->clear();
+    list_genre->addItems(cat);
+    list_folder->clear();
+    list_folder->addItems(path);
+
+
+    setCursor(Qt::ArrowCursor);
+
+}
+
+managedb::~managedb(){
+
+
     QSet<QString>set_singer;
     QSet<QString>set_language;
     QSet<QString>set_category;
@@ -514,16 +562,33 @@ void managedb::updateList(){
     qSort(cat.begin(),cat.end());
     qSort(path.begin(), path.end());
 
-    list_singer->clear();
-    list_singer->addItems(singer);
-    list_language->clear();
-    list_language->addItems(lang);
-    list_genre->clear();
-    list_genre->addItems(cat);
-    list_folder->clear();
-    list_folder->addItems(path);
+    writeTextStream(QDir::homePath()+"/.elroke/meta/singer", singer);
+     writeTextStream(QDir::homePath()+"/.elroke/meta/language", lang);
+      writeTextStream(QDir::homePath()+"/.elroke/meta/category", cat);
+       writeTextStream(QDir::homePath()+"/.elroke/meta/path", path);
 
 
-    setCursor(Qt::ArrowCursor);
+}
+
+void managedb::writeTextStream(const QString &file, QList<QString>set){
+    QFileInfo info;
+    info.setFile(file);
+    if(!info.dir().exists())
+        QDir().mkdir(info.path());
+
+    QFile f(file);
+
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)){
+         qDebug()<<"cannot write stream";
+    }
+    else{
+          QTextStream stream(&f);
+
+          for(int i=0; i<set.size(); i++){
+                stream << set.at(i)<<'\n';
+          }
+    }
+         f.close();
+
 
 }
