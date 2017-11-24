@@ -24,7 +24,8 @@ SOURCES += main.cpp\
         keyboard.cpp \
         editdb.cpp \
         dbmanager.cpp \
-        opening.cpp
+        opening.cpp \
+    clineedit.cpp
 
 HEADERS  += mainwindow.h \
         player.h \
@@ -37,7 +38,8 @@ HEADERS  += mainwindow.h \
         editdb.h \
         dbmanager.h \
         opening.h \
-        liststringfileparser.h
+        liststringfileparser.h \
+    clineedit.h
 
 
 DISTFILES +=

@@ -23,6 +23,8 @@ private:
 private slots:
     AeroButton *createButton(const QString &, const char *member);
     void onButtonClicked();
+
+
 };
 
 #endif // WIDGET_H

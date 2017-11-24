@@ -6,9 +6,11 @@
 #include <QLineEdit>
 #include <QTableView>
 #include "proxymodel.h"
+#include "keyboard.h"
 #include <QLabel>
 #include <QSqlTableModel>
 #include <QComboBox>
+#include "clineedit.h"
 
 class managedb : public QDialog
 {
@@ -20,7 +22,7 @@ public:
 private :
     QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
     QCheckBox *check_singer,  *check_language,  *check_genre,   *cb_folder;
-    QLineEdit  *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
+    CLineEdit  *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
     QTableView *table;
     ProxyModel *proxy_model;
     QSqlTableModel *sql_model;
@@ -28,6 +30,7 @@ private :
     QLabel *selected_count_label;
     QComboBox *combo_audio_channel;
     bool changeSave=false;
+    Keyboard *kboard;
 
 private slots:
     void swapItem(int, int);
@@ -49,7 +52,10 @@ private slots:
     void updateList();
     void writeTextStream(const QString &file, QList<QString>set);
     void setAudioChannel();
+    //void show
     void dclose();
+
+
 
 };
 

@@ -7,7 +7,7 @@
 #include "delay.h"
 #include "keyboard.h"
 #include "dbmanager.h"
-
+#include "clineedit.h"
 #include <QDialog>
 #include <QComboBox>
 #include <QTableView>
@@ -20,7 +20,7 @@
 #include <QLabel>
 #include <QKeyEvent>
 #include <QDesktopWidget>
-#include <QApplication>
+//#include <QApplication>
 #include <QSqlTableModel>
 //#include <QStackedLayout>
 
@@ -40,7 +40,7 @@ private :
     QTableView *table_playlist;
     ProxyModel *proxy_model;
 
-    QLineEdit *le_search;
+    CLineEdit *le_search;
     QSlider *slider;
     QSlider *slider_pos;
     QSlider *slider_vol;
@@ -114,6 +114,7 @@ private slots:
     void delayEvent();
     void tableRule();
     bool isKeyValid(int);
+    void showKeyboard(bool);
 
 
 

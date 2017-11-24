@@ -107,6 +107,7 @@ managedb::managedb(QWidget *parent) :
     proxy_model = new ProxyModel(this);
     proxy_model->setSourceModel(sql_model);
 
+
     QHBoxLayout *lo_bottom = new QHBoxLayout;
     QFrame *frame_left_bottom = new QFrame;
 
@@ -133,24 +134,30 @@ managedb::managedb(QWidget *parent) :
     QPushButton *button_set_title = new QPushButton("Set Title", this);
     connect(button_set_title,&QPushButton::clicked,this,&managedb::setTitle);
 
-    le_set_title = new QLineEdit(this);
+    le_set_title = new CLineEdit(this);
     le_set_title->setPlaceholderText("Title");
+//    connect(le_set_title,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+
     QPushButton *button_set_singer = new QPushButton("Set Singer", this);
     connect(button_set_singer,&QPushButton::clicked,this,&managedb::setSinger);
 
-    le_set_singer = new QLineEdit(this);
+    le_set_singer = new CLineEdit(this);
     le_set_singer->setPlaceholderText("Singer");
+//    connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+
     QPushButton *button_set_language = new QPushButton("Set Language", this);
     connect(button_set_language,&QPushButton::clicked,this,&managedb::setLanguage);
 
-    le_set_language = new QLineEdit(this);
+    le_set_language = new CLineEdit(this);
     le_set_language->setPlaceholderText("Language");
+//    connect(le_set_language,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
     QPushButton *button_set_category = new QPushButton("Set Category", this);
     connect(button_set_category,&QPushButton::clicked,this,&managedb::setCategory);
 
-    le_set_category = new QLineEdit(this);
+    le_set_category = new CLineEdit(this);
     le_set_category->setPlaceholderText("Category");
+//    connect(le_set_category,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
     combo_audio_channel = new QComboBox(this);
     combo_audio_channel->addItem("LEFT");
@@ -269,9 +276,18 @@ connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&man
     setLayout(lo_main);
     setWindowTitle("Manage Database");
 
-setWindowFlags(Qt::FramelessWindowHint);
+
+
+    setWindowFlags(Qt::FramelessWindowHint);
     showMaximized();
 
+    kboard =new Keyboard(this);
+    kboard->hide();
+
+    connect(le_set_title,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+    connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+    connect(le_set_language,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+    connect(le_set_category,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
 }
 
@@ -358,7 +374,7 @@ void managedb::setLanguage(){
 
     if(!le_set_language->text().isEmpty())
     setitem(le_set_language->text(), 3);
-    updateList();
+    //updateList();
 changeSave=true;
 }
 void managedb::setCategory(){
@@ -585,3 +601,6 @@ void managedb::dclose(){
 this->close();
 
 }
+
+
+

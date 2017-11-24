@@ -169,9 +169,10 @@ void mainWindow::createWidgets(){
     auto *lo_search = new QHBoxLayout;
 
     QLabel *label_search = new QLabel("SEARCH :", this);
-    le_search = new QLineEdit(this);
+    le_search = new CLineEdit(this);
     le_search->setFixedWidth(300);
     le_search->installEventFilter(this);
+    connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
     connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
 
     auto *button_backspace = new AeroButton(QIcon(":/usr/share/elroke/file/icon/backspace.png")," ", this);
@@ -513,11 +514,11 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
 
         if(event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return){
             //send item to playlist with enter key
-            if(qApp->focusWidget()==table){
+            if(focusWidget()==table){
                 addToPlaylist();
             }
             //play item with enter key
-            else if(qApp->focusWidget()==table_playlist){
+            else if(focusWidget()==table_playlist){
                 playPlayer();
             }
         }
@@ -793,18 +794,7 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
 
 
     //fhow hide keyboard
-    if(target==le_search){
 
-    if(event->type() == event->FocusIn){
-        int x =(table->width()-keyboard->width())/2;
-        int y = table->mapToGlobal(table->rect().bottomLeft()).y()-keyboard->height();
-        keyboard->move(QPoint(x,y));
-         keyboard->show();
-    }
-        if(event->type() == event->FocusOut){
-            keyboard->hide();
-        }
-}
 
 //         if(event->type() == event->FocusIn && target==table){
 //             this->setFocus();
@@ -1115,6 +1105,21 @@ bool mainWindow::isKeyValid(int key){
         return true;
 
     return false;
+
+
+}
+
+void mainWindow::showKeyboard(bool x){
+
+
+    if(x){
+        int x =(table->width()-keyboard->width())/2;
+        int y = table->mapToGlobal(table->rect().bottomLeft()).y()-keyboard->height();
+        keyboard->move(QPoint(x,y));
+         keyboard->show();
+    }
+      else
+            keyboard->hide();
 
 
 }
