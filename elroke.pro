@@ -20,12 +20,11 @@ SOURCES += main.cpp\
         addtodatabase.cpp \
         aerobutton.cpp \
         proxymodel.cpp \
-        #database.cpp \
         delay.cpp \
         keyboard.cpp \
-    editdb.cpp \
-    dbmanager.cpp \
-    opening.cpp
+        editdb.cpp \
+        dbmanager.cpp \
+        opening.cpp
 
 HEADERS  += mainwindow.h \
         player.h \
@@ -35,15 +34,15 @@ HEADERS  += mainwindow.h \
         proxymodel.h \
         delay.h \
         keyboard.h \
-    editdb.h \
-    dbmanager.h \
-    opening.h \
-    liststringfileparser.h
-        #database.h \
+        editdb.h \
+        dbmanager.h \
+        opening.h \
+        liststringfileparser.h
+
 
 DISTFILES +=
 
-CONFIG += console
+#CONFIG += console
 
 RESOURCES += \
     file.qrc

@@ -8,6 +8,7 @@
 #include "proxymodel.h"
 #include <QLabel>
 #include <QSqlTableModel>
+#include <QComboBox>
 
 class managedb : public QDialog
 {
@@ -18,13 +19,15 @@ public:
 
 private :
     QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
-    QCheckBox *check_singer,  *check_language,  *check_genre,   *check_genre_folder;
-    QLineEdit *le_singer, *le_language, *le_genre, *le_folder, *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
+    QCheckBox *check_singer,  *check_language,  *check_genre,   *cb_folder;
+    QLineEdit  *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
     QTableView *table;
     ProxyModel *proxy_model;
     QSqlTableModel *sql_model;
     QLabel *total_count_label;
     QLabel *selected_count_label;
+    QComboBox *combo_audio_channel;
+    bool changeSave=false;
 
 private slots:
     void swapItem(int, int);
@@ -45,6 +48,8 @@ private slots:
     void onListWidgetClicked(QListWidgetItem *);
     void updateList();
     void writeTextStream(const QString &file, QList<QString>set);
+    void setAudioChannel();
+    void dclose();
 
 };
 

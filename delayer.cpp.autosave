@@ -1,0 +1,38 @@
+#include "delayer.h"
+#include <QDebug>
+
+delay::delay(QObject *parent) :
+    QObject(parent),
+    m_cancelRequested(false)
+    //m_pauseRequired(false)
+{
+
+}
+
+void delay::doDelay(){
+    isWorking=true;
+qDebug()<<"before"<<isWorking;
+    for (int i=10;i>0;i--){
+        if ( m_cancelRequested) {
+            isWorking=false;
+            return;
+        }
+        QThread::sleep(1);
+        qDebug()<<i;
+    }
+
+
+
+           isWorking=false;
+           qDebug()<<"after"<<isWorking;
+           emit finished();
+           qDebug()<<"emitted";
+}
+
+
+void delay::cancelDelay()
+{
+qDebug()<<"cancel aceepeted";
+
+   m_cancelRequested = true;
+}

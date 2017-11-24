@@ -8,7 +8,6 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QTableWidget>
-#include <QComboBox>
 #include <QDebug>
 #include <QFile>
 #include <QDir>
@@ -37,34 +36,23 @@ managedb::managedb(QWidget *parent) :
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
 
     check_singer = new QCheckBox("Filter Singer", this);
-    QPushButton *button_replace_singer = new QPushButton("Replace", this);
-    QHBoxLayout *lo_cb = new QHBoxLayout;
-    lo_cb->addWidget(check_singer);
-    lo_cb->addWidget(button_replace_singer);
-    le_singer = new QLineEdit(this);
+
     lo_grup_singer->addWidget(list_singer);
-    lo_grup_singer->addLayout(lo_cb);
-    lo_grup_singer->addWidget(le_singer);
+    lo_grup_singer->addWidget(check_singer);
     grup_singer->setLayout(lo_grup_singer);
 
     QGroupBox *grup_language = new QGroupBox("Language", this);
 
-  list_language = new QListWidget(this);
+    list_language = new QListWidget(this);
     list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_language = new QCheckBox("Filter Language", this);
 
-    QPushButton *button_replace_language = new QPushButton("Replace",this);
-    QHBoxLayout *lo_cb_language = new QHBoxLayout;
-    lo_cb_language->addWidget(check_language);
-    lo_cb_language->addWidget(button_replace_language);
 
-    le_language = new QLineEdit(this);
     QVBoxLayout *lo_grup_language = new QVBoxLayout;
     lo_grup_language->addWidget(list_language);
-    lo_grup_language->addLayout(lo_cb_language);
-    lo_grup_language->addWidget(le_language);
+    lo_grup_language->addWidget(check_language);
     grup_language->setLayout(lo_grup_language);
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
@@ -73,16 +61,10 @@ managedb::managedb(QWidget *parent) :
      connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_genre = new QCheckBox("Filter Genre", this);
-    QPushButton *button_replace_genre = new QPushButton("Replace", this);
-    QHBoxLayout *lo_cb_genre = new QHBoxLayout;
-    lo_cb_genre->addWidget(check_genre);
-    lo_cb_genre->addWidget(button_replace_genre);
-    le_genre = new QLineEdit(this);
 
     QVBoxLayout *lo_grup_genre = new QVBoxLayout;
     lo_grup_genre->addWidget(list_genre);
-    lo_grup_genre->addLayout(lo_cb_genre);
-    lo_grup_genre->addWidget(le_genre);
+    lo_grup_genre->addWidget(check_genre);
     grup_genre->setLayout(lo_grup_genre);
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
@@ -92,21 +74,11 @@ managedb::managedb(QWidget *parent) :
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
 
-    QHBoxLayout *lo_cb_folder = new QHBoxLayout;
-    check_genre_folder = new QCheckBox("Filter Genre", this);
-    le_title_fixed = new QLineEdit(this);
+    cb_folder = new QCheckBox("Filter Path", this);
 
-    lo_cb_folder->addWidget(check_genre_folder);
-    lo_cb_folder->addStretch();
-    lo_cb_folder->addWidget(new QLabel("Filter Title", this));
-
-    QComboBox *cmb_filter = new QComboBox(this);
-    cmb_filter->addItems(QStringList()<<"Start with"<<"Contain"<<"End with");
-    lo_cb_folder->addWidget(cmb_filter);
-    lo_cb_folder->addWidget(le_title_fixed);
 
     lo_grup_folder->addWidget(list_folder);
-    lo_grup_folder->addLayout(lo_cb_folder);
+    lo_grup_folder->addWidget(cb_folder);
 
     grup_folder->setLayout(lo_grup_folder);
 
@@ -180,6 +152,14 @@ managedb::managedb(QWidget *parent) :
     le_set_category = new QLineEdit(this);
     le_set_category->setPlaceholderText("Category");
 
+    combo_audio_channel = new QComboBox(this);
+    combo_audio_channel->addItem("LEFT");
+    combo_audio_channel->addItem("RIGHT");
+    combo_audio_channel->addItem("STEREO");
+
+    QPushButton *button_set_audio_channel = new QPushButton("Set Audio Channel");
+    connect(button_set_audio_channel,&QPushButton::clicked,this,&managedb::setAudioChannel);
+
     table = new QTableView(this);
 
     QPushButton *button_selectall = new QPushButton("Select All", this);
@@ -194,7 +174,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     connect(button_save, &QPushButton::clicked, this, &managedb::save);
 
     QPushButton *button_close = new QPushButton("CLOSE", this);
-    connect(button_close,SIGNAL(pressed()),this,SLOT(close()));
+    connect(button_close,SIGNAL(pressed()),this,SLOT(dclose()));
 
     glo_button->addWidget( button_title_singer,0,0);
     glo_button->addWidget( button_singer_language,0,1);
@@ -210,11 +190,13 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     glo_button->addWidget(le_set_language,5,0);
     glo_button->addWidget(button_set_category,6,1);
     glo_button->addWidget(le_set_category,6,0);
-    glo_button->addWidget(button_selectall,7,1);
-    glo_button->addWidget(button_delete_selected,7,0);
-    glo_button->addWidget(button_save,8,0);
-    glo_button->addWidget(button_unselect,8,1);
-    glo_button->addWidget(button_close,9,0);
+    glo_button->addWidget(combo_audio_channel,7,0);
+    glo_button->addWidget(button_set_audio_channel,7,1);
+    glo_button->addWidget(button_selectall,8,1);
+    glo_button->addWidget(button_delete_selected,8,0);
+    glo_button->addWidget(button_save,9,0);
+    glo_button->addWidget(button_unselect,9,1);
+    glo_button->addWidget(button_close,10,0);
     glo_button->setMargin(0);
     frame_left_bottom->setLayout(glo_button);
 
@@ -296,6 +278,7 @@ setWindowFlags(Qt::FramelessWindowHint);
 void managedb::swapTitleSinger(){
 
     swapItem(1,2);
+      changeSave=true;
 
 }
 
@@ -318,7 +301,7 @@ void managedb::swapItem(int column1, int column2){
 void managedb::swapSingerLanguage(){
 
     swapItem(2,3);
-
+  changeSave=true;
 }
 
 void managedb::swapTitleLanguage(){
@@ -326,20 +309,22 @@ void managedb::swapTitleLanguage(){
 
     swapItem(1,3);
 
-
+  changeSave=true;
 }
 void managedb::swapSingerCategory(){
     swapItem(2,4);
+      changeSave=true;
 }
 
 void managedb::swapTitleCategory(){
     swapItem(1,4);
-
+  changeSave=true;
 }
 
 void managedb::swapLanguageCategory(){
 
     swapItem(3,4);
+    changeSave=true;
 }
 
 void managedb::setitem(QString text, int column){
@@ -359,13 +344,14 @@ void managedb::setTitle(){
 
     if(!le_set_title->text().isEmpty())
     setitem(le_set_title->text(), 1);
+    changeSave=true;
 
 }
 void managedb::setSinger(){
 
     if(!le_set_singer->text().isEmpty())
     setitem(le_set_singer->text(), 2);
-
+changeSave=true;
 
 }
 void managedb::setLanguage(){
@@ -373,13 +359,20 @@ void managedb::setLanguage(){
     if(!le_set_language->text().isEmpty())
     setitem(le_set_language->text(), 3);
     updateList();
-
+changeSave=true;
 }
 void managedb::setCategory(){
 
     if(!le_set_category->text().isEmpty())
     setitem(le_set_category->text(), 4);
+changeSave=true;
 
+}
+
+void managedb::setAudioChannel(){
+
+    setitem(combo_audio_channel->currentText(),5);
+    changeSave=true;
 
 }
 
@@ -409,6 +402,7 @@ void managedb::deleteItem(){
         sql_model->removeRow(proxy_model->mapToSource(ind).row());
     }
 
+    changeSave=true;
 }
 
 
@@ -419,6 +413,7 @@ void managedb::save(){
         qDebug()<<"error o submit"<<sql_model->lastError();
     sql_model->select();
     total_count_label->setText(QString::number(sql_model->rowCount()));
+    changeSave=false;
 
 updateList();
 }
@@ -575,4 +570,18 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
 void managedb::selectedCount(){
     QModelIndexList list = table->selectionModel()->selectedRows();
     selected_count_label->setText(QString::number(list.count()));
+}
+
+void managedb::dclose(){
+
+
+    if(changeSave){
+    QMessageBox::StandardButton warning;
+    warning = QMessageBox::question(this, "Warning","Change not save yet. Save?", QMessageBox::Yes | QMessageBox::No);
+    if(warning==QMessageBox::Yes){
+      sql_model->submitAll();
+    }
+    }
+this->close();
+
 }

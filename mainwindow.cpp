@@ -233,6 +233,9 @@ qDebug()<<"masuk ke playlist";
     autosave_playlist = new QAction("Auto save playlist", this);
     autosave_playlist->setCheckable(1);
     autosave_playlist->setChecked(1);
+    //load playlist
+    if(autosave_playlist->isChecked())
+        loadPlaylist();
 
     auto*save_as = new QAction("Save as",  this);
     connect(save_as, SIGNAL(triggered(bool)), this, SLOT(dialogSavePlaylist()));
@@ -422,7 +425,7 @@ void mainWindow::createShortcut(){
 }
 void mainWindow::getCategory(){
 
-QList <QString> s = listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer");
+QList <QString> s = listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category");
 
 qDebug()<<"s"<<s;
 }
@@ -841,8 +844,8 @@ void mainWindow::addToDatabase(){
 
     addtodatabase *atd = new addtodatabase(this);
 
-    connect(atd,SIGNAL(accepted()),sql_model,SLOT(select()));
-       connect(atd,SIGNAL(accepted()),this,SLOT(getCategory()));
+    connect(atd,SIGNAL(accepted()),this,SLOT(tableRule()));
+     connect(atd,SIGNAL(accepted()),this,SLOT(getCategory()));
     atd->exec();
 
 }

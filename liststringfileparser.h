@@ -11,6 +11,7 @@ class listStringFileParser
 public:
     static QList<QString> parse( const QString &file ){
 
+
         QFile f(file);
 
         if(!f.open(QIODevice::ReadOnly | QIODevice::Text)){
