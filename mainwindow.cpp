@@ -9,6 +9,7 @@
 #include "editdb.h"
 //#include "dbmanager.h"
 #include "opening.h"
+#include "liststringfileparser.h"
 
 #include <QAction>
 #include <QDebug>
@@ -421,24 +422,9 @@ void mainWindow::createShortcut(){
 }
 void mainWindow::getCategory(){
 
-    QStringList list;
-    QSet <QString> set;
+QList <QString> s = listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer");
 
-    for(int i=0; i<sql_model->rowCount(); i++){
-
-        list<<sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString();
-
-    }
-
-        set = list.toSet();
-
-        for(int i =0; i<set.size(); i++){
-
-            qDebug()<<set.values().at(i)<<list.count(set.values().at(i));
-
-
-        }
-
+qDebug()<<"s"<<s;
 }
 
 

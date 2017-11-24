@@ -37,7 +37,8 @@ HEADERS  += mainwindow.h \
         keyboard.h \
     editdb.h \
     dbmanager.h \
-    opening.h
+    opening.h \
+    liststringfileparser.h
         #database.h \
 
 DISTFILES +=

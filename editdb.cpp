@@ -1,5 +1,6 @@
 #include "editdb.h"
 #include "dbmanager.h"
+#include "liststringfileparser.h"
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QPushButton>
@@ -30,7 +31,7 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_singer = new QGroupBox("Singer", this);
 
    list_singer = new QListWidget(this);
-    list_singer->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/singer"));
+    list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
 
     connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
@@ -49,7 +50,7 @@ managedb::managedb(QWidget *parent) :
     QGroupBox *grup_language = new QGroupBox("Language", this);
 
   list_language = new QListWidget(this);
-    list_language->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/language"));
+    list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_language = new QCheckBox("Filter Language", this);
@@ -68,7 +69,7 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
    list_genre = new QListWidget(this);
-    list_genre->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/category"));
+    list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
      connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     check_genre = new QCheckBox("Filter Genre", this);
@@ -86,7 +87,7 @@ managedb::managedb(QWidget *parent) :
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
    list_folder = new QListWidget(this);
-    list_folder->addItems(readListOfFile(QDir::homePath()+"/.elroke/meta/path"));
+    list_folder->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/path"));
      connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
@@ -234,23 +235,27 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
 
-
+connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
 
     QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spRight.setHorizontalStretch(2);
 
     QVBoxLayout *lo_bottom_right = new QVBoxLayout;
 
-    QHBoxLayout *lo_label_count = new QHBoxLayout;
+    QHBoxLayout *lo_label_total_count = new QHBoxLayout;
 
-    count_item = new QLabel(QString::number(sql_model->rowCount()), this);
+    total_count_label = new QLabel(QString::number(sql_model->rowCount()), this);
+    selected_count_label = new QLabel(QString::number(0), this);
 
-    lo_label_count->addWidget(new QLabel("Total : ", this));
-    lo_label_count->addWidget(count_item);
-    lo_label_count->addStretch();
+    lo_label_total_count->addWidget(new QLabel("Selected : ", this));
+    lo_label_total_count->addWidget(selected_count_label);
+    lo_label_total_count->addStretch();
+    lo_label_total_count->addWidget(new QLabel("Total : ", this));
+    lo_label_total_count->addWidget(total_count_label);
+    lo_label_total_count->addStretch();
 
     lo_bottom_right->addWidget(table);
-    lo_bottom_right->addLayout(lo_label_count);
+    lo_bottom_right->addLayout(lo_label_total_count);
     lo_bottom_right->setMargin(0);
 
     QWidget *w_bottom  = new QWidget(this);
@@ -413,35 +418,9 @@ void managedb::save(){
     if(!sql_model->submitAll())
         qDebug()<<"error o submit"<<sql_model->lastError();
     sql_model->select();
-    count_item->setText(QString::number(sql_model->rowCount()));
+    total_count_label->setText(QString::number(sql_model->rowCount()));
 
 updateList();
-}
-
-QList<QString> managedb::readListOfFile(const QString &filename){
-
-    QFile file(filename);
-
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qDebug()<<"cant read singer";
-
-    }
-
-    QTextStream stream(&file);
-
-    QString line = stream.readLine();
-    QList<QString>list;
-
-    while(line!=NULL){
-
-        list<<line;
-        line=stream.readLine();
-    }
-
-    qSort(list.begin(), list.end());
-        return list;
-
-
 }
 
 
@@ -591,4 +570,9 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
          f.close();
 
 
+}
+
+void managedb::selectedCount(){
+    QModelIndexList list = table->selectionModel()->selectedRows();
+    selected_count_label->setText(QString::number(list.count()));
 }

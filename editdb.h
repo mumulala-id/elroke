@@ -23,7 +23,8 @@ private :
     QTableView *table;
     ProxyModel *proxy_model;
     QSqlTableModel *sql_model;
-    QLabel *count_item;
+    QLabel *total_count_label;
+    QLabel *selected_count_label;
 
 private slots:
     void swapItem(int, int);
@@ -40,7 +41,7 @@ private slots:
     void swapLanguageCategory();
     void deleteItem();
     void save();
-    QList<QString>readListOfFile(const QString &file);
+    void selectedCount();
     void onListWidgetClicked(QListWidgetItem *);
     void updateList();
     void writeTextStream(const QString &file, QList<QString>set);
