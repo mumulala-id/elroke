@@ -106,6 +106,7 @@ managedb::managedb(QWidget *parent) :
 
     proxy_model = new ProxyModel(this);
     proxy_model->setSourceModel(sql_model);
+    proxy_model->setAlignment(6, Qt::AlignCenter);
 
 
     QHBoxLayout *lo_bottom = new QHBoxLayout;
@@ -150,14 +151,13 @@ managedb::managedb(QWidget *parent) :
 
     le_set_language = new CLineEdit(this);
     le_set_language->setPlaceholderText("Language");
-//    connect(le_set_language,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
     QPushButton *button_set_category = new QPushButton("Set Category", this);
     connect(button_set_category,&QPushButton::clicked,this,&managedb::setCategory);
 
     le_set_category = new CLineEdit(this);
     le_set_category->setPlaceholderText("Category");
-//    connect(le_set_category,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+
 
     combo_audio_channel = new QComboBox(this);
     combo_audio_channel->addItem("LEFT");
@@ -457,7 +457,7 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
 
 
     for(int i=0; i<sql_model->rowCount();i++){
-        if(column==6){
+        if(column==7){
             if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString().startsWith(text))
                 table->selectRow(i);
         }
@@ -490,7 +490,7 @@ void managedb::updateList(){
          set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
           set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
           QFileInfo info;
-          info.setFile(sql_model->data(sql_model->index(i,6),Qt::DisplayRole).toString());
+          info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
            set_folder.insert(info.path());
 
 
@@ -524,7 +524,7 @@ void managedb::updateList(){
 
 managedb::~managedb(){
 
-
+//update latest change
     QSet<QString>set_singer;
     QSet<QString>set_language;
     QSet<QString>set_category;
@@ -536,7 +536,7 @@ managedb::~managedb(){
          set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
           set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
           QFileInfo info;
-          info.setFile(sql_model->data(sql_model->index(i,6),Qt::DisplayRole).toString());
+          info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
            set_folder.insert(info.path());
 
 

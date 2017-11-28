@@ -70,7 +70,8 @@ private :
 //    QTimer delay_timer;
     bool on_delay=false;
     Keyboard *keyboard;
-    dbmanager *db_playlist;
+    dbmanager *db;
+//    dbmanager *db_playlist;
 
     QWidget *spacer;
     QPushButton *button_audio_channel;

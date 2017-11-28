@@ -17,9 +17,7 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
     case add :
         conname = "elroke_add";
         break;
-    case playlist:
-        conname = "elroke_playlist";
-        break;
+
 
     }
 
@@ -37,7 +35,6 @@ void dbmanager::connectToDB(){
     }
     else{
 
-qDebug()<<"db opened";
         openDB();
     }
 
@@ -77,12 +74,8 @@ bool dbmanager::createTable(){
 QSqlQuery query(db);
 
 //create playlist table
-    if(conname=="elroke_playlist"){
-        query.prepare("CREATE TABLE IF NOT EXISTS playlist123 (ID INTEGER UNIQUE PRIMARY KEY, PATH TEXT,TITLE TEXT, SINGER TEXT, CHANNEL TEXT)");
 
-    }
-    else
-    query.prepare("CREATE TABLE IF NOT EXISTS elroke123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PATH TEXT)");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT )");
 
     if(query.exec()){
         qDebug()<<"table created";
@@ -135,26 +128,46 @@ bool dbmanager::insertIntoTable(const QVariantList &data){
 
     QSqlQuery  query(db);
 
-    if(conname=="elroke_playlist"){
-query.prepare("INSERT INTO playlist123 (PATH,  PLAYLIST, SINGER,  CHANNEL  ) VALUES (:Path, :Title, :Singer, :Channel )");
-query.bindValue(":Path", data[0].toString());
-query.bindValue(":Title", data[1].toString());
-query.bindValue(":Singer", data[2].toString());
- query.bindValue(":Channel", data[3].toString());
-}
-else{
 
-   query.prepare("INSERT INTO elroke123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PATH  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Path )");
 
-   query.bindValue(":Title", data[0].toString());
-   query.bindValue(":Singer", data[1].toString());
-    query.bindValue(":Language", data[2].toString());
+   query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path )");
+
+     query.bindValue(":Title", data[0].toString());
+     query.bindValue(":Singer", data[1].toString());
+     query.bindValue(":Language", data[2].toString());
      query.bindValue(":Category", data[3].toString());
      query.bindValue(":Channel", data[4].toString());
+     query.bindValue(":Playtimes", 0);
      query.bindValue(":Path", data[5].toString());
-}
+
      if(!query.exec())
          return false;
      return true;
+
+}
+
+void dbmanager::updatePlayedTime(int id){
+
+    QSqlQuery query(db);
+  int value;
+    query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+QString::number(id));
+
+    if(query.exec()){
+        query.first();
+          value = query.value(0).toInt()+1;
+    }
+    query.clear();
+    prepare();
+
+    query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+QString::number(id));
+    if(!query.exec())
+        qDebug()<<"cant update played time";
+    else
+        submit();
+
+query.clear();
+
+
+
 
 }

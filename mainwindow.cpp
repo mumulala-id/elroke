@@ -147,12 +147,12 @@ void mainWindow::createWidgets(){
     header_palette.setColor(QPalette::ButtonText, Qt::blue);
     header_palette.setColor(QPalette::Button, Qt::transparent);
 
-    dbmanager *db = new dbmanager(dbmanager::show, this);
+    db = new dbmanager(dbmanager::show, this);
     db->setDBName("elroke");
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
-  // sql_model->setHeaderData()
+    sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
     proxy_model = new ProxyModel(this);
     proxy_model->setSourceModel(sql_model);
@@ -168,10 +168,10 @@ void mainWindow::createWidgets(){
 
     auto *lo_search = new QHBoxLayout;
 
-    QLabel *label_search = new QLabel("SEARCH :", this);
+    auto *label_search = new QLabel("SEARCH :", this);
     le_search = new CLineEdit(this);
     le_search->setFixedWidth(300);
-    le_search->installEventFilter(this);
+
     connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
     connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
 
@@ -201,19 +201,20 @@ void mainWindow::createWidgets(){
     QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spLeft.setHorizontalStretch(3);
     w_table_left->setSizePolicy(spLeft);
-qDebug()<<"masuk ke playlist";
+
     auto *lo_playlist = new QVBoxLayout;
     model_playlist =new QStandardItemModel(this);
-    model_playlist->setColumnCount(4);
-    model_playlist->setHeaderData(1,Qt::Horizontal,"PLAYLIST");
+    model_playlist->setColumnCount(5);
+    model_playlist->setHeaderData(2,Qt::Horizontal,"PLAYLIST");
 
 
     table_playlist = new QTableView(this);
     table_playlist->setModel(model_playlist);
-    table_playlist->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+    table_playlist->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
     table_playlist->hideColumn(0);
-    table_playlist->hideColumn(2);
+    table_playlist->hideColumn(1);
     table_playlist->hideColumn(3);
+    table_playlist->hideColumn(4);
     table_playlist->verticalHeader()->hide();
     table_playlist->setShowGrid(0);
     table_playlist->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -225,6 +226,7 @@ qDebug()<<"masuk ke playlist";
     table_playlist->setPalette(table_palette);
     table_playlist->installEventFilter(this);
     connect(table_playlist,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
+
     auto *lo_button_playlist = new QHBoxLayout;
 
     auto *button_menu = new AeroButton(this);
@@ -474,29 +476,34 @@ void mainWindow::addToPlaylist(){
   //  int rowCount = model_playlist->rowCount();
     model_playlist->setRowCount(model_playlist->rowCount()+1);
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
-    QString path =  sql_model->data(sql_model->index(row,6),Qt::DisplayRole).toString();
+    int id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toInt();
+    QString path =  sql_model->data(sql_model->index(row,7),Qt::DisplayRole).toString();
     QString title = sql_model->data(sql_model->index(row,1),Qt::DisplayRole).toString();
     QString singer = sql_model->data(sql_model->index(row,2),Qt::DisplayRole).toString();
     QString channel = sql_model->data(sql_model->index(row,5),Qt::DisplayRole).toString();
 
+    QStandardItem *item_id = new QStandardItem;
+    item_id->setText(QString::number(id));
+    model_playlist->setItem(model_playlist->rowCount()-1,0,item_id);
+
     QStandardItem *item_path = new QStandardItem;
     item_path ->setText( path);
-    model_playlist->setItem(model_playlist->rowCount()-1,0,item_path);
+    model_playlist->setItem(model_playlist->rowCount()-1,1,item_path);
 
     QStandardItem *item_title = new QStandardItem;
     item_title->setText(title);
     item_title->setTextAlignment(Qt::AlignCenter);
-    model_playlist->setItem(model_playlist->rowCount()-1,1,item_title);
+    model_playlist->setItem(model_playlist->rowCount()-1,2,item_title);
 
     QStandardItem *item_singer = new QStandardItem;
     item_singer->setText(singer);
-    model_playlist->setItem(model_playlist->rowCount()-1,2,item_singer);
+    model_playlist->setItem(model_playlist->rowCount()-1,3,item_singer);
 
 
 
     QStandardItem *item_channel = new QStandardItem;
     item_channel->setText(channel);
-    model_playlist->setItem(model_playlist->rowCount()-1,3,item_channel);
+    model_playlist->setItem(model_playlist->rowCount()-1,4,item_channel);
 
 
     //set curretn item at 0
@@ -632,13 +639,14 @@ void mainWindow::clearPlaylist(){
 void mainWindow::deleteItemPlaylist(){
 
          QModelIndex index = table_playlist->selectionModel()->currentIndex();
-       model_playlist->removeRow(index.row());
+        model_playlist->removeRow(index.row());
 
 }
 
-
 void mainWindow::playPlayer(){
 
+
+    //IF TABLE EMPTY RETURN
             if(model_playlist->rowCount()==0){
 
                 video->close();
@@ -646,28 +654,29 @@ void mainWindow::playPlayer(){
 
                  return;
             }
-
+//STOP IF PLAYING
             if(video->isPlaying()){
                 video->stop();
             }
 
             int cur = table_playlist->selectionModel()->currentIndex().row();
+int id = model_playlist->item(cur,0)->text().toInt();
+            QString file= model_playlist->item(cur,1)->text();
+            QString title = model_playlist->item(cur,2)->text();
+            QString singer = model_playlist->item(cur,3)->text();
+            channel = model_playlist->item(cur,4)->text();
 
-            QString file= model_playlist->item(cur,0)->text();
-            QString title = model_playlist->item(cur,1)->text();
-            QString singer = model_playlist->item(cur,2)->text();
-            channel = model_playlist->item(cur,3)->text();
 
-
+            //CHECK IF FILE EXIST
             if (!QFile(file).exists()){
 
-               QMessageBox *message = new QMessageBox;
-               message->setIcon(QMessageBox::Information);
-               message->setInformativeText("File is not found, maybe drive is not mounted");
-               message->setWindowFlags(Qt::FramelessWindowHint);
-               message->setStandardButtons(QMessageBox::NoButton);
-               message->show();
-               QTimer::singleShot(3000, message,SLOT(close()));
+               QMessageBox message;
+               message.setIcon(QMessageBox::Information);
+               message.setInformativeText("File is not found, maybe drive is not mounted");
+               message.setWindowFlags(Qt::FramelessWindowHint);
+               message.setStandardButtons(QMessageBox::Close);
+               message.exec();
+
 
               return;
            }
@@ -676,6 +685,9 @@ void mainWindow::playPlayer(){
            video->setMeta(title, singer);
 
            video->play();
+           db->updatePlayedTime(id);
+           sql_model->select();
+//tableRule();
 
             if(button_lock_playlist->isChecked()){
                 //move to last
@@ -689,7 +701,6 @@ void mainWindow::playPlayer(){
 }
 
 void mainWindow::setaudiochannelAuto(){
-
 
         //wait while video get fully loaded but this break gui
         this_thread::sleep_for(chrono::milliseconds(100));
@@ -792,17 +803,6 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
       }
 }
 
-
-    //fhow hide keyboard
-
-
-//         if(event->type() == event->FocusIn && target==table){
-//             this->setFocus();
-//         }
-
-//         if(event->type() == event->FocusIn && target==table_playlist){
-//             this->setFocus();
-//         }
 
 
         return QObject::eventFilter(target, event);
@@ -963,7 +963,7 @@ void mainWindow::writePlaylist(const QString &playlistname){
 
      for(int i=0; i<model_playlist->rowCount(); i++){
 
-            stream<<model_playlist->item(i,0)->text()<<'\t'<<model_playlist->item(i,1)->text()<<'\t'<<model_playlist->item(i,2)->text()<<'\t'<<model_playlist->item(i,3)->text()<<'\n';
+            stream<<model_playlist->item(i,0)->text()<<'\t'<<model_playlist->item(i,1)->text()<<'\t'<<model_playlist->item(i,2)->text()<<'\t'<<model_playlist->item(i,3)->text()<<'\t'<<model_playlist->item(i,4)->text()<<'\n';
 
      }
 
@@ -991,31 +991,36 @@ void mainWindow::loadPlaylist(const QString &s){
 
     int line_number=0;
 
-    QStandardItem *item_path, *item_title, *item_singer, *item_channel;
+    QStandardItem *item_id, *item_path, *item_title, *item_singer, *item_channel;
 
     while(stuff!=NULL){
-        QString path=stuff.split('\t').at(0);
-        QString title=stuff.split('\t').at(1);
-        QString singer=stuff.split('\t').at(2);
-        QString channel=stuff.split('\t').at(3);
+        QString id=stuff.split('\t').at(0);
+        QString path=stuff.split('\t').at(1);
+        QString title=stuff.split('\t').at(2);
+        QString singer=stuff.split('\t').at(3);
+        QString channel=stuff.split('\t').at(4);
         model_playlist->setRowCount(line_number+1);
+
+        item_id =  new QStandardItem;
+        item_id->setText(path);
+        model_playlist->setItem(line_number,0, item_id);
 
         item_path =  new QStandardItem;
         item_path->setText(path);
-        model_playlist->setItem(line_number,0, item_path);
+        model_playlist->setItem(line_number,1, item_path);
 
         item_title = new QStandardItem;
         item_title->setText(title);
         item_title->setTextAlignment(Qt::AlignCenter);
-        model_playlist->setItem(line_number,1,item_title);
+        model_playlist->setItem(line_number,2,item_title);
 
         item_singer = new QStandardItem;
         item_singer->setText(singer);
-        model_playlist->setItem(line_number,2,item_singer);
+        model_playlist->setItem(line_number,3,item_singer);
 
         item_channel = new QStandardItem;
         item_channel->setText(channel);
-        model_playlist->setItem(line_number,3, item_channel);
+        model_playlist->setItem(line_number,4, item_channel);
 
          line_number++;
          stuff= stream.readLine();
@@ -1072,9 +1077,10 @@ void mainWindow::tableRule(){
 
     //rebuild rule after sql_model->clear();
     //is there better way to update table?
-    sql_model->setTable("elroke123");
+    sql_model->setTable("ELROKE123");
     sql_model->setSort(1,Qt::AscendingOrder);
     sql_model->select();
+
     table->verticalHeader()->hide();
     table->setShowGrid(0);
     table->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
@@ -1087,6 +1093,7 @@ void mainWindow::tableRule(){
     table->hideColumn(4);
     table->hideColumn(5);
     table->hideColumn(6);
+    table->hideColumn(7);
     table->installEventFilter(this);
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new NoFocusDelegate());

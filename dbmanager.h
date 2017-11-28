@@ -9,14 +9,14 @@ class dbmanager
 {
 
 public:
-    enum dbcontype{ show, edit, add, playlist};
+    enum dbcontype{ show, edit, add};
      dbmanager(dbcontype contype, QObject *parent=0);
 
 private:
 
     dbcontype contype;
     QSqlDatabase db;
-   QString dbname;
+    QString dbname;
     QString dbdir = QDir::homePath()+"/.elroke";
     QString conname="";
 
@@ -31,7 +31,7 @@ public slots:
       void closeDB();
       void rollBack();
       bool insertIntoTable(const QVariantList & );
-
+      void updatePlayedTime(int id);
 
 private slots:
 
