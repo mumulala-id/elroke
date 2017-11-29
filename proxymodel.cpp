@@ -26,6 +26,7 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
 
 QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int role) const {
 
+
     return sourceModel()->headerData(section, orientation, role);
 }
 

@@ -37,7 +37,7 @@ about::about(QWidget *parent) :
     //license
     QTextEdit *license_txt = new QTextEdit(this);
 
-    QFile file(":/usr/share/halohalo/file/LICENSE");
+    QFile file(":/usr/share/elroke/file/LICENSE");
     file.open(QFile::ReadOnly | QFile::Text);
 
     QTextStream readfile(&file);

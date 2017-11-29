@@ -2,6 +2,8 @@
 #include <QDebug>
 #include <QVariant>
 #include <QSqlQuery>
+#include <QSqlError>
+#include <QDate>
 dbmanager::dbmanager(dbcontype contype, QObject *parent)
 {
     Q_UNUSED(parent)
@@ -21,14 +23,16 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
 
     }
 
+
     db = QSqlDatabase::database(conname);
+    QSqlQuery query(db);
+    db.setDatabaseName(dbname);
 
-    }
-
+}
 
 void dbmanager::connectToDB(){
 
-    if(!QFile(dbname).exists()){
+    if(!QFile(QDir::homePath()+"/.elroke/elroke.db").exists()){
 
         restoreDB();
 
@@ -47,8 +51,10 @@ bool dbmanager::restoreDB(){
 
     if(openDB()){
 
-        if(!createTable())
+        if(!createTable()){
+            qDebug()<<"cant create table"<<db.lastError();
             return false;
+        }
         return true;
 
     }
@@ -60,7 +66,7 @@ bool dbmanager::restoreDB(){
 bool dbmanager::openDB(){
 
   if(!db.open()){
-      qDebug()<<"Database not open";
+      qDebug()<<"Database not open"<<db.lastError();
       return false;
   }
 
@@ -75,7 +81,7 @@ QSqlQuery query(db);
 
 //create playlist table
 
-    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT )");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT)");
 
     if(query.exec()){
         qDebug()<<"table created";
@@ -101,19 +107,6 @@ void dbmanager::submit(){
     db.commit();
 }
 
-void dbmanager::setDBName(const QString &name){
-
-    dbname=dbdir+"/"+name+".db";
-    db.setDatabaseName(dbname);
-
-}
-
-void dbmanager::setDBDir(const QString &dirname){
-
-    dbdir = QDir::homePath()+"/.elroke/"+dirname;
-
-
-}
 
 QString dbmanager::dbName(){
     return dbname;
@@ -128,9 +121,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data){
 
     QSqlQuery  query(db);
 
-
-
-   query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path )");
+   query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path , :Date)");
 
      query.bindValue(":Title", data[0].toString());
      query.bindValue(":Singer", data[1].toString());
@@ -139,6 +130,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data){
      query.bindValue(":Channel", data[4].toString());
      query.bindValue(":Playtimes", 0);
      query.bindValue(":Path", data[5].toString());
+     query.bindValue(":Date", QDate::currentDate().toString("yyyy-MM-dd"));
 
      if(!query.exec())
          return false;
@@ -149,7 +141,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data){
 void dbmanager::updatePlayedTime(int id){
 
     QSqlQuery query(db);
-  int value;
+  int value=0;
     query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+QString::number(id));
 
     if(query.exec()){

@@ -3,9 +3,7 @@
 #include <QGuiApplication>
 #include <QGridLayout>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QDebug>
-//#include <QPushButton>
 
 Keyboard::Keyboard(QWidget *parent) :
     QWidget(parent)
@@ -23,19 +21,18 @@ Keyboard::Keyboard(QWidget *parent) :
         main_layout->addWidget(keyButton[i], row, column);
     }
 
-    main_layout->setHorizontalSpacing(0);
-    main_layout->setVerticalSpacing(0);
+
     AeroButton *space = new AeroButton(this);
     space->setText("SPACE");
     space->setFocusPolicy(Qt::NoFocus);
     space->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(space,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
+    main_layout->setHorizontalSpacing(0);
+    main_layout->setVerticalSpacing(0);
     main_layout->addWidget(space,1,16,1,4);
     main_layout->setSpacing(0);
     main_layout->setMargin(0);
-    main_layout->setVerticalSpacing(0);
-    main_layout->setHorizontalSpacing(0);
     main_layout->setSizeConstraint( QLayout::SetFixedSize );
 
     setLayout(main_layout);
@@ -86,6 +83,7 @@ void Keyboard::onButtonClicked(){
             QCoreApplication::sendEvent(receiver,&releaseEvent);
 
         }
+
 else{
     switch(text.unicode()){
     case '0':
@@ -202,11 +200,7 @@ else{
 
     QCoreApplication::sendEvent(receiver, &pressEvent);
     QCoreApplication::sendEvent(receiver,&releaseEvent);
-
-
 }
-
-
 
 }
 

@@ -9,15 +9,15 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
-            qDebug()<<"sqlite is not installed";
+            qDebug()<<"SQLITE is not installed";
 
     //create  database connection
-    QSqlDatabase A=  QSqlDatabase::addDatabase("QSQLITE","elroke_show");
+   QSqlDatabase A=  QSqlDatabase::addDatabase("QSQLITE","elroke_show");
     QSqlDatabase B = QSqlDatabase::addDatabase("QSQLITE","elroke_add");
     QSqlDatabase C = QSqlDatabase::addDatabase("QSQLITE", "elroke_edit");
 
     mainWindow w;
-w.showFullScreen();
+    w.showFullScreen();
 
 
     return a.exec();

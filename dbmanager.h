@@ -16,15 +16,13 @@ private:
 
     dbcontype contype;
     QSqlDatabase db;
-    QString dbname;
+    QString dbname=QDir::homePath()+"/.elroke/elroke.db";
     QString dbdir = QDir::homePath()+"/.elroke";
     QString conname="";
 
 public slots:
     void connectToDB();
     QSqlDatabase database(){return db;}
-    void setDBName(const QString &);
-    void setDBDir(const QString &);
     void prepare();
     void submit();
      QString dbName();
@@ -34,14 +32,9 @@ public slots:
       void updatePlayedTime(int id);
 
 private slots:
-
-
     bool restoreDB();
     bool openDB();
     bool createTable();
-
-
-
 
 public slots:
 

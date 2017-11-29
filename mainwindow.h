@@ -23,6 +23,7 @@
 //#include <QApplication>
 #include <QSqlTableModel>
 //#include <QStackedLayout>
+#include <QPainter>
 
 
 class mainWindow : public QDialog
@@ -116,7 +117,9 @@ private slots:
     void tableRule();
     bool isKeyValid(int);
     void showKeyboard(bool);
-
+    void videoInstance();
+    void keyBoardInstance();
+    void fontSetup();
 
 
 protected :
@@ -134,6 +137,17 @@ protected:
                         QStyleOptionViewItem itemOption(option);
                         if (itemOption.state & QStyle::State_HasFocus)
                             itemOption.state = itemOption.state ^ QStyle::State_HasFocus;
+
+                        if(option.state & QStyle::State_Selected)
+                                {
+                                    painter->save();
+                                    QPen pen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                                    int w = pen.width()/2;
+                                    painter->setPen(pen);
+                                    painter->drawRect(option.rect.adjusted(w,w,-w,-w));
+                                    painter->restore();
+                                }
+
                         QStyledItemDelegate::paint(painter, itemOption, index);
                     }
 };

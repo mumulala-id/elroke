@@ -64,7 +64,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      file_model->setRootPath(pakDir());
 
-     //list name files
+     //list for show files
      lw_list = new QListWidget(this);
 
      QHBoxLayout *lo_drive = new QHBoxLayout;
@@ -229,7 +229,7 @@ void addtodatabase::saveToDatabase(){
      QString namefile;
 
      dbmanager *db = new dbmanager(dbmanager::add, this);
-     db->setDBName("elroke");
+//     db->setDBName("elroke");
      db->connectToDB();
      db->prepare();
 
@@ -237,7 +237,6 @@ void addtodatabase::saveToDatabase(){
 
 
     QVariantList data;
- //   QSet<QString> set_title;
     QSet<QString>set_singer;
     QSet<QString>set_language;
     QSet<QString>set_category;
@@ -322,7 +321,6 @@ void addtodatabase::saveToDatabase(){
     qSort(list_singer.begin(), list_singer.end());
     qSort(list_language.begin(), list_language.end());
     qSort(list_genre.begin(), list_genre.end());
-//    grabMetadata(set_singer, set_language, set_category, set_folder);
 
     writeTextStream(QDir::homePath()+"/.elroke/meta/singer", list_singer);
      writeTextStream(QDir::homePath()+"/.elroke/meta/language", list_language);

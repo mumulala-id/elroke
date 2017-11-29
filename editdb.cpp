@@ -94,11 +94,11 @@ managedb::managedb(QWidget *parent) :
 
     //DATABASE
     dbmanager *db = new dbmanager(dbmanager::edit, this);
-    db->setDBName("elroke");
+
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
-    sql_model->setTable("elroke123");
+    sql_model->setTable("ELROKE123");
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sql_model->select();
 
@@ -220,7 +220,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     table->verticalHeader()->hide();
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table->setSelectionMode(QAbstractItemView::MultiSelection);
+    table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
 

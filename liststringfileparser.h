@@ -13,6 +13,12 @@ public:
 
 
         QFile f(file);
+         QList<QString>list;
+if(!f.exists()){
+    qDebug()<<file+" not found";
+    return list;
+}
+
 
         if(!f.open(QIODevice::ReadOnly | QIODevice::Text)){
             qDebug()<<"cant read singer";
@@ -22,7 +28,7 @@ public:
         QTextStream stream(&f);
 
         QString line = stream.readLine();
-        QList<QString>list;
+
 
         while(line!=NULL){
 

@@ -2,6 +2,7 @@
     <qresource prefix="/usr/share/elroke">
         <file>file/font/Xolonium.ttf</file>
         <file>file/background/background.jpg</file>
+         <file>file/background/backgroundTrans.png</file>
         <file>file/icon/next.png</file>
         <file>file/icon/left.png</file>
         <file>file/icon/play.png</file>
