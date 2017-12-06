@@ -21,7 +21,7 @@ private:
          QPushButton *keyButton[36];
 
 private slots:
-    AeroButton *createButton(const QString &, const char *member);
+    AeroButton *createButton(const QString &);
     void onButtonClicked();
 
 

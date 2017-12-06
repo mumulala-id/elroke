@@ -7,8 +7,6 @@
 #include "addtodatabase.h"
 #include "aerobutton.h"
 #include "editdb.h"
-//#include "dbmanager.h"
-//#include "opening.h"
 #include "liststringfileparser.h"
 
 #include <QAction>
@@ -34,13 +32,16 @@ mainWindow::mainWindow(QWidget *parent)
     : QDialog(parent)
 {
     fontSetup();
+
     createWidgets();
+    keyBoardInstance();
     videoInstance();
     createShortcut();
     setBackground();
 
     getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
+  // setAttribute( Qt::AA_EnableHighDpiScaling);
 
 
 }
@@ -54,41 +55,41 @@ void mainWindow::createWidgets(){
 
     QHBoxLayout *lo_top = new QHBoxLayout;
 
-    AeroButton *pb_menu = new AeroButton(QIcon(":/usr/share/elroke/file/icon/menu.png")," ", this);
+    auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
+    pb_menu->setFlat(1);
+
     pb_menu->setFocusPolicy(Qt::NoFocus);
 
-
-
-
-
-
     QAction *manage_database = new QAction("Manage Database", this);
+    manage_database->setFont(font());
     connect(manage_database, SIGNAL(triggered(bool)),this,SLOT(openManagedb()));
 
-    QAction *preferences_act = new QAction("Preferences", this);
+    auto *preferences_act = new QAction("Preferences", this);
 //    connect(preferences_act,SIGNAL(triggered(bool)),this,SLOT(openPreferences()));
 
-    QAction *about_act = new QAction("About", this);
+    auto *about_act = new QAction("About", this);
     connect(about_act,SIGNAL(triggered(bool)),this,SLOT(openAbout()));
 
-    QAction *quit = new QAction("Quit", this);
-    connect(quit,SIGNAL(triggered(bool)),qApp,SLOT(quit()));
+    auto *quit = new QAction("Quit", this);
+    connect(quit,SIGNAL(triggered(bool)),this,SLOT(close()));
 
-    QMenu *menu = new QMenu(this);
+    auto *menu = new QMenu(this);
     menu->setFont(font());
 
-    QMenu *menu_database = new QMenu("Database", this);
-    QAction *set_berkas = new QAction("Add to Database", this);
-    connect(set_berkas, SIGNAL(triggered(bool)), this,SLOT(addToDatabase()));
+    auto *menu_database = new QMenu("Database", this);
+    auto *add_to_database= new QAction("Add to Database", this);
+    add_to_database->setFont(font());
+    connect(add_to_database, SIGNAL(triggered(bool)), this,SLOT(addToDatabase()));
 
     menu->addMenu(menu_database);
-    menu_database->addAction(set_berkas);
+    menu_database->addAction(add_to_database);
     menu_database->addAction(manage_database);
     menu->addAction(preferences_act);
     menu->addAction(about_act);
     menu->addAction(quit);
 
     pb_menu->setMenu(menu);
+//        pb_menu->menu()->
 
     AeroButton *pb_all = new AeroButton("ALL", this);
     AeroButton *button_cat_indonesia = new AeroButton("category1", this);
@@ -97,8 +98,8 @@ void mainWindow::createWidgets(){
     AeroButton *button_cat_pop = new AeroButton("category4", this);
     AeroButton *button_cat_dangdut = new AeroButton("category5", this);
 
-    combo_cat = new QComboBox(this);
-    combo_cat->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+//    combo_cat = new QComboBox(this);
+//    combo_cat->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
 
 //show clock
@@ -108,7 +109,9 @@ void mainWindow::createWidgets(){
     timer->start(60000);
     showClock();
 
-    lo_top->addWidget(pb_menu,0,Qt::AlignLeft);
+
+    lo_top->addWidget(pb_menu);
+        lo_top->addStretch();
     lo_top->addWidget(pb_all);
     lo_top->addWidget(button_cat_indonesia);
     lo_top->addWidget(button_cat_barat);
@@ -116,11 +119,24 @@ void mainWindow::createWidgets(){
     lo_top->addWidget(button_cat_pop);
     lo_top->addWidget(button_cat_dangdut);
     lo_top->addStretch();
-    lo_top->addWidget(new QLabel("OTHER :", this));
-    lo_top->addWidget(combo_cat);
-    lo_top->addStretch();
+//    lo_top->addWidget(new QLabel("OTHER :", this));
+//    lo_top->addWidget(combo_cat);
+//    lo_top->addStretch();
     lo_top->addWidget(clock);
     lo_top->setSpacing(0);
+    lo_top->setMargin(0);
+
+    QWidget *widget_top = new QWidget(this);
+    QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
+    QPalette palette_bg;
+
+    bg_trans =   bg_trans.scaled(widget_top->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    palette_bg.setBrush(QPalette::Background, bg_trans);
+
+
+    widget_top->setAutoFillBackground(1);
+    widget_top->setPalette(palette_bg);
+    widget_top->setLayout(lo_top);
 
 
     QHBoxLayout *lo_table = new QHBoxLayout;
@@ -159,26 +175,26 @@ void mainWindow::createWidgets(){
 
     auto *label_search = new QLabel("SEARCH :", this);
     le_search = new CLineEdit(this);
- //   le_search->setFixedWidth(300);
 
     connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
     connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
 
-    auto *button_backspace = new AeroButton(QIcon(":/usr/share/elroke/file/icon/backspace.png")," ", this);
+    auto *button_backspace = new AeroButton(QIcon(":/usr/share/elroke/file/icon/backspace.png"), this);
     button_backspace->setFocusPolicy(Qt::NoFocus);
     connect(button_backspace,&QPushButton::pressed,le_search,&QLineEdit::backspace);
 
-    auto *button_clear = new AeroButton(QIcon(":/usr/share/elroke/file/icon/clear.png")," ", this);
+    auto *button_clear = new AeroButton(QIcon(":/usr/share/elroke/file/icon/clear.png"), this);
     button_clear->setFocusPolicy(Qt::NoFocus);
     connect(button_clear,&QPushButton::pressed,le_search,&QLineEdit::clear);
 
     lo_search->addStretch();
+    lo_search->setSpacing(0);
     lo_search->addWidget(label_search);
     lo_search->addWidget(le_search);
     lo_search->addWidget(button_backspace);
     lo_search->addWidget(button_clear);
     lo_search->addStretch();
-    lo_search->setMargin(0);
+
 
     lo_left->addWidget(table);
     lo_left->addLayout(lo_search);
@@ -218,8 +234,8 @@ void mainWindow::createWidgets(){
 
     auto *lo_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new QPushButton(this);
-    button_menu->setIcon(QIcon(":/usr/share/elroke/file/icon/menu.png"));
+    auto *button_menu = new AeroButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),this);
+//    button_menu->setIcon();
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction("Auto save playlist", this);
@@ -240,25 +256,27 @@ void mainWindow::createWidgets(){
 
     button_menu->setMenu(menu_playlist);
 
-    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
+    auto *button_delete = new AeroButton(QIcon(":/usr/share/elroke/file/icon/delete.png"), this);
     button_delete->setFocusPolicy(Qt::NoFocus);
     connect(button_delete,SIGNAL(pressed()),this,SLOT(deleteItemPlaylist()));
 
-    auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/clear.png"),"", this);
+    auto *button_clear_playlist = new AeroButton(QIcon(":/usr/share/elroke/file/icon/clear.png"), this);
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
     connect(button_clear_playlist,SIGNAL(pressed()),this,SLOT(clearPlaylist()));
 
-    auto *button_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/up.png"),"", this);
+    auto *button_up = new AeroButton(QIcon(":/usr/share/elroke/file/icon/up.png"), this);
     button_up->setFocusPolicy(Qt::NoFocus);
     connect(button_up,SIGNAL(pressed()),this,SLOT(moveItemUp()));
 
-    auto *button_down = new QPushButton(QIcon(":/usr/share/elroke/file/icon/down.png"),"", this);
+    auto *button_down = new AeroButton(QIcon(":/usr/share/elroke/file/icon/down.png"), this);
     button_down->setFocusPolicy(Qt::NoFocus);
     connect(button_down,SIGNAL(pressed()),this,SLOT(moveItemDown()));
 
-    button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
+    button_lock_playlist = new AeroButton(QIcon(":/usr/share/elroke/file/icon/lock.png"), this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
     button_lock_playlist->setCheckable(true);
+    connect(button_lock_playlist,&QPushButton::clicked,this,&mainWindow::updateLockButton);
+//    button_lock_playlist->setCentang(1);
 
     lo_button_playlist->addWidget(button_menu);
     lo_button_playlist->addWidget(button_delete);
@@ -369,21 +387,21 @@ void mainWindow::createWidgets(){
      lo_player_control->setMargin(0);
      QWidget *widget_bottom = new QWidget(this);
 
-     QPixmap bg(":/usr/share/elroke/file/background/backgroundTrans.png");
-     QPalette plt;
+//     QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
+//     QPalette palette_bg;
 
-     bg =   bg.scaled(widget_bottom->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
-     plt.setBrush(QPalette::Background, bg);
+//     bg_trans =   bg.scaled(widget_bottom->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+//     palette_bg.setBrush(QPalette::Background, bg_trans);
 
 
      widget_bottom->setAutoFillBackground(1);
-     widget_bottom->setPalette(plt);
+     widget_bottom->setPalette(palette_bg);
      widget_bottom->setLayout(lo_player_control);
 
 
 
 
-    lo_main->addLayout(lo_top);
+    lo_main->addWidget(widget_top);
     lo_main->addWidget(all_table);
 
     //spacer willbe mask when video playing, keep lyric vicible
@@ -1122,7 +1140,6 @@ void mainWindow::showKeyboard(bool x){
       else
             keyboard->hide();
 
-
 }
 
 void mainWindow::videoInstance(){
@@ -1139,8 +1156,8 @@ void mainWindow::videoInstance(){
     connect(video,SIGNAL(almostEnded()),this,SLOT(almostEnd()));
     connect(video,SIGNAL(playing()),this,SLOT(setaudiochannelAuto()));
     connect(video,SIGNAL(error()),this,SLOT(errorHandling()));
-  connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
-  connect(slider_vol,&QSlider::sliderMoved,video,&Player::setVolume);
+    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
+    connect(slider_vol,&QSlider::sliderMoved,video,&Player::setVolume);
 }
 
 void mainWindow::keyBoardInstance(){
@@ -1161,6 +1178,14 @@ void mainWindow::fontSetup(){
     setFont(font);
 
 
+}
+
+void mainWindow::updateLockButton(bool lock){
+
+    if(lock)
+        button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
+    else
+         button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
 }
 mainWindow::~mainWindow()
 {

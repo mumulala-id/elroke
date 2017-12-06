@@ -8,7 +8,7 @@ AeroButton::AeroButton(QWidget * parent)
     m_pressed(false),
     m_color(Qt::gray),
     m_highlight(Qt::lightGray),
-    m_shadow(Qt::black),
+    m_shadow(Qt::green),
     m_opacity(1.0),
     m_roundness(0){}
 
@@ -16,7 +16,17 @@ AeroButton::AeroButton(const QString & text, QWidget * parent)
     : QPushButton(text, parent),
     m_hovered(false),
     m_pressed(false),
-    m_color(Qt::gray),
+    m_color(Qt::black),
+    m_highlight(Qt::lightGray),
+    m_shadow(Qt::black),
+    m_opacity(1.0),
+    m_roundness(0){}
+
+AeroButton::AeroButton(const QIcon & icon, QWidget * parent)
+    : QPushButton(icon,"", parent),
+    m_hovered(false),
+    m_pressed(false),
+    m_color(Qt::black),
     m_highlight(Qt::lightGray),
     m_shadow(Qt::black),
     m_opacity(1.0),
@@ -26,7 +36,7 @@ AeroButton::AeroButton(const QIcon & icon, const QString & text, QWidget * paren
     : QPushButton(icon, text, parent),
     m_hovered(false),
     m_pressed(false),
-    m_color(Qt::gray),
+    m_color(Qt::white),
     m_highlight(Qt::lightGray),
     m_shadow(Qt::black),
     m_opacity(1.0),
@@ -69,10 +79,10 @@ void AeroButton::paintEvent(QPaintEvent * pe)
     //gradient
     QLinearGradient gradient(0, 0, 0, button_rect.height());
     gradient.setSpread(QGradient::ReflectSpread);
-    gradient.setColorAt(0.0, button_color);
-    gradient.setColorAt(0.4, m_shadow);
-    gradient.setColorAt(0.6, m_shadow);
-    gradient.setColorAt(1.0, button_color);
+    gradient.setColorAt(0.0, Qt::white);
+    gradient.setColorAt(0.4, Qt::black);
+    gradient.setColorAt(0.6, button_color);
+//    gradient.setColorAt(0.9, Qt::white);
 
     QBrush brush(gradient);
     painter.setBrush(brush);

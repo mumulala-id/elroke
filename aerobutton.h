@@ -15,10 +15,11 @@ class AeroButton : public QPushButton
 public:
     AeroButton(QWidget * parent = 0);
     AeroButton(const QString & text, QWidget * parent = 0);
+    AeroButton(const QIcon & icon, QWidget * parent = 0);
     AeroButton(const QIcon & icon, const QString & text, QWidget * parent = 0);
 
     ~AeroButton();
-
+public slots:
     void setColor(QColor color)            { m_color = color; }
     void setHighlight(QColor highlight) { m_highlight = highlight; }
     void setShadow(QColor shadow)        { m_shadow = shadow; }

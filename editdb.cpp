@@ -216,6 +216,11 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
 
 //right bottom
 
+    CLineEdit *le_search = new CLineEdit(this);
+    connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
+
+
+
     table->setModel(proxy_model);
     table->verticalHeader()->hide();
     table->resizeColumnsToContents();
@@ -223,8 +228,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
-
-connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
+   connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
 
     QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spRight.setHorizontalStretch(2);
@@ -243,6 +247,7 @@ connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&man
     lo_label_total_count->addWidget(total_count_label);
     lo_label_total_count->addStretch();
 
+    lo_bottom_right->addWidget(le_search);
     lo_bottom_right->addWidget(table);
     lo_bottom_right->addLayout(lo_label_total_count);
     lo_bottom_right->setMargin(0);

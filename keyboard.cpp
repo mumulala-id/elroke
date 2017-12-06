@@ -3,6 +3,7 @@
 #include <QGuiApplication>
 #include <QGridLayout>
 #include <QKeyEvent>
+#include <QLineEdit>
 #include <QDebug>
 
 Keyboard::Keyboard(QWidget *parent) :
@@ -15,22 +16,35 @@ Keyboard::Keyboard(QWidget *parent) :
     QString text = "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
     for(int i=0; i<text.size(); i++){
-        keyButton[i] = createButton(text.at(i), SLOT(onButtonClicked()));
+        keyButton[i] = createButton(text.at(i));
         int row = (i/20);
         int column = (i%20);
         main_layout->addWidget(keyButton[i], row, column);
     }
 
 
-    AeroButton *space = new AeroButton(this);
-    space->setText("SPACE");
+    AeroButton *space = new AeroButton("\u2423", this);
     space->setFocusPolicy(Qt::NoFocus);
+    space->setObjectName("space");
     space->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     connect(space,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
+    auto *del = new AeroButton("\u232B", this);
+    del->setObjectName("backspace");
+    del->setMaximumSize(QSize(48,48));
+    connect(del,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+
+    auto *clear = new AeroButton("\u239A", this);
+    clear->setMaximumSize(QSize(48,48));
+    clear->setObjectName("clear");
+    connect(clear,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+
+
     main_layout->setHorizontalSpacing(0);
     main_layout->setVerticalSpacing(0);
-    main_layout->addWidget(space,1,16,1,4);
+    main_layout->addWidget(space,1,16,1,2);
+    main_layout->addWidget(del,1,18,1,2);
+    main_layout->addWidget(clear,1,19,1,2);
     main_layout->setSpacing(0);
     main_layout->setMargin(0);
     main_layout->setSizeConstraint( QLayout::SetFixedSize );
@@ -43,10 +57,9 @@ Keyboard::Keyboard(QWidget *parent) :
 }
 
 
-AeroButton *Keyboard::createButton( const QString &text, const char *member){
+AeroButton *Keyboard::createButton( const QString &text){
 
-    AeroButton *button = new AeroButton(this);
-    button->setText(text);
+    AeroButton *button = new AeroButton(text, this);
 
     button->setMaximumSize(QSize(48,48));
     QFont font;
@@ -54,27 +67,28 @@ AeroButton *Keyboard::createButton( const QString &text, const char *member){
 
     button->setFont(font);
     button->setFocusPolicy(Qt::NoFocus);
-    connect(button,SIGNAL(pressed()),this,member);
-
-
+    button->setObjectName(text);
+    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
     return button;
 }
 
 void Keyboard::onButtonClicked(){
 
- QObject *receiver = qobject_cast<QObject*>(QGuiApplication::focusObject());
+ QObject*receiver = qobject_cast<QObject*>(QGuiApplication::focusObject());
 
          if(!receiver)
              return;
 
             QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
-            QChar text = clickedButton->text().at(0);
+            QString objeck_name = clickedButton->objectName();
+            QChar text = objeck_name.at(0);
+//            qDebug()<<"ukuran"<<clickedButton->text().size()<<text;
 
             Qt::Key key;
+if(objeck_name.size()>1){
 
-
-        if(clickedButton->text()=="SPACE"){
+        if(objeck_name=="space"){
             key = Qt::Key_Space;
             QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier," " );
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
@@ -83,6 +97,27 @@ void Keyboard::onButtonClicked(){
             QCoreApplication::sendEvent(receiver,&releaseEvent);
 
         }
+        if(objeck_name=="backspace"){
+            key = Qt::Key_Backspace;
+            QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, 0,0 );
+            QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
+
+            QCoreApplication::sendEvent(receiver, &pressEvent);
+            QCoreApplication::sendEvent(receiver,&releaseEvent);
+//            qDebug()<<"Del";
+        }
+        if(objeck_name=="clear"){
+       QLineEdit *le =     qobject_cast<QLineEdit*>(QGuiApplication::focusObject());
+            le->clear();
+//            qDebug()<<"clear";
+//            key = Qt::Key_Clear;
+//            QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, 0,0);//Qt::NoModifier,QKeySequence(key).toString() );
+//            QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
+
+//            QCoreApplication::sendEvent(receiver, &pressEvent);
+//            QCoreApplication::sendEvent(receiver,&releaseEvent);
+        }
+}
 
 else{
     switch(text.unicode()){

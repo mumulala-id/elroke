@@ -20,9 +20,7 @@
 #include <QLabel>
 #include <QKeyEvent>
 #include <QDesktopWidget>
-//#include <QApplication>
 #include <QSqlTableModel>
-//#include <QStackedLayout>
 #include <QPainter>
 
 
@@ -72,7 +70,7 @@ private :
     bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;
-//    dbmanager *db_playlist;
+
 
     QWidget *spacer;
     QPushButton *button_audio_channel;
@@ -120,6 +118,7 @@ private slots:
     void videoInstance();
     void keyBoardInstance();
     void fontSetup();
+    void updateLockButton(bool);
 
 
 protected :

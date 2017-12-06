@@ -6,6 +6,8 @@
 
 int main(int argc, char *argv[])
 {
+    // turn on the DPI support**
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
