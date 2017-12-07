@@ -8,16 +8,21 @@ class ProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
     QMap<int, Qt::Alignment>alignMap;
+
 public:
+      enum mode{column,smart};
     ProxyModel(QObject* parent = 0);
+    ProxyModel(mode, QObject *parent=0);
     bool filterAcceptsRow(int source_row,
                           const QModelIndex &source_parent) const;
     QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation,
                         int role) const;
 
+
 public slots:
     void search(QString);
+    void search(QVariantList);
   void setAlignment(unsigned int, Qt::Alignment);
 
 private slots:
@@ -26,7 +31,9 @@ private slots:
 
 private:
     QString text_search;
-  //  QString m_kapal;
+ int colom=0;
+
+ mode md;
 };
 
 #endif // PROXYMODEL_H

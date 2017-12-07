@@ -157,9 +157,6 @@ void dbmanager::updatePlayedTime(int id){
     else
         submit();
 
-query.clear();
-
-
-
+    query.clear();
 
 }

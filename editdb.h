@@ -29,6 +29,8 @@ private :
     QLabel *total_count_label;
     QLabel *selected_count_label;
     QComboBox *combo_audio_channel;
+    QComboBox *combo_search;
+        CLineEdit *le_search;
     bool changeSave=false;
     Keyboard *kboard;
 
@@ -52,9 +54,12 @@ private slots:
     void updateList();
     void writeTextStream(const QString &file, QList<QString>set);
     void setAudioChannel();
-    //void show
+    void receiverSearch(QString);
+    void comboSearchChange(int);
+    void jumpTo(QString);
     void dclose();
-
+signals :
+    void toSearch(QVariantList);
 
 
 };

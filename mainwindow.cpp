@@ -149,18 +149,12 @@ void mainWindow::createWidgets(){
     table_palette.setColor(QPalette::Highlight, Qt::transparent);
     table_palette.setColor(QPalette::HighlightedText, Qt::white);
 
-
-    QPalette header_palette;
-    header_palette.setColor(QPalette::Button, Qt::transparent);
-    header_palette.setColor(QPalette::Base, Qt::transparent);
-    header_palette.setColor(QPalette::ButtonText, Qt::blue);
-    header_palette.setColor(QPalette::Button, Qt::transparent);
     db = new dbmanager(dbmanager::show, this);
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
-    proxy_model = new ProxyModel(this);
+    proxy_model = new ProxyModel(ProxyModel::smart, this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(1, Qt::AlignLeft);
     proxy_model->setAlignment(2, Qt::AlignRight);
@@ -168,8 +162,17 @@ void mainWindow::createWidgets(){
     table = new QTableView(this);
     table->setModel(proxy_model);
     tableRule();
+    QPalette header_palette = table->horizontalHeader()->palette();
+    header_palette.setBrush(QPalette::Button, Qt::blue);
+    header_palette.setColor(QPalette::Background, Qt::transparent);
+    header_palette.setColor(QPalette::ButtonText, Qt::red);
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
+
+
+
+   // header_palette.setColor(QPalette::Button, Qt::transparent);
+
     connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
     auto *lo_search = new QHBoxLayout;
 

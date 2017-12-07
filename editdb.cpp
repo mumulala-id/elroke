@@ -16,7 +16,8 @@
 #include <QSizePolicy>
 #include <QSqlError>
 #include <QMessageBox>
-#include <QtAlgorithms>   // for qSort()
+#include <QtAlgorithms>
+// for qSort()
 
 
 managedb::managedb(QWidget *parent) :
@@ -104,10 +105,11 @@ managedb::managedb(QWidget *parent) :
 
 
 
-    proxy_model = new ProxyModel(this);
+    proxy_model = new ProxyModel(ProxyModel::column, this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(6, Qt::AlignCenter);
 
+    connect(this,SIGNAL(toSearch(QVariantList)),proxy_model,SLOT(search(QVariantList)));
 
     QHBoxLayout *lo_bottom = new QHBoxLayout;
     QFrame *frame_left_bottom = new QFrame;
@@ -137,14 +139,14 @@ managedb::managedb(QWidget *parent) :
 
     le_set_title = new CLineEdit(this);
     le_set_title->setPlaceholderText("Title");
-//    connect(le_set_title,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+
 
     QPushButton *button_set_singer = new QPushButton("Set Singer", this);
     connect(button_set_singer,&QPushButton::clicked,this,&managedb::setSinger);
 
     le_set_singer = new CLineEdit(this);
     le_set_singer->setPlaceholderText("Singer");
-//    connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+
 
     QPushButton *button_set_language = new QPushButton("Set Language", this);
     connect(button_set_language,&QPushButton::clicked,this,&managedb::setLanguage);
@@ -215,10 +217,30 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     lo_bottom->addWidget(frame_left_bottom);
 
 //right bottom
+    QHBoxLayout *lo_search = new QHBoxLayout;
+   combo_search = new QComboBox(this);
+    combo_search->addItem("Title");
+    combo_search->addItem("Singer");
+    connect(combo_search,SIGNAL(activated(int)),this,SLOT(comboSearchChange(int)));
 
-    CLineEdit *le_search = new CLineEdit(this);
-    connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
 
+
+    le_search = new CLineEdit(this);
+    le_search->setMaximumWidth(300);
+    le_search->setPlaceholderText("SEARCH");
+    connect(le_search,&CLineEdit::textChanged,this,&managedb::receiverSearch);
+
+    CLineEdit *le_jump = new CLineEdit(this);
+le_jump->setFixedWidth(100);
+le_jump->setValidator(new QIntValidator(this));
+connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
+
+
+    lo_search->addWidget(combo_search);
+    lo_search->addWidget(le_search);
+    lo_search->addWidget(new QLabel("Jump to : "));
+    lo_search->addWidget(le_jump);
+    lo_search->addStretch();
 
 
     table->setModel(proxy_model);
@@ -247,7 +269,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     lo_label_total_count->addWidget(total_count_label);
     lo_label_total_count->addStretch();
 
-    lo_bottom_right->addWidget(le_search);
+    lo_bottom_right->addLayout(lo_search);
     lo_bottom_right->addWidget(table);
     lo_bottom_right->addLayout(lo_label_total_count);
     lo_bottom_right->setMargin(0);
@@ -284,7 +306,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
 
 
     setWindowFlags(Qt::FramelessWindowHint);
-    showMaximized();
+    showFullScreen();
 
     kboard =new Keyboard(this);
     kboard->hide();
@@ -293,6 +315,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
     connect(le_set_language,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
     connect(le_set_category,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
+    connect(le_search,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
 }
 
@@ -309,11 +332,12 @@ void managedb::swapItem(int column1, int column2){
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
 
     foreach (QModelIndex indexes, list_selected) {
+        int r =  proxy_model->mapToSource( indexes).row();
 
-        QString data1 = sql_model->index(indexes.row(),column1).data().toString();
-        QString data2 = sql_model->index(indexes.row(),column2).data().toString();
-        sql_model->setData(sql_model->index(indexes.row(), column1), data2);
-        sql_model->setData(sql_model->index(indexes.row(), column2), data1);
+        QString data1 = sql_model->index(r,column1).data().toString();
+        QString data2 = sql_model->index(r,column2).data().toString();
+        sql_model->setData(sql_model->index(r, column1), data2);
+        sql_model->setData(sql_model->index(r, column2), data1);
 
     }
 
@@ -354,8 +378,8 @@ void managedb::setitem(QString text, int column){
 
 
     foreach (QModelIndex indexes, list_selected) {
-
-        sql_model->setData(sql_model->index(indexes.row(), column), text);
+int r =  proxy_model->mapToSource( indexes).row();
+        sql_model->setData(sql_model->index(r, column), text);
 
     }
 
@@ -445,6 +469,7 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
     setCursor(Qt::WaitCursor);
 
     table->clearSelection();
+
     QObject *obj = sender();
     QString text=item->text();
 
@@ -460,7 +485,7 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
             column=6;
 
 
-
+sql_model->canFetchMore();
     for(int i=0; i<sql_model->rowCount();i++){
         if(column==7){
             if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString().startsWith(text))
@@ -608,4 +633,46 @@ this->close();
 }
 
 
+void managedb::comboSearchChange(int i){
+    QVariantList list;
+    list.append(i);
+    QString text = le_search->text();
+    if(text==NULL)
+        return;
 
+    list.append(text);
+
+    emit toSearch(list);
+
+
+
+
+}
+void managedb::receiverSearch(QString s){
+    QVariantList list;
+    list.append(combo_search->currentIndex());
+    list.append(s);
+
+    emit toSearch(list);
+
+
+}
+
+void managedb::jumpTo(QString t){
+    qDebug()<<t;
+//    sql_model->fetchMore();
+    int x = t.toInt();
+    if(x>0){
+qDebug()<<"x : "<<x;
+        table->scrollTo(sql_model->index(x,0));
+        //sql_model->
+}
+        else
+{return;}
+
+
+
+
+
+
+}
