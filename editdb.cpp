@@ -36,10 +36,8 @@ managedb::managedb(QWidget *parent) :
     connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
 
-    check_singer = new QCheckBox("Filter Singer", this);
 
     lo_grup_singer->addWidget(list_singer);
-    lo_grup_singer->addWidget(check_singer);
     grup_singer->setLayout(lo_grup_singer);
 
     QGroupBox *grup_language = new QGroupBox("Language", this);
@@ -48,12 +46,8 @@ managedb::managedb(QWidget *parent) :
     list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
-    check_language = new QCheckBox("Filter Language", this);
-
-
     QVBoxLayout *lo_grup_language = new QVBoxLayout;
     lo_grup_language->addWidget(list_language);
-    lo_grup_language->addWidget(check_language);
     grup_language->setLayout(lo_grup_language);
 
      QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
@@ -61,11 +55,9 @@ managedb::managedb(QWidget *parent) :
     list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
      connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
-    check_genre = new QCheckBox("Filter Genre", this);
 
     QVBoxLayout *lo_grup_genre = new QVBoxLayout;
     lo_grup_genre->addWidget(list_genre);
-    lo_grup_genre->addWidget(check_genre);
     grup_genre->setLayout(lo_grup_genre);
 
      QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
@@ -75,11 +67,7 @@ managedb::managedb(QWidget *parent) :
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
 
-    cb_folder = new QCheckBox("Filter Path", this);
-
-
     lo_grup_folder->addWidget(list_folder);
-    lo_grup_folder->addWidget(cb_folder);
 
     grup_folder->setLayout(lo_grup_folder);
 
@@ -174,13 +162,17 @@ managedb::managedb(QWidget *parent) :
     QPushButton *button_selectall = new QPushButton("Select All", this);
     connect(button_selectall,&QPushButton::clicked,table,&QTableView::selectAll);
 
-QPushButton *button_unselect = new QPushButton("Unselect", this);
-connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection);
+    QPushButton *button_unselect = new QPushButton("Unselect", this);
+    connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection);
+
     QPushButton *button_delete_selected = new QPushButton("Delete Selected", this);
     connect(button_delete_selected,&QPushButton::clicked,this,&managedb::deleteItem);
 
     QPushButton *button_save = new QPushButton("SAVE", this);
     connect(button_save, &QPushButton::clicked, this, &managedb::save);
+
+    QPushButton *button_undo = new QPushButton("UNDO", this);
+    connect(button_undo, &QPushButton::clicked, this, &managedb::undo);
 
     QPushButton *button_close = new QPushButton("CLOSE", this);
     connect(button_close,SIGNAL(pressed()),this,SLOT(dclose()));
@@ -206,6 +198,7 @@ connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection)
     glo_button->addWidget(button_save,9,0);
     glo_button->addWidget(button_unselect,9,1);
     glo_button->addWidget(button_close,10,0);
+    glo_button->addWidget(button_undo,10,1);
     glo_button->setMargin(0);
     frame_left_bottom->setLayout(glo_button);
 
@@ -235,22 +228,33 @@ le_jump->setFixedWidth(100);
 le_jump->setValidator(new QIntValidator(this));
 connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
 
+auto *reset = new QPushButton("Show All", this);
+connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
+
 
     lo_search->addWidget(combo_search);
     lo_search->addWidget(le_search);
     lo_search->addWidget(new QLabel("Jump to : "));
     lo_search->addWidget(le_jump);
+    lo_search->addWidget(reset);
     lo_search->addStretch();
 
 
     table->setModel(proxy_model);
-    table->verticalHeader()->hide();
+//    table->verticalHeader()->hide();
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
    connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
+
+   QPalette header_palette = table->horizontalHeader()->palette();
+   header_palette.setBrush(QPalette::Button, Qt::blue);
+   header_palette.setColor(QPalette::Background, Qt::transparent);
+   header_palette.setColor(QPalette::ButtonText, Qt::red);
+   table->horizontalHeader()->setPalette(header_palette);
+   table->verticalHeader()->setPalette(header_palette);
 
     QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spRight.setHorizontalStretch(2);
@@ -322,7 +326,7 @@ connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
 void managedb::swapTitleSinger(){
 
     swapItem(1,2);
-      changeSave=true;
+      anyChange=true;
 
 }
 
@@ -346,7 +350,7 @@ void managedb::swapItem(int column1, int column2){
 void managedb::swapSingerLanguage(){
 
     swapItem(2,3);
-  changeSave=true;
+  anyChange=true;
 }
 
 void managedb::swapTitleLanguage(){
@@ -354,75 +358,77 @@ void managedb::swapTitleLanguage(){
 
     swapItem(1,3);
 
-  changeSave=true;
+  anyChange=true;
 }
 void managedb::swapSingerCategory(){
     swapItem(2,4);
-      changeSave=true;
+      anyChange=true;
 }
 
 void managedb::swapTitleCategory(){
     swapItem(1,4);
-  changeSave=true;
+  anyChange=true;
 }
 
 void managedb::swapLanguageCategory(){
 
     swapItem(3,4);
-    changeSave=true;
+    anyChange=true;
 }
 
 void managedb::setitem(QString text, int column){
 
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
-
+int r=0;
 
     foreach (QModelIndex indexes, list_selected) {
-int r =  proxy_model->mapToSource( indexes).row();
+        r =  proxy_model->mapToSource( indexes).row();
         sql_model->setData(sql_model->index(r, column), text);
 
     }
 
+   QModelIndex index = table->indexAt(QPoint(0,0));
+   if(!index.isValid())
+       proxy_model->reset();
 }
 
 void managedb::setTitle(){
 
     if(!le_set_title->text().isEmpty())
     setitem(le_set_title->text(), 1);
-    changeSave=true;
+    anyChange=true;
 
 }
 void managedb::setSinger(){
 
     if(!le_set_singer->text().isEmpty())
     setitem(le_set_singer->text(), 2);
-changeSave=true;
-
+    anyChange=true;
 }
 void managedb::setLanguage(){
 
     if(!le_set_language->text().isEmpty())
     setitem(le_set_language->text(), 3);
-    //updateList();
-changeSave=true;
+    anyChange=true;
 }
 void managedb::setCategory(){
 
     if(!le_set_category->text().isEmpty())
     setitem(le_set_category->text(), 4);
-changeSave=true;
+    anyChange=true;
 
 }
 
 void managedb::setAudioChannel(){
 
     setitem(combo_audio_channel->currentText(),5);
-    changeSave=true;
+    anyChange=true;
 
 }
 
 
 void managedb::deleteItem(){
+setCursor(Qt::WaitCursor);
 
     QModelIndexList listInd =  table->selectionModel()->selectedRows();
     if(listInd.size()==sql_model->rowCount()){
@@ -439,28 +445,37 @@ void managedb::deleteItem(){
 
         }
         else
+        {
+            setCursor(Qt::ArrowCursor);
         return;
+        }
     }
 
     foreach (QModelIndex ind, listInd) {
-        table->hideRow(proxy_model->mapToSource(ind).row());
+        table->hideRow(proxy_model->mapToSource(ind).row());// need to hiding row first, deleted row will disappear after submit.
         sql_model->removeRow(proxy_model->mapToSource(ind).row());
     }
-
-    changeSave=true;
+    QModelIndex index = table->indexAt(QPoint(0,0));
+    if(!index.isValid())
+        proxy_model->reset();
+    anyChange=true;
+    setCursor(Qt::ArrowCursor);
 }
 
 
 
 void managedb::save(){
 
+    if(!anyChange)
+        return;
+
     if(!sql_model->submitAll())
         qDebug()<<"error o submit"<<sql_model->lastError();
     sql_model->select();
     total_count_label->setText(QString::number(sql_model->rowCount()));
-    changeSave=false;
+    anyChange=false;
 
-updateList();
+    updateList();
 }
 
 
@@ -476,29 +491,20 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
     int column=0;
 
     if (obj==list_singer)
-        column=2;
+        column=1;
     else if(obj==list_language)
-        column=3;
+        column=2;
     else if(obj==list_genre)
-        column=4;
+        column=3;
     else if(obj==list_folder)
             column=6;
 
+    QVariantList list;
+    list.append(column);
+    list.append(text);
 
-sql_model->canFetchMore();
-    for(int i=0; i<sql_model->rowCount();i++){
-        if(column==7){
-            if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString().startsWith(text))
-                table->selectRow(i);
-        }
-        else{
-            if(sql_model->data(sql_model->index(i,column),Qt::DisplayRole).toString()==text)
-
-        table->selectRow(i);
-
-        }
-}
-
+    emit toSearch(list);
+    table->selectAll();
 
     setCursor(Qt::ArrowCursor);
 
@@ -516,9 +522,9 @@ void managedb::updateList(){
 
     for(int i=0; i<sql_model->rowCount(); i++){
 
-        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString());
-         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
-          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
+        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString().toUpper());
+         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
+          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
           QFileInfo info;
           info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
            set_folder.insert(info.path());
@@ -562,13 +568,12 @@ managedb::~managedb(){
 
     for(int i=0; i<sql_model->rowCount(); i++){
 
-        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString());
-         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString());
-          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString());
+        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString().toUpper());
+         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
+          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
           QFileInfo info;
           info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
            set_folder.insert(info.path());
-
 
     }
 
@@ -620,15 +625,15 @@ void managedb::selectedCount(){
 
 void managedb::dclose(){
 
-
-    if(changeSave){
+    if(anyChange){
     QMessageBox::StandardButton warning;
     warning = QMessageBox::question(this, "Warning","Change not save yet. Save?", QMessageBox::Yes | QMessageBox::No);
     if(warning==QMessageBox::Yes){
       sql_model->submitAll();
     }
     }
-this->close();
+
+    close();
 
 }
 
@@ -643,35 +648,35 @@ void managedb::comboSearchChange(int i){
     list.append(text);
 
     emit toSearch(list);
-
-
-
-
 }
+
 void managedb::receiverSearch(QString s){
     QVariantList list;
     list.append(combo_search->currentIndex());
     list.append(s);
 
     emit toSearch(list);
-
-
 }
 
 void managedb::jumpTo(QString t){
-    qDebug()<<t;
-//    sql_model->fetchMore();
+
     int x = t.toInt();
-    if(x>0){
-qDebug()<<"x : "<<x;
-        table->scrollTo(sql_model->index(x,0));
-        //sql_model->
+    table->scrollTo( table->model()->index(x-1,0), QAbstractItemView::PositionAtTop);
+
 }
-        else
-{return;}
+
+void managedb::undo(){
 
 
+    sql_model->revertAll();
 
+    //unhide row
+    for(int i=0; i<sql_model->rowCount();i++){
+
+        table->setRowHidden(i,0);
+
+
+    }
 
 
 

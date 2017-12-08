@@ -290,21 +290,20 @@ void addtodatabase::saveToDatabase(){
         }
 
 
-        set_singer.insert(singer);
-        set_language.insert(language);
-        set_category.insert(category);
+        set_singer.insert(singer.toUpper());
+        set_language.insert(language.toUpper());
+        set_category.insert(category.toUpper());
         set_folder.insert(folder);
 
-        data.append(title);
+          data.append(title);
           data.append(singer);
           data.append(language);
           data.append(category);
           data.append(a_channel);
           data.append(path);
 
-
-                                    sql_ok =  db->insertIntoTable(data);
-                                    data.clear();
+        sql_ok =  db->insertIntoTable(data);
+        data.clear();
 
     }
     if(sql_ok)

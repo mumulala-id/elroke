@@ -31,7 +31,11 @@ Keyboard::Keyboard(QWidget *parent) :
 
     auto *del = new AeroButton("\u232B", this);
     del->setObjectName("backspace");
+    del->setFocusPolicy(Qt::NoFocus);
     del->setMaximumSize(QSize(48,48));
+    del->setAutoRepeat(true);
+    del->setAutoRepeatInterval(1000);
+    del->setCheckable(1);
     connect(del,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
     auto *clear = new AeroButton("\u239A", this);
@@ -68,13 +72,13 @@ AeroButton *Keyboard::createButton( const QString &text){
     button->setFont(font);
     button->setFocusPolicy(Qt::NoFocus);
     button->setObjectName(text);
-    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+        connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
     return button;
 }
 
 void Keyboard::onButtonClicked(){
-
+//qDebug()
  QObject*receiver = qobject_cast<QObject*>(QGuiApplication::focusObject());
 
          if(!receiver)
@@ -83,14 +87,14 @@ void Keyboard::onButtonClicked(){
             QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
             QString objeck_name = clickedButton->objectName();
             QChar text = objeck_name.at(0);
-//            qDebug()<<"ukuran"<<clickedButton->text().size()<<text;
+            qDebug()<<text;//"ukuran"<<clickedButton->text().size()<<text;
 
             Qt::Key key;
 if(objeck_name.size()>1){
 
         if(objeck_name=="space"){
             key = Qt::Key_Space;
-            QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier," " );
+            QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier," ");
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
 
             QCoreApplication::sendEvent(receiver, &pressEvent);
@@ -107,7 +111,7 @@ if(objeck_name.size()>1){
 //            qDebug()<<"Del";
         }
         if(objeck_name=="clear"){
-       QLineEdit *le =     qobject_cast<QLineEdit*>(QGuiApplication::focusObject());
+       QLineEdit *le =   qobject_cast<QLineEdit*>(QGuiApplication::focusObject());
             le->clear();
 //            qDebug()<<"clear";
 //            key = Qt::Key_Clear;

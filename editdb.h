@@ -2,7 +2,6 @@
 #define MANAGEDB_H
 #include <QDialog>
 #include <QListWidget>
-#include <QCheckBox>
 #include <QLineEdit>
 #include <QTableView>
 #include "proxymodel.h"
@@ -21,7 +20,6 @@ public:
 
 private :
     QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
-    QCheckBox *check_singer,  *check_language,  *check_genre,   *cb_folder;
     CLineEdit  *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
     QTableView *table;
     ProxyModel *proxy_model;
@@ -31,7 +29,7 @@ private :
     QComboBox *combo_audio_channel;
     QComboBox *combo_search;
         CLineEdit *le_search;
-    bool changeSave=false;
+    bool anyChange=false;
     Keyboard *kboard;
 
 private slots:
@@ -58,6 +56,7 @@ private slots:
     void comboSearchChange(int);
     void jumpTo(QString);
     void dclose();
+    void undo();
 signals :
     void toSearch(QVariantList);
 

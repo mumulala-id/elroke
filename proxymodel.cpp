@@ -95,3 +95,11 @@ void ProxyModel::clearAlign(){
     alignMap.clear();
 
 }
+
+void ProxyModel::reset(){
+    colom =  0;
+    text_search ="";
+    invalidateFilter();
+
+
+}
