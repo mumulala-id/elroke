@@ -28,7 +28,7 @@ managedb::managedb(QWidget *parent) :
 
     QHBoxLayout *lo_top = new QHBoxLayout;
 
-    QGroupBox *grup_singer = new QGroupBox("Singer", this);
+    QGroupBox *grup_singer = new QGroupBox(tr("Singer"), this);
 
    list_singer = new QListWidget(this);
     list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
@@ -40,7 +40,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_singer->addWidget(list_singer);
     grup_singer->setLayout(lo_grup_singer);
 
-    QGroupBox *grup_language = new QGroupBox("Language", this);
+    QGroupBox *grup_language = new QGroupBox(tr("Language"), this);
 
     list_language = new QListWidget(this);
     list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
@@ -50,7 +50,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_language->addWidget(list_language);
     grup_language->setLayout(lo_grup_language);
 
-     QGroupBox *grup_genre = new QGroupBox("Genre/category", this);
+     QGroupBox *grup_genre = new QGroupBox(tr("Category"), this);
    list_genre = new QListWidget(this);
     list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
      connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
@@ -60,7 +60,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_genre->addWidget(list_genre);
     grup_genre->setLayout(lo_grup_genre);
 
-     QGroupBox *grup_folder = new QGroupBox("Folder/Path", this);
+     QGroupBox *grup_folder = new QGroupBox(tr("Path"), this);
    list_folder = new QListWidget(this);
     list_folder->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/path"));
      connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
@@ -104,49 +104,49 @@ managedb::managedb(QWidget *parent) :
 
     QGridLayout *glo_button = new QGridLayout;
 
-    QPushButton *button_title_singer = new QPushButton("Title <--> Singer", this);
+    QPushButton *button_title_singer = new QPushButton(tr("Title <--> Singer"), this);
     connect(button_title_singer, &QPushButton::clicked, this, &managedb::swapTitleSinger);
 
-    QPushButton *button_singer_language = new QPushButton("Singer <--> Language", this);
+    QPushButton *button_singer_language = new QPushButton(tr("Singer <--> Language"), this);
     connect(button_singer_language,&QPushButton::clicked,this,&managedb::swapSingerLanguage);
 
-    QPushButton *button_title_language = new QPushButton("Title <--> Language", this);
+    QPushButton *button_title_language = new QPushButton(tr("Title <--> Language"), this);
     connect(button_title_language, &QPushButton::clicked,this,&managedb::swapTitleLanguage);
 
-    QPushButton *button_singer_category = new QPushButton("Singer <--> Category",this);
+    QPushButton *button_singer_category = new QPushButton(tr("Singer <--> Category"),this);
     connect(button_singer_category,&QPushButton::clicked,this,&managedb::swapSingerCategory);
 
-    QPushButton *button_title_category = new QPushButton("Title <--> Category", this);
+    QPushButton *button_title_category = new QPushButton(tr("Title <--> Category"), this);
     connect(button_title_category,&QPushButton::clicked,this,&managedb::swapTitleCategory);
 
-    QPushButton *button_language_category = new QPushButton("Language <--> Category", this);
+    QPushButton *button_language_category = new QPushButton(tr("Language <--> Category"), this);
     connect(button_language_category,&QPushButton::clicked,this,&managedb::swapLanguageCategory);
 
-    QPushButton *button_set_title = new QPushButton("Set Title", this);
+    QPushButton *button_set_title = new QPushButton(tr("Set Title"), this);
     connect(button_set_title,&QPushButton::clicked,this,&managedb::setTitle);
 
     le_set_title = new CLineEdit(this);
-    le_set_title->setPlaceholderText("Title");
+    le_set_title->setPlaceholderText(tr("Title"));
 
 
-    QPushButton *button_set_singer = new QPushButton("Set Singer", this);
+    QPushButton *button_set_singer = new QPushButton(tr("Set Singer"), this);
     connect(button_set_singer,&QPushButton::clicked,this,&managedb::setSinger);
 
     le_set_singer = new CLineEdit(this);
-    le_set_singer->setPlaceholderText("Singer");
+    le_set_singer->setPlaceholderText(tr("Singer"));
 
 
-    QPushButton *button_set_language = new QPushButton("Set Language", this);
+    QPushButton *button_set_language = new QPushButton(tr("Set Language"), this);
     connect(button_set_language,&QPushButton::clicked,this,&managedb::setLanguage);
 
     le_set_language = new CLineEdit(this);
-    le_set_language->setPlaceholderText("Language");
+    le_set_language->setPlaceholderText(tr("Language"));
 
-    QPushButton *button_set_category = new QPushButton("Set Category", this);
+    QPushButton *button_set_category = new QPushButton(tr("Set Category"), this);
     connect(button_set_category,&QPushButton::clicked,this,&managedb::setCategory);
 
     le_set_category = new CLineEdit(this);
-    le_set_category->setPlaceholderText("Category");
+    le_set_category->setPlaceholderText(tr("Category"));
 
 
     combo_audio_channel = new QComboBox(this);
@@ -154,27 +154,27 @@ managedb::managedb(QWidget *parent) :
     combo_audio_channel->addItem("RIGHT");
     combo_audio_channel->addItem("STEREO");
 
-    QPushButton *button_set_audio_channel = new QPushButton("Set Audio Channel");
+    QPushButton *button_set_audio_channel = new QPushButton(tr("Set Audio Channel"));
     connect(button_set_audio_channel,&QPushButton::clicked,this,&managedb::setAudioChannel);
 
     table = new QTableView(this);
 
-    QPushButton *button_selectall = new QPushButton("Select All", this);
+    QPushButton *button_selectall = new QPushButton(tr("Select All"), this);
     connect(button_selectall,&QPushButton::clicked,table,&QTableView::selectAll);
 
-    QPushButton *button_unselect = new QPushButton("Unselect", this);
+    QPushButton *button_unselect = new QPushButton(tr("Unselect"), this);
     connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection);
 
-    QPushButton *button_delete_selected = new QPushButton("Delete Selected", this);
+    QPushButton *button_delete_selected = new QPushButton(tr("Delete Selected"), this);
     connect(button_delete_selected,&QPushButton::clicked,this,&managedb::deleteItem);
 
-    QPushButton *button_save = new QPushButton("SAVE", this);
+    QPushButton *button_save = new QPushButton(tr("SAVE"), this);
     connect(button_save, &QPushButton::clicked, this, &managedb::save);
 
-    QPushButton *button_undo = new QPushButton("UNDO", this);
+    QPushButton *button_undo = new QPushButton(tr("UNDO"), this);
     connect(button_undo, &QPushButton::clicked, this, &managedb::undo);
 
-    QPushButton *button_close = new QPushButton("CLOSE", this);
+    QPushButton *button_close = new QPushButton(tr("CLOSE"), this);
     connect(button_close,SIGNAL(pressed()),this,SLOT(dclose()));
 
     glo_button->addWidget( button_title_singer,0,0);
@@ -212,15 +212,15 @@ managedb::managedb(QWidget *parent) :
 //right bottom
     QHBoxLayout *lo_search = new QHBoxLayout;
    combo_search = new QComboBox(this);
-    combo_search->addItem("Title");
-    combo_search->addItem("Singer");
+    combo_search->addItem(tr("Title"));
+    combo_search->addItem(tr("Singer"));
     connect(combo_search,SIGNAL(activated(int)),this,SLOT(comboSearchChange(int)));
 
 
 
     le_search = new CLineEdit(this);
     le_search->setMaximumWidth(300);
-    le_search->setPlaceholderText("SEARCH");
+    le_search->setPlaceholderText(tr("SEARCH"));
     connect(le_search,&CLineEdit::textChanged,this,&managedb::receiverSearch);
 
     CLineEdit *le_jump = new CLineEdit(this);
@@ -228,14 +228,23 @@ le_jump->setFixedWidth(100);
 le_jump->setValidator(new QIntValidator(this));
 connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
 
-auto *reset = new QPushButton("Show All", this);
+auto *scroll_top = new QPushButton(tr("Top"), this);
+connect(scroll_top,SIGNAL(pressed()),table,SLOT(scrollToTop()));
+
+auto *scroll_bottom = new QPushButton(tr("Bottom"), this);
+connect(scroll_bottom,SIGNAL(pressed()),table,SLOT(scrollToBottom()));
+
+
+auto *reset = new QPushButton(tr("Show All"), this);
 connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
 
     lo_search->addWidget(combo_search);
     lo_search->addWidget(le_search);
-    lo_search->addWidget(new QLabel("Jump to : "));
+    lo_search->addWidget(new QLabel(tr("Scroll to : ")));
     lo_search->addWidget(le_jump);
+    lo_search->addWidget(scroll_top);
+    lo_search->addWidget(scroll_bottom);
     lo_search->addWidget(reset);
     lo_search->addStretch();
 
@@ -266,10 +275,10 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     total_count_label = new QLabel(QString::number(sql_model->rowCount()), this);
     selected_count_label = new QLabel(QString::number(0), this);
 
-    lo_label_total_count->addWidget(new QLabel("Selected : ", this));
+    lo_label_total_count->addWidget(new QLabel(tr("Selected : "), this));
     lo_label_total_count->addWidget(selected_count_label);
     lo_label_total_count->addStretch();
-    lo_label_total_count->addWidget(new QLabel("Total : ", this));
+    lo_label_total_count->addWidget(new QLabel(tr("Total : "), this));
     lo_label_total_count->addWidget(total_count_label);
     lo_label_total_count->addStretch();
 
@@ -305,7 +314,7 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     lo_main->addWidget(bottom);
     lo_main->setMargin(0);
     setLayout(lo_main);
-    setWindowTitle("Manage Database");
+    setWindowTitle(tr("Manage Database"));
 
 
 
@@ -627,7 +636,7 @@ void managedb::dclose(){
 
     if(anyChange){
     QMessageBox::StandardButton warning;
-    warning = QMessageBox::question(this, "Warning","Change not save yet. Save?", QMessageBox::Yes | QMessageBox::No);
+    warning = QMessageBox::question(this,tr( "Warning"),tr("Change not save yet. Save?"), QMessageBox::Yes | QMessageBox::No);
     if(warning==QMessageBox::Yes){
       sql_model->submitAll();
     }

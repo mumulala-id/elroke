@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSqlDatabase>
-
+#include <QTranslator>
 
 
 int main(int argc, char *argv[])
@@ -9,6 +9,9 @@ int main(int argc, char *argv[])
     // turn on the DPI support**
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication a(argc, argv);
+    QTranslator t;
+    t.load(":/usr/share/elroke/indonesia.qm");
+    a.installTranslator(&t);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
             qDebug()<<"SQLITE is not installed";

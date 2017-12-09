@@ -137,15 +137,10 @@ protected:
                         if (itemOption.state & QStyle::State_HasFocus)
                             itemOption.state = itemOption.state ^ QStyle::State_HasFocus;
 
-                        if(option.state & QStyle::State_Selected)
-                                {
-                                    painter->save();
-                                    QPen pen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-                                    int w = pen.width()/2;
-                                    painter->setPen(pen);
-                                    painter->drawRect(option.rect.adjusted(w,w,-w,-w));
-                                    painter->restore();
-                                }
+                        if ((itemOption.state & QStyle::State_Selected) &&
+                                (itemOption.state & QStyle::State_Active))
+                                itemOption.palette.setColor(QPalette::Highlight, Qt::red);
+                        QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
 
                         QStyledItemDelegate::paint(painter, itemOption, index);
                     }

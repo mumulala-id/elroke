@@ -47,19 +47,19 @@ about::about(QWidget *parent) :
 
     QVBoxLayout *lo_main = new QVBoxLayout;
 
-    QPushButton *btn_desc = new QPushButton("Description", this);
+    QPushButton *btn_desc = new QPushButton(tr("Description"), this);
     connect(btn_desc,SIGNAL(pressed()),this,SLOT(showDescription()));
 
-    QPushButton *btn_license = new QPushButton("License", this);
+    QPushButton *btn_license = new QPushButton(tr("License"), this);
     connect(btn_license,SIGNAL(pressed()),this,SLOT(showLicense()));
 
-    QPushButton *btn_credit = new QPushButton("Credit", this);
+    QPushButton *btn_credit = new QPushButton(tr("Credit"), this);
     connect(btn_credit,SIGNAL(pressed()),this,SLOT(showCredit()));
 
-    QPushButton *btn_donatur =new QPushButton("Donatur", this);
+    QPushButton *btn_donatur =new QPushButton(tr("Donatur"), this);
     connect(btn_donatur,SIGNAL(pressed()),this,SLOT(showDonatur()));
 
-    QPushButton *btn_close = new QPushButton("Close", this);
+    QPushButton *btn_close = new QPushButton(tr("Close"), this);
     connect(btn_close,SIGNAL(clicked(bool)),this,SLOT(close()));
 
     //Credit

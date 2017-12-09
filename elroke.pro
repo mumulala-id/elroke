@@ -41,6 +41,7 @@ HEADERS  += mainwindow.h \
         liststringfileparser.h \
     clineedit.h
 
+TRANSLATIONS = indonesia.ts
 
 DISTFILES +=
 

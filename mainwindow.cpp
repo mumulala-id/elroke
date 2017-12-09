@@ -60,24 +60,24 @@ void mainWindow::createWidgets(){
 
     pb_menu->setFocusPolicy(Qt::NoFocus);
 
-    QAction *manage_database = new QAction("Manage Database", this);
+    QAction *manage_database = new QAction(tr("Manage Database"), this);
     manage_database->setFont(font());
     connect(manage_database, SIGNAL(triggered(bool)),this,SLOT(openManagedb()));
 
-    auto *preferences_act = new QAction("Preferences", this);
+    auto *preferences_act = new QAction(tr("Preferences"), this);
 //    connect(preferences_act,SIGNAL(triggered(bool)),this,SLOT(openPreferences()));
 
-    auto *about_act = new QAction("About", this);
+    auto *about_act = new QAction(tr("About"), this);
     connect(about_act,SIGNAL(triggered(bool)),this,SLOT(openAbout()));
 
-    auto *quit = new QAction("Quit", this);
+    auto *quit = new QAction(tr("Quit"), this);
     connect(quit,SIGNAL(triggered(bool)),this,SLOT(close()));
 
     auto *menu = new QMenu(this);
     menu->setFont(font());
 
-    auto *menu_database = new QMenu("Database", this);
-    auto *add_to_database= new QAction("Add to Database", this);
+    auto *menu_database = new QMenu(tr("Database"), this);
+    auto *add_to_database= new QAction(tr("Add to Database"), this);
     add_to_database->setFont(font());
     connect(add_to_database, SIGNAL(triggered(bool)), this,SLOT(addToDatabase()));
 
@@ -91,7 +91,7 @@ void mainWindow::createWidgets(){
     pb_menu->setMenu(menu);
 //        pb_menu->menu()->
 
-    AeroButton *pb_all = new AeroButton("ALL", this);
+    AeroButton *pb_all = new AeroButton(tr("ALL"), this);
     AeroButton *button_cat_indonesia = new AeroButton("category1", this);
     AeroButton *button_cat_barat = new AeroButton("category2", this);
     AeroButton *button_cat_rock = new AeroButton("category3", this);
@@ -145,7 +145,7 @@ void mainWindow::createWidgets(){
 
     QPalette table_palette;
     table_palette.setColor(QPalette::Base, Qt::transparent);
-    table_palette.setColor(QPalette::Text, Qt::yellow);
+    table_palette.setColor(QPalette::Text, Qt::white);
     table_palette.setColor(QPalette::Highlight, Qt::transparent);
     table_palette.setColor(QPalette::HighlightedText, Qt::white);
 
@@ -176,7 +176,7 @@ void mainWindow::createWidgets(){
     connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
     auto *lo_search = new QHBoxLayout;
 
-    auto *label_search = new QLabel("SEARCH :", this);
+    auto *label_search = new QLabel(tr("SEARCH "), this);
     le_search = new CLineEdit(this);
 
     connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
@@ -213,7 +213,7 @@ void mainWindow::createWidgets(){
     auto *lo_playlist = new QVBoxLayout;
     model_playlist =new QStandardItemModel(this);
     model_playlist->setColumnCount(5);
-    model_playlist->setHeaderData(2,Qt::Horizontal,"PLAYLIST");
+    model_playlist->setHeaderData(2,Qt::Horizontal, tr("PLAYLIST"));
 
 
     table_playlist = new QTableView(this);
@@ -241,16 +241,16 @@ void mainWindow::createWidgets(){
 //    button_menu->setIcon();
 
     auto *menu_playlist = new QMenu(this);
-    autosave_playlist = new QAction("Auto save playlist", this);
+    autosave_playlist = new QAction(tr("Auto save playlist"), this);
     autosave_playlist->setCheckable(1);
     autosave_playlist->setChecked(1);
     //load playlist
     if(autosave_playlist->isChecked())
         loadPlaylist();
 
-    auto*save_as = new QAction("Save as",  this);
+    auto*save_as = new QAction(tr("Save as"),  this);
     connect(save_as, SIGNAL(triggered(bool)), this, SLOT(dialogSavePlaylist()));
-    auto *load_playlist = new QAction("Load playlist" , this);
+    auto *load_playlist = new QAction(tr("Load playlist") , this);
     connect(load_playlist, SIGNAL(triggered(bool)),this,SLOT(dialogLoadPlaylist()));
 
     menu_playlist->addAction(autosave_playlist);
@@ -677,7 +677,7 @@ int id = model_playlist->item(cur,0)->text().toInt();
 
                QMessageBox message;
                message.setIcon(QMessageBox::Information);
-               message.setInformativeText("File is not found, maybe drive is not mounted");
+               message.setInformativeText(tr("File is not found, maybe drive is not mounted"));
                message.setWindowFlags(Qt::FramelessWindowHint);
                message.setStandardButtons(QMessageBox::Close);
                message.exec();

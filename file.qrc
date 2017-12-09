@@ -22,6 +22,7 @@
          <file>file/icon/lock.png</file>
          <file>file/icon/unlock.png</file>
               <file>file/icon/logo.png</file>
+              <file>indonesia.qm</file>
         <file>file/LICENSE</file>
     </qresource>
 </RCC>
