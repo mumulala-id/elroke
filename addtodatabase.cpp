@@ -84,7 +84,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     connect(cb_auto,SIGNAL(toggled(bool)),this,SLOT(setToAuto(bool)));
 
     QHBoxLayout *lo_use_char = new QHBoxLayout;
-    QCheckBox *cb_splitby= new QCheckBox("Split by", this);
+    QCheckBox *cb_splitby= new QCheckBox(tr("Split by"), this);
     connect(cb_splitby,SIGNAL(toggled(bool)),this,SLOT(setToManual(bool)));
 
     le_splitter = new QLineEdit(this);
@@ -97,24 +97,24 @@ addtodatabase::addtodatabase(QWidget *parent) :
     lo_splitter->addWidget(cb_auto);
     lo_splitter->addLayout(lo_use_char);
 
-    QGroupBox *grup_splitter = new QGroupBox("Splitter", this);
+    QGroupBox *grup_splitter = new QGroupBox(tr("Splitter"), this);
     grup_splitter->setLayout(lo_splitter);
 
     QVBoxLayout *lo_pattern = new QVBoxLayout;
 
     cmb_titlefirst = new QCheckBox( this);
-    cmb_titlefirst->setText("Title"+splitter+"Singer");
+    cmb_titlefirst->setText(tr("Title")+splitter+tr("Singer"));
     cmb_titlefirst->setChecked(title_first);
     connect(cmb_titlefirst,SIGNAL(clicked(bool)),this,SLOT(setTitleFirst(bool)));
 
     cmb_singerfirst = new QCheckBox(this);
-    cmb_singerfirst->setText("Singer"+splitter+"Title");
+    cmb_singerfirst->setText(tr("Singer")+splitter+tr("Title"));
     connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
 
     lo_pattern->addWidget(cmb_titlefirst);
     lo_pattern->addWidget(cmb_singerfirst);
 
-    QGroupBox *grup_pattern = new QGroupBox("Pattern", this);
+    QGroupBox *grup_pattern = new QGroupBox(tr("Pattern"), this);
     grup_pattern->setLayout(lo_pattern);
 
    QGridLayout *lo_additional_item = new QGridLayout;
@@ -123,15 +123,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
    QLineEdit *le_language = new QLineEdit(this);
    QLineEdit *le_category = new QLineEdit(this);
 
-   lo_additional_item->addWidget( new QLabel("Singer"),0,0);
+   lo_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
    lo_additional_item->addWidget(le_singer,0,1);
-   lo_additional_item->addWidget(new QLabel("Language", this), 1,0);
+   lo_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
    lo_additional_item->addWidget(le_language,1,1);
-   lo_additional_item->addWidget(new QLabel("Category/Genre", this),2,0);
+   lo_additional_item->addWidget(new QLabel(tr("Category"), this),2,0);
    lo_additional_item->addWidget(le_category,2,1);
 
 
-   QGroupBox *gr_addcat = new QGroupBox("Add category if not available");
+   QGroupBox *gr_addcat = new QGroupBox(tr("Add data if not available"));
    gr_addcat->setLayout(lo_additional_item);
 
    QVBoxLayout *lo_audio_channel = new QVBoxLayout;
@@ -143,7 +143,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    lo_audio_channel->addWidget(combo_channel_right);
    lo_audio_channel->addStretch();
 
-   QGroupBox *gr_audio_channel = new QGroupBox("Audio Channel", this);
+   QGroupBox *gr_audio_channel = new QGroupBox(tr("Audio Channel"), this);
 
    gr_audio_channel->setLayout(lo_audio_channel);
 
@@ -154,10 +154,10 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    QHBoxLayout *lo_btn = new QHBoxLayout;
 
-   btn_start = new QPushButton("Start", this);
+   btn_start = new QPushButton(tr("Start"), this);
    connect(btn_start,SIGNAL(clicked(bool)),this,SLOT(saveToDatabase()));
 
-   QPushButton *btn_cancel = new QPushButton("Cancel", this);
+   QPushButton *btn_cancel = new QPushButton(tr("Cancel"), this);
 
    connect(btn_cancel,SIGNAL(clicked(bool)),this,SLOT(close()));
 
@@ -210,8 +210,8 @@ void addtodatabase::splitterChange(QString split){
 
     if(split==NULL)
         return;
-    cmb_titlefirst->setText("Title"+split+"Singer");
-    cmb_singerfirst->setText("Singer"+split+"Title");
+    cmb_titlefirst->setText(tr("Title")+split+tr("Singer"));
+    cmb_singerfirst->setText(tr("Singer")+split+tr("Title"));
 
 }
 
@@ -229,7 +229,6 @@ void addtodatabase::saveToDatabase(){
      QString namefile;
 
      dbmanager *db = new dbmanager(dbmanager::add, this);
-//     db->setDBName("elroke");
      db->connectToDB();
      db->prepare();
 
