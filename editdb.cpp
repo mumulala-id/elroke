@@ -1,13 +1,10 @@
 #include "editdb.h"
 #include "dbmanager.h"
 #include "liststringfileparser.h"
-#include <QVBoxLayout>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QLabel>
 #include <QFrame>
 #include <QGridLayout>
-#include <QTableWidget>
 #include <QDebug>
 #include <QFile>
 #include <QDir>

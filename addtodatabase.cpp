@@ -1,10 +1,8 @@
 #include "addtodatabase.h"
 #include <dbmanager.h>
-#include <QHBoxLayout>
 #include <QStorageInfo>
 #include <QLabel>
 #include <QHeaderView>
-#include <QLineEdit>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QDebug>
@@ -13,7 +11,6 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariantList>
-//#include <QScrollBar>
 #include <QtAlgorithms>//qSort
 
 addtodatabase::addtodatabase(QWidget *parent) :
@@ -66,6 +63,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      //list for show files
      lw_list = new QListWidget(this);
+     lw_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
      QHBoxLayout *lo_drive = new QHBoxLayout;
      lo_drive->addWidget(combo_mounted);
@@ -73,13 +71,22 @@ addtodatabase::addtodatabase(QWidget *parent) :
      lo_top_left->addLayout(lo_drive);
      lo_top_left->addWidget(tv_folder);
      lo_top ->addLayout(lo_top_left);
-     lo_top->addWidget(lw_list);
 
-    QHBoxLayout *lo_g = new QHBoxLayout;
+
+     QPushButton *button_select_all = new QPushButton(tr("Select All"), this);
+     connect(button_select_all,SIGNAL(pressed()),lw_list,SLOT(selectAll()));
+     //right
+     QVBoxLayout *lo_list = new QVBoxLayout;
+     lo_list->addWidget(lw_list);
+     lo_list->addWidget(button_select_all);
+
+     lo_top->addLayout(lo_list);
+
+
     // ----
 
     QVBoxLayout *lo_splitter = new QVBoxLayout;
-    cb_auto = new QCheckBox("Auto", this);
+    cb_auto = new QCheckBox(tr("Auto"), this);
     cb_auto->setChecked(automatic);
     connect(cb_auto,SIGNAL(toggled(bool)),this,SLOT(setToAuto(bool)));
 
@@ -147,6 +154,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    gr_audio_channel->setLayout(lo_audio_channel);
 
+   QHBoxLayout *lo_g = new QHBoxLayout;
    lo_g->addWidget(grup_splitter);
    lo_g->addWidget(grup_pattern);
    lo_g->addWidget(gr_addcat);
@@ -155,6 +163,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    QHBoxLayout *lo_btn = new QHBoxLayout;
 
    btn_start = new QPushButton(tr("Start"), this);
+   btn_start->setEnabled(0);
    connect(btn_start,SIGNAL(clicked(bool)),this,SLOT(saveToDatabase()));
 
    QPushButton *btn_cancel = new QPushButton(tr("Cancel"), this);
@@ -173,10 +182,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
     setPalette(dark_palet);
 
     setMinimumSize(1000,400);
-
-    QFont font;
-    font.setPointSize(12);
-    setFont(font);
 
     setWindowFlags(Qt::FramelessWindowHint);
 }
@@ -219,7 +224,7 @@ void addtodatabase::saveToDatabase(){
 
     setCursor(Qt::BusyCursor);
     btn_start->setEnabled(0);
-     splitter = le_splitter->text();
+    splitter = le_splitter->text();
 
     QDirIterator it(working_path,QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
 
@@ -285,7 +290,6 @@ void addtodatabase::saveToDatabase(){
                singer = filename.at(1);
 
             }
-            qDebug()<<"failed"<<namefile<<title<<singer;
         }
 
 
@@ -321,18 +325,15 @@ void addtodatabase::saveToDatabase(){
     qSort(list_genre.begin(), list_genre.end());
 
     writeTextStream(QDir::homePath()+"/.elroke/meta/singer", list_singer);
-     writeTextStream(QDir::homePath()+"/.elroke/meta/language", list_language);
-      writeTextStream(QDir::homePath()+"/.elroke/meta/category", list_genre);
-       writeTextStream(QDir::homePath()+"/.elroke/meta/path", list_path);
+    writeTextStream(QDir::homePath()+"/.elroke/meta/language", list_language);
+    writeTextStream(QDir::homePath()+"/.elroke/meta/category", list_genre);
+    writeTextStream(QDir::homePath()+"/.elroke/meta/path", list_path);
 
      setCursor(Qt::ArrowCursor);
 
       this->accept();
 
  }
-
-
-
 
 void addtodatabase::writeTextStream(const QString &file, QList<QString>set){
     QFileInfo info;
@@ -437,7 +438,6 @@ void addtodatabase::setToManual(bool m){
 void addtodatabase::paintEvent(QPaintEvent *){
 
     QColor backgroundColor = palette().dark().color();
-    backgroundColor.setAlpha(200);
     QPainter customPainter(this);
     customPainter.fillRect(rect(), backgroundColor);
 

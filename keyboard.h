@@ -3,7 +3,6 @@
 
 #include <QWidget>
 #include <QString>
-#include <QToolButton>
 #include <QPushButton>
 
 #include "aerobutton.h"
@@ -15,6 +14,7 @@ class Keyboard : public QWidget
 public:
     explicit Keyboard(QWidget *parent = 0);
     ~Keyboard();
+    void showKeyboard(QPoint);
 
 private:
 

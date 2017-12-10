@@ -74,7 +74,7 @@ about::about(QWidget *parent) :
 
     QTextEdit * donatur = new QTextEdit (this);
 
-    donatur->setText("Thank to all donatur, keep Elroke alive :\n\n"
+    donatur->setText(tr("Thank to all contributor, keep Elroke alive)")+ ":\n\n"
                      "John\n"
                      "Due\n");
     donatur->setReadOnly(1);
@@ -101,7 +101,7 @@ about::about(QWidget *parent) :
     setLayout(lo_main);
 
     setFixedSize(800,360);
-//    setWindowTitle("About Elroke");
+    setWindowTitle(tr("About")+"  Elroke");
     setWindowFlags(Qt::FramelessWindowHint);
     setPalette(palet);
 

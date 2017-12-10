@@ -243,6 +243,13 @@ else{
 
 }
 
+
+void Keyboard::showKeyboard(QPoint p){
+
+    move(p);
+
+
+}
 Keyboard::~Keyboard()
 {
 

@@ -1,6 +1,5 @@
 #include "dbmanager.h"
 #include <QDebug>
-#include <QVariant>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDate>

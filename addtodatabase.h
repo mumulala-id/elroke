@@ -1,6 +1,5 @@
 #ifndef ADDTODATABASE_H
 #define ADDTODATABASE_H
-//#include "database.h"
 #include <QDialog>
 #include <QCheckBox>
 #include <QTreeView>
@@ -9,7 +8,6 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QComboBox>
-#include <QSet>
 
 class addtodatabase : public QDialog
 {
@@ -20,27 +18,25 @@ public:
     explicit addtodatabase(QWidget *parent=0);
 
 private :
-    //database *dtbs;
+
     QString dir_;
     QString working_path;
-
     QFileSystemModel *dir_model;
     QTreeView *tv_folder;
     QFileSystemModel *file_model;
     QListWidget *lw_list;
     QStringList filelist;
     QCheckBox *cmb_titlefirst;
-     QCheckBox *cmb_singerfirst;
-     QPushButton *btn_start;
-     QLineEdit *le_splitter;
-     QString splitter{"#"};
-     QComboBox *combo_mounted;
-     QCheckBox *cb_auto;
-     QCheckBox *cb_splitby;
-
-     QString default_singer;
-     QString defafult_language;
-     QString default_category;
+    QCheckBox *cmb_singerfirst;
+    QPushButton *btn_start;
+    QLineEdit *le_splitter;
+    QString splitter{"#"};
+    QComboBox *combo_mounted;
+    QCheckBox *cb_auto;
+    QCheckBox *cb_splitby;
+    QString default_singer;
+    QString defafult_language;
+    QString default_category;
 
      bool title_first=true;
      bool singer_first=false;

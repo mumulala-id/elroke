@@ -4,7 +4,6 @@
 #include "vlc/vlc.h"
 #include <QWidget>
 #include <QTimer>
-//#include "opening.h"
 #include <QDesktopWidget>
 #include <QApplication>
 #include <QEvent>

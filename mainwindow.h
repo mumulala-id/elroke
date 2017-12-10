@@ -8,16 +8,13 @@
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
+
 #include <QDialog>
 #include <QComboBox>
 #include <QTableView>
-#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
-#include <QLineEdit>
 #include <QSlider>
-#include <QPushButton>
-#include <QLabel>
 #include <QKeyEvent>
 #include <QDesktopWidget>
 #include <QSqlTableModel>
@@ -45,9 +42,8 @@ private :
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
     Player *video;
-
     QSqlTableModel *sql_model;
-     QStandardItemModel *model_playlist;
+    QStandardItemModel *model_playlist;
 
 //    QStringList category;
 
@@ -70,17 +66,28 @@ private :
     bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;
+    QString userID;
+    QString password;
+    QString group_auth = "Authentication";
 
 
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool tampak=false;
     QAction *autosave_playlist;
+    QLineEdit * le_userName;
+    QLineEdit * le_password;
 
 
 
 private slots:
-    void addToDatabase();
+    void dialogAdmin();
+    void dialogAddToDatabase();
+    void checkAdmin();
+    void createAdminAccount();
+    void dialogCreateAdmin();
+    void dialogLogin();
+    void login();
     void almostEnd();
     void createShortcut();
     void createWidgets();
@@ -91,7 +98,7 @@ private slots:
     void moveItemDown();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
-    void openManagedb();
+    void dialogEditDatabase();
     void setVolStepDown();
     void setVolStepUp();
     void setMute();
@@ -102,7 +109,7 @@ private slots:
     void deleteItemPlaylist();
     void playPlayer();
     void clearPlaylist();
-    void openAbout();
+    void dialogAbout();
     void getCategory();
     void dialogSavePlaylist();
      void writePlaylist();
@@ -123,6 +130,10 @@ private slots:
 
 protected :
     void keyPressEvent(QKeyEvent *event);
+
+signals :
+    void loginAccepted();
+    void usernameCreated();
 
 };
 

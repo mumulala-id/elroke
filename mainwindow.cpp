@@ -11,7 +11,6 @@
 
 #include <QAction>
 #include <QDebug>
-#include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFontDatabase>
@@ -19,7 +18,6 @@
 #include <QMenu>
 #include <QHeaderView>
 #include <QShortcut>
-#include <QTextStream>
 #include <QTime>
 #include <QMessageBox>
 #include <thread>
@@ -57,39 +55,8 @@ void mainWindow::createWidgets(){
 
     auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
     pb_menu->setFlat(1);
-
     pb_menu->setFocusPolicy(Qt::NoFocus);
-
-    QAction *manage_database = new QAction(tr("Manage Database"), this);
-    manage_database->setFont(font());
-    connect(manage_database, SIGNAL(triggered(bool)),this,SLOT(openManagedb()));
-
-    auto *preferences_act = new QAction(tr("Preferences"), this);
-//    connect(preferences_act,SIGNAL(triggered(bool)),this,SLOT(openPreferences()));
-
-    auto *about_act = new QAction(tr("About"), this);
-    connect(about_act,SIGNAL(triggered(bool)),this,SLOT(openAbout()));
-
-    auto *quit = new QAction(tr("Quit"), this);
-    connect(quit,SIGNAL(triggered(bool)),this,SLOT(close()));
-
-    auto *menu = new QMenu(this);
-    menu->setFont(font());
-
-    auto *menu_database = new QMenu(tr("Database"), this);
-    auto *add_to_database= new QAction(tr("Add to Database"), this);
-    add_to_database->setFont(font());
-    connect(add_to_database, SIGNAL(triggered(bool)), this,SLOT(addToDatabase()));
-
-    menu->addMenu(menu_database);
-    menu_database->addAction(add_to_database);
-    menu_database->addAction(manage_database);
-    menu->addAction(preferences_act);
-    menu->addAction(about_act);
-    menu->addAction(quit);
-
-    pb_menu->setMenu(menu);
-//        pb_menu->menu()->
+    connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
 
     AeroButton *pb_all = new AeroButton(tr("ALL"), this);
     AeroButton *button_cat_indonesia = new AeroButton("category1", this);
@@ -242,6 +209,7 @@ void mainWindow::createWidgets(){
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
+    autosave_playlist->setFont(font());
     autosave_playlist->setCheckable(1);
     autosave_playlist->setChecked(1);
     //load playlist
@@ -249,8 +217,10 @@ void mainWindow::createWidgets(){
         loadPlaylist();
 
     auto*save_as = new QAction(tr("Save as"),  this);
+    save_as->setFont(font());
     connect(save_as, SIGNAL(triggered(bool)), this, SLOT(dialogSavePlaylist()));
     auto *load_playlist = new QAction(tr("Load playlist") , this);
+    load_playlist->setFont(font());
     connect(load_playlist, SIGNAL(triggered(bool)),this,SLOT(dialogLoadPlaylist()));
 
     menu_playlist->addAction(autosave_playlist);
@@ -562,7 +532,7 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
         }
 }
 
-void mainWindow::openAbout(){
+void mainWindow::dialogAbout(){
 
     about About;
     About.exec();
@@ -826,13 +796,13 @@ void mainWindow::delayEvent(){
 
 }
 
-void mainWindow::addToDatabase(){
+void mainWindow::dialogAddToDatabase(){
 
-    addtodatabase *atd = new addtodatabase(this);
+    addtodatabase atd;// = new addtodatabase(NULL);
 
-    connect(atd,SIGNAL(accepted()),this,SLOT(tableRule()));
-    connect(atd,SIGNAL(accepted()),this,SLOT(getCategory()));
-    atd->exec();
+    connect(&atd,SIGNAL(accepted()),this,SLOT(tableRule()));
+    connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
+    atd.exec();
 
 }
 
@@ -1054,7 +1024,7 @@ QRegion mainWindow::getMaska(){
 }
 
 
-void mainWindow::openManagedb(){
+void mainWindow::dialogEditDatabase(){
 
     //sql_model must be inActive before editing
     sql_model->clear();
@@ -1137,8 +1107,8 @@ void mainWindow::showKeyboard(bool x){
     if(x){
         int x =(table->width()-keyboard->width())/2;
         int y = table->mapToGlobal(table->rect().bottomLeft()).y()-keyboard->height();
-        keyboard->move(QPoint(x,y));
-         keyboard->show();
+        //key show on the midle of table
+         keyboard->showKeyboard(QPoint(x,y));
     }
       else
             keyboard->hide();
@@ -1189,6 +1159,174 @@ void mainWindow::updateLockButton(bool lock){
         button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
     else
          button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
+}
+
+void mainWindow::dialogAdmin(){
+
+    QDialog dialog_admin;
+
+    QVBoxLayout *lo_main = new QVBoxLayout;
+
+    auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), &dialog_admin);
+    connect(button_add_to_database,SIGNAL(pressed()),this,SLOT(dialogAddToDatabase()));
+
+    auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), &dialog_admin);
+    connect(button_manage_database,SIGNAL(pressed()),this,SLOT(dialogEditDatabase()));
+
+    auto *button_preferences = new QPushButton(tr("PREFERENCES"), &dialog_admin);
+
+    auto *button_about = new QPushButton(tr("ABOUT"), &dialog_admin);
+    connect(button_about,SIGNAL(pressed()),this,SLOT(dialogAbout()));
+
+    auto *button_close = new QPushButton(tr("CLOSE"), &dialog_admin);
+    connect(button_close,SIGNAL(pressed()),&dialog_admin,SLOT(close()));
+
+    auto *button_exit = new QPushButton(tr("QUIT APP"), &dialog_admin);
+    connect(button_exit,SIGNAL(pressed()),&dialog_admin,SLOT(close()));
+    connect(button_exit,SIGNAL(pressed()),this,SLOT(close()));
+
+    lo_main->addWidget(button_add_to_database);
+    lo_main->addWidget(button_manage_database);
+    lo_main->addWidget(button_preferences);
+    lo_main->addWidget(button_about);
+    lo_main->addWidget(button_close);
+    lo_main->addWidget(button_exit);
+
+    dialog_admin.setLayout(lo_main);
+    dialog_admin.setWindowFlags(Qt::FramelessWindowHint);
+    dialog_admin.exec();
+
+}
+
+void mainWindow::checkAdmin(){
+
+//    dialogCreateAdmin();
+    QSettings settings("elroke","elroke");
+    QString user;
+    settings.beginGroup(group_auth);
+    user=settings.value("name").toString();
+    settings.endGroup();
+
+    qDebug()<<"yser"<<user;
+
+    if(user==NULL)
+        dialogCreateAdmin();
+    else
+        dialogLogin();
+
+}
+
+void mainWindow::dialogCreateAdmin(){
+
+    QDialog dialog;
+    QVBoxLayout *lo_main = new QVBoxLayout;
+    QHBoxLayout *lo_username = new QHBoxLayout;
+    QHBoxLayout *lo_password = new QHBoxLayout;
+
+    le_userName = new QLineEdit(&dialog);
+
+
+    lo_username->addWidget(new QLabel(tr("Username"),&dialog));
+    lo_username->addWidget(le_userName);
+
+    le_password = new QLineEdit(&dialog);
+    le_password->setEchoMode(QLineEdit::Password);
+    lo_password->addWidget(new QLabel(tr("Password"),&dialog));
+    lo_password->addWidget(le_password);
+
+    auto *button_create_admin = new QPushButton(tr("Create Administrator"), &dialog);
+    connect(button_create_admin,SIGNAL(pressed()),this,SLOT(createAdminAccount()));
+
+    lo_main->addWidget(new QLabel(tr("First setup,  create admin account"), &dialog));
+    lo_main->addLayout(lo_username);
+    lo_main->addLayout(lo_password);
+    lo_main->addWidget(button_create_admin);
+
+     dialog.setLayout(lo_main);
+     connect(this,SIGNAL(usernameCreated()),&dialog,SLOT(close()));
+     dialog.setWindowFlags(Qt::FramelessWindowHint);
+     dialog.exec();
+
+
+
+}
+
+void mainWindow::dialogLogin(){
+
+    QDialog dialog;
+    QVBoxLayout *lo_main = new QVBoxLayout;
+    QHBoxLayout *lo_username = new QHBoxLayout;
+    QHBoxLayout *lo_password = new QHBoxLayout;
+
+    le_userName = new QLineEdit(&dialog);
+
+
+    lo_username->addWidget(new QLabel(tr("Username"),&dialog));
+    lo_username->addWidget(le_userName);
+
+    le_password = new QLineEdit(&dialog);
+    le_password->setEchoMode(QLineEdit::Password);
+    lo_password->addWidget(new QLabel(tr("Password"),&dialog));
+    lo_password->addWidget(le_password);
+
+    auto *button_close = new QPushButton(tr("Close"), &dialog);
+    connect(button_close,SIGNAL(pressed()),&dialog,SLOT(close()));
+    auto *button_login = new QPushButton(tr("Login"), &dialog);
+    button_login->setFocus();
+    connect(button_login,SIGNAL(pressed()),this,SLOT(login()));
+
+    QHBoxLayout *lo_button = new QHBoxLayout;
+    lo_button->addWidget(button_close);
+    lo_button->addWidget(button_login);
+    lo_main->addLayout(lo_username);
+    lo_main->addLayout(lo_password);
+    lo_main->addLayout(lo_button);
+
+     dialog.setLayout(lo_main);
+     dialog.setWindowFlags(Qt::FramelessWindowHint);
+     connect(this,SIGNAL(loginAccepted()),&dialog,SLOT(close()));
+     dialog.exec();
+
+
+
+}
+
+void mainWindow::createAdminAccount(){
+
+QSettings setting("elroke","elroke");
+
+QString user = le_userName->text();
+QString pass = le_password->text();
+
+if(user.isEmpty() && pass.isEmpty())
+    return;
+
+setting.beginGroup(group_auth);
+setting.setValue("name", user);
+setting.setValue("sandi", pass);
+setting.endGroup();
+
+emit usernameCreated();
+
+
+}
+
+void mainWindow::login(){
+
+    QSettings settings("elroke","elroke");
+    QString user;
+    QString password;
+    settings.beginGroup(group_auth);
+    user=settings.value("name").toString();
+    password=settings.value("sandi").toString();
+    settings.endGroup();
+
+    if(le_userName->text()==user && le_password->text()==password){
+     emit loginAccepted();
+    dialogAdmin();
+    }
+    else return;
+
 }
 mainWindow::~mainWindow()
 {
