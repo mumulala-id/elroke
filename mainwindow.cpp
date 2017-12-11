@@ -5,7 +5,7 @@
 #include "mainwindow.h"
 #include "about.h"
 #include "addtodatabase.h"
-#include "aerobutton.h"
+//#include "QPushButton.h"
 #include "editdb.h"
 #include "liststringfileparser.h"
 
@@ -23,6 +23,7 @@
 #include <thread>
 #include <chrono>
 #include <QMutex>
+#include <QCryptographicHash>
 
 using namespace std;
 
@@ -55,19 +56,18 @@ void mainWindow::createWidgets(){
 
     auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
     pb_menu->setFlat(1);
-    pb_menu->setFocusPolicy(Qt::NoFocus);
+//    pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
 
-    AeroButton *pb_all = new AeroButton(tr("ALL"), this);
-    AeroButton *button_cat_indonesia = new AeroButton("category1", this);
-    AeroButton *button_cat_barat = new AeroButton("category2", this);
-    AeroButton *button_cat_rock = new AeroButton("category3", this);
-    AeroButton *button_cat_pop = new AeroButton("category4", this);
-    AeroButton *button_cat_dangdut = new AeroButton("category5", this);
+    le_search = new CLineEdit(this);
+    le_search->setPlaceholderText(tr("SEARCH"));
 
-//    combo_cat = new QComboBox(this);
-//    combo_cat->setSizeAdjustPolicy(QComboBox::AdjustToContents);
-
+    QPushButton *pb_all = new QPushButton(tr("ALL"), this);
+    QPushButton *button_cat_indonesia = new QPushButton("category1", this);
+    QPushButton *button_cat_barat = new QPushButton("category2", this);
+    QPushButton *button_cat_rock = new QPushButton("category3", this);
+    QPushButton *button_cat_pop = new QPushButton("category4", this);
+    QPushButton *button_cat_dangdut = new QPushButton("category5", this);
 
 //show clock
     clock =new QLabel(this);
@@ -76,9 +76,9 @@ void mainWindow::createWidgets(){
     timer->start(60000);
     showClock();
 
-
     lo_top->addWidget(pb_menu);
-        lo_top->addStretch();
+    lo_top->addWidget(le_search);
+    lo_top->addSpacing(40);
     lo_top->addWidget(pb_all);
     lo_top->addWidget(button_cat_indonesia);
     lo_top->addWidget(button_cat_barat);
@@ -86,9 +86,6 @@ void mainWindow::createWidgets(){
     lo_top->addWidget(button_cat_pop);
     lo_top->addWidget(button_cat_dangdut);
     lo_top->addStretch();
-//    lo_top->addWidget(new QLabel("OTHER :", this));
-//    lo_top->addWidget(combo_cat);
-//    lo_top->addStretch();
     lo_top->addWidget(clock);
     lo_top->setSpacing(0);
     lo_top->setMargin(0);
@@ -108,7 +105,7 @@ void mainWindow::createWidgets(){
 
     QHBoxLayout *lo_table = new QHBoxLayout;
 
-    QVBoxLayout *lo_left = new QVBoxLayout;
+//    QVBoxLayout *lo_left = new QVBoxLayout;
 
     QPalette table_palette;
     table_palette.setColor(QPalette::Base, Qt::transparent);
@@ -133,49 +130,18 @@ void mainWindow::createWidgets(){
     header_palette.setBrush(QPalette::Button, Qt::blue);
     header_palette.setColor(QPalette::Background, Qt::transparent);
     header_palette.setColor(QPalette::ButtonText, Qt::red);
+      header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::red);
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
 
-
-
-   // header_palette.setColor(QPalette::Button, Qt::transparent);
-
     connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
-    auto *lo_search = new QHBoxLayout;
-
-    auto *label_search = new QLabel(tr("SEARCH "), this);
-    le_search = new CLineEdit(this);
 
     connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
     connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
 
-    auto *button_backspace = new AeroButton(QIcon(":/usr/share/elroke/file/icon/backspace.png"), this);
-    button_backspace->setFocusPolicy(Qt::NoFocus);
-    connect(button_backspace,&QPushButton::pressed,le_search,&QLineEdit::backspace);
-
-    auto *button_clear = new AeroButton(QIcon(":/usr/share/elroke/file/icon/clear.png"), this);
-    button_clear->setFocusPolicy(Qt::NoFocus);
-    connect(button_clear,&QPushButton::pressed,le_search,&QLineEdit::clear);
-
-    lo_search->addStretch();
-    lo_search->setSpacing(0);
-    lo_search->addWidget(label_search);
-    lo_search->addWidget(le_search);
-    lo_search->addWidget(button_backspace);
-    lo_search->addWidget(button_clear);
-    lo_search->addStretch();
-
-
-    lo_left->addWidget(table);
-    lo_left->addLayout(lo_search);
-    lo_left->setMargin(0);
-
-    auto *w_table_left = new QWidget(this);//THIS WIDGET ENCAPSULATE TABLE,LINEEDIT, AND BUTTOn to apply sizepolicy
-    w_table_left->setLayout(lo_left);
-
     QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spLeft.setHorizontalStretch(3);
-    w_table_left->setSizePolicy(spLeft);
+    table->setSizePolicy(spLeft);
 
     auto *lo_playlist = new QVBoxLayout;
     model_playlist =new QStandardItemModel(this);
@@ -190,6 +156,7 @@ void mainWindow::createWidgets(){
     table_playlist->hideColumn(1);
     table_playlist->hideColumn(3);
     table_playlist->hideColumn(4);
+    table_playlist->horizontalHeader()->hide();
     table_playlist->verticalHeader()->hide();
     table_playlist->setShowGrid(0);
     table_playlist->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -204,8 +171,8 @@ void mainWindow::createWidgets(){
 
     auto *lo_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new AeroButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),this);
-//    button_menu->setIcon();
+    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
+    button_menu->setFlat(1);
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
@@ -229,23 +196,23 @@ void mainWindow::createWidgets(){
 
     button_menu->setMenu(menu_playlist);
 
-    auto *button_delete = new AeroButton(QIcon(":/usr/share/elroke/file/icon/delete.png"), this);
+    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
     button_delete->setFocusPolicy(Qt::NoFocus);
     connect(button_delete,SIGNAL(pressed()),this,SLOT(deleteItemPlaylist()));
 
-    auto *button_clear_playlist = new AeroButton(QIcon(":/usr/share/elroke/file/icon/clear.png"), this);
+    auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/clear.png"),"", this);
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
     connect(button_clear_playlist,SIGNAL(pressed()),this,SLOT(clearPlaylist()));
 
-    auto *button_up = new AeroButton(QIcon(":/usr/share/elroke/file/icon/up.png"), this);
+    auto *button_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/up.png"),"", this);
     button_up->setFocusPolicy(Qt::NoFocus);
     connect(button_up,SIGNAL(pressed()),this,SLOT(moveItemUp()));
 
-    auto *button_down = new AeroButton(QIcon(":/usr/share/elroke/file/icon/down.png"), this);
+    auto *button_down = new QPushButton(QIcon(":/usr/share/elroke/file/icon/down.png"), "",this);
     button_down->setFocusPolicy(Qt::NoFocus);
     connect(button_down,SIGNAL(pressed()),this,SLOT(moveItemDown()));
 
-    button_lock_playlist = new AeroButton(QIcon(":/usr/share/elroke/file/icon/lock.png"), this);
+    button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
     button_lock_playlist->setCheckable(true);
     connect(button_lock_playlist,&QPushButton::clicked,this,&mainWindow::updateLockButton);
@@ -258,8 +225,11 @@ void mainWindow::createWidgets(){
     lo_button_playlist->addWidget(button_down);
     lo_button_playlist->addWidget(button_lock_playlist);
     lo_button_playlist->setSpacing(0);
-    lo_playlist->addWidget(table_playlist);
+    lo_button_playlist->setMargin(0);
+
     lo_playlist->addLayout(lo_button_playlist);
+    lo_playlist->addWidget(table_playlist);
+lo_playlist->setSpacing(0);
     lo_playlist->setMargin(0);
 
     //CREATE WIDGET TO APPLY SIZEPOLICY
@@ -270,13 +240,13 @@ void mainWindow::createWidgets(){
     spRight.setHorizontalStretch(1);
     w_table_right->setSizePolicy(spRight);
 
-    lo_table->addWidget(w_table_left);
+    lo_table->addWidget(table);
     lo_table->addWidget(w_table_right);
     lo_table->setMargin(0);
     lo_table->setSpacing(0);
 
 
-    //CREATE WIDGET TO APPLY SIZEPOLICY
+    //CREATE WIDGET TO APPLY SIZEPOLICY(Height)
     auto *all_table = new QWidget(this);
     all_table->setLayout(lo_table);
 
@@ -758,7 +728,7 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
                 }
 
                 le_search->setFocus();
-                le_search->setText(keyEvent->text().toUpper());
+                le_search->setText(keyEvent->text());
 
 
              }
@@ -766,14 +736,14 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
     //if video is playing, user click, mainwindow will be shown
  if(event->type()==QEvent::MouseButtonPress){
 
-     if(!tampak){
+     if(!main_window_visible){
          this->activateWindow();
          this->setMask(getMaska());
-         tampak=true;
+         main_window_visible=true;
      }
      else{
          video->activateWindow();
-         tampak=false;}
+         main_window_visible=false;}
       }
 }
 
@@ -965,7 +935,7 @@ void mainWindow::loadPlaylist(const QString &s){
     QTextStream stream(&file);
 
     QString stuff= stream.readLine();
-    //validate
+    //validate first line
     if(stuff!="[elroke playlist]")
         return;
 
@@ -1163,26 +1133,26 @@ void mainWindow::updateLockButton(bool lock){
 
 void mainWindow::dialogAdmin(){
 
-    QDialog dialog_admin;
+    QDialog *dialog_admin = new QDialog;
 
     QVBoxLayout *lo_main = new QVBoxLayout;
 
-    auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), &dialog_admin);
+    auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
     connect(button_add_to_database,SIGNAL(pressed()),this,SLOT(dialogAddToDatabase()));
 
-    auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), &dialog_admin);
+    auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,SIGNAL(pressed()),this,SLOT(dialogEditDatabase()));
 
-    auto *button_preferences = new QPushButton(tr("PREFERENCES"), &dialog_admin);
+    auto *button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
 
-    auto *button_about = new QPushButton(tr("ABOUT"), &dialog_admin);
+    auto *button_about = new QPushButton(tr("ABOUT"), dialog_admin);
     connect(button_about,SIGNAL(pressed()),this,SLOT(dialogAbout()));
 
-    auto *button_close = new QPushButton(tr("CLOSE"), &dialog_admin);
-    connect(button_close,SIGNAL(pressed()),&dialog_admin,SLOT(close()));
+    auto *button_close = new QPushButton(tr("CLOSE"), dialog_admin);
+    connect(button_close,SIGNAL(pressed()),dialog_admin,SLOT(close()));
 
-    auto *button_exit = new QPushButton(tr("QUIT APP"), &dialog_admin);
-    connect(button_exit,SIGNAL(pressed()),&dialog_admin,SLOT(close()));
+    auto *button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
+    connect(button_exit,SIGNAL(pressed()),dialog_admin,SLOT(close()));
     connect(button_exit,SIGNAL(pressed()),this,SLOT(close()));
 
     lo_main->addWidget(button_add_to_database);
@@ -1192,22 +1162,26 @@ void mainWindow::dialogAdmin(){
     lo_main->addWidget(button_close);
     lo_main->addWidget(button_exit);
 
-    dialog_admin.setLayout(lo_main);
-    dialog_admin.setWindowFlags(Qt::FramelessWindowHint);
-    dialog_admin.exec();
+    dialog_admin->setLayout(lo_main);
+    dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
+    QPalette plt = palette();
+    plt.setColor(QPalette::Window, Qt::black);
+    plt.setColor(QPalette::Text, Qt::white);
+    dialog_admin->setPalette(plt);
+    dialog_admin->setAutoFillBackground(1);
+    dialog_admin->setParent(this);
+    dialog_admin->adjustSize();
+    dialog_admin->show();
 
 }
 
 void mainWindow::checkAdmin(){
 
-//    dialogCreateAdmin();
     QSettings settings("elroke","elroke");
     QString user;
     settings.beginGroup(group_auth);
-    user=settings.value("name").toString();
+    user=settings.value("username").toString();
     settings.endGroup();
-
-    qDebug()<<"yser"<<user;
 
     if(user==NULL)
         dialogCreateAdmin();
@@ -1218,75 +1192,81 @@ void mainWindow::checkAdmin(){
 
 void mainWindow::dialogCreateAdmin(){
 
-    QDialog dialog;
+    QDialog *dialog = new QDialog;
     QVBoxLayout *lo_main = new QVBoxLayout;
     QHBoxLayout *lo_username = new QHBoxLayout;
     QHBoxLayout *lo_password = new QHBoxLayout;
 
-    le_userName = new QLineEdit(&dialog);
+    le_userName = new CLineEdit(dialog);
 
-
-    lo_username->addWidget(new QLabel(tr("Username"),&dialog));
+    lo_username->addWidget(new QLabel(tr("Username"),dialog));
     lo_username->addWidget(le_userName);
 
-    le_password = new QLineEdit(&dialog);
+    le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
-    lo_password->addWidget(new QLabel(tr("Password"),&dialog));
+    lo_password->addWidget(new QLabel(tr("Password"),dialog));
     lo_password->addWidget(le_password);
 
-    auto *button_create_admin = new QPushButton(tr("Create Administrator"), &dialog);
+    auto *button_create_admin = new QPushButton(tr("Create Administrator"), dialog);
     connect(button_create_admin,SIGNAL(pressed()),this,SLOT(createAdminAccount()));
 
-    lo_main->addWidget(new QLabel(tr("First setup,  create admin account"), &dialog));
+    lo_main->addWidget(new QLabel(tr("First setup,  create administrator account"), dialog));
     lo_main->addLayout(lo_username);
     lo_main->addLayout(lo_password);
     lo_main->addWidget(button_create_admin);
 
-     dialog.setLayout(lo_main);
-     connect(this,SIGNAL(usernameCreated()),&dialog,SLOT(close()));
-     dialog.setWindowFlags(Qt::FramelessWindowHint);
-     dialog.exec();
-
-
+     dialog->setLayout(lo_main);
+     connect(this,SIGNAL(usernameCreated()),dialog,SLOT(close()));
+     dialog->setWindowFlags(Qt::FramelessWindowHint);
+     dialog->setParent(this);
+     dialog->show();
 
 }
 
 void mainWindow::dialogLogin(){
 
-    QDialog dialog;
+    QDialog *dialog = new QDialog;
     QVBoxLayout *lo_main = new QVBoxLayout;
-    QHBoxLayout *lo_username = new QHBoxLayout;
-    QHBoxLayout *lo_password = new QHBoxLayout;
 
-    le_userName = new QLineEdit(&dialog);
+    le_userName = new CLineEdit(dialog);
 
-
-    lo_username->addWidget(new QLabel(tr("Username"),&dialog));
-    lo_username->addWidget(le_userName);
-
-    le_password = new QLineEdit(&dialog);
+    le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
-    lo_password->addWidget(new QLabel(tr("Password"),&dialog));
-    lo_password->addWidget(le_password);
 
-    auto *button_close = new QPushButton(tr("Close"), &dialog);
-    connect(button_close,SIGNAL(pressed()),&dialog,SLOT(close()));
-    auto *button_login = new QPushButton(tr("Login"), &dialog);
-    button_login->setFocus();
+    auto *button_close = new QPushButton(tr("Close"), dialog);
+    connect(button_close,SIGNAL(pressed()),dialog,SLOT(close()));
+
+    auto *button_login = new QPushButton(tr("Login"), dialog);
+
+    connect(le_userName,SIGNAL(returnPressed()),button_login,SLOT(click()));
+    connect(le_password,SIGNAL(returnPressed()),button_login,SLOT(click()));
     connect(button_login,SIGNAL(pressed()),this,SLOT(login()));
 
     QHBoxLayout *lo_button = new QHBoxLayout;
     lo_button->addWidget(button_close);
     lo_button->addWidget(button_login);
-    lo_main->addLayout(lo_username);
-    lo_main->addLayout(lo_password);
+
+    lo_main->addStretch();
+    lo_main->addWidget(new QLabel(tr("Username"),dialog));
+    lo_main->addWidget(le_userName);
+    lo_main->addWidget(new QLabel(tr("Password"),dialog));
+
+    lo_main->addWidget(le_password);
+    lo_main->addStretch();
     lo_main->addLayout(lo_button);
 
-     dialog.setLayout(lo_main);
-     dialog.setWindowFlags(Qt::FramelessWindowHint);
-     connect(this,SIGNAL(loginAccepted()),&dialog,SLOT(close()));
-     dialog.exec();
-
+     dialog->setLayout(lo_main);
+     dialog->setAutoFillBackground(1);
+     QPalette *plt = new QPalette();
+     plt->setColor(QPalette::Window, Qt::black);
+     plt->setColor(QPalette::Text, Qt::white);
+     plt->setColor(QPalette::Button,Qt::white);
+     plt->setColor(QPalette::ButtonText,Qt::black);
+     dialog->setPalette(*plt);
+     connect(this,SIGNAL(loginAccepted()),dialog,SLOT(close()));
+     dialog->setParent(this);
+      dialog->adjustSize();
+     dialog->show();
 
 
 }
@@ -1298,34 +1278,42 @@ QSettings setting("elroke","elroke");
 QString user = le_userName->text();
 QString pass = le_password->text();
 
-if(user.isEmpty() && pass.isEmpty())
+
+if(user.isEmpty() || pass.isEmpty()){
     return;
+}
 
-setting.beginGroup(group_auth);
-setting.setValue("name", user);
-setting.setValue("sandi", pass);
-setting.endGroup();
+    setting.beginGroup(group_auth);
+    setting.setValue("username", QCryptographicHash::hash(user.toUtf8(), QCryptographicHash::Sha1));
+    setting.setValue("password", QCryptographicHash::hash(pass.toUtf8(), QCryptographicHash::Sha1));
+    setting.endGroup();
 
-emit usernameCreated();
+    emit usernameCreated();
 
 
 }
 
 void mainWindow::login(){
-
+    qDebug()<<"login";
+//   if(le_userName->text().isEmpty() || le_password->text().isEmpty())
+//       return;
+qDebug()<<"login 1";
     QSettings settings("elroke","elroke");
-    QString user;
-    QString password;
+    QByteArray user;
+    QByteArray password;
     settings.beginGroup(group_auth);
-    user=settings.value("name").toString();
-    password=settings.value("sandi").toString();
+    user=settings.value("username").toByteArray();
+    password=settings.value("password").toByteArray();
     settings.endGroup();
 
-    if(le_userName->text()==user && le_password->text()==password){
+   QByteArray u  = QCryptographicHash::hash(le_userName->text().toUtf8(), QCryptographicHash::Sha1);
+   QByteArray p = QCryptographicHash::hash(le_password->text().toUtf8(), QCryptographicHash::Sha1);
+
+    if(u==user && p==password){
      emit loginAccepted();
-    dialogAdmin();
+        dialogAdmin();
     }
-    else return;
+//    else return;
 
 }
 mainWindow::~mainWindow()

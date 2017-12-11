@@ -20,7 +20,7 @@
 #include <QSqlTableModel>
 #include <QPainter>
 
-
+#include <QLabel>
 class mainWindow : public QDialog
 {
     Q_OBJECT
@@ -73,10 +73,10 @@ private :
 
     QWidget *spacer;
     QPushButton *button_audio_channel;
-    bool tampak=false;
+    bool main_window_visible=false;
     QAction *autosave_playlist;
-    QLineEdit * le_userName;
-    QLineEdit * le_password;
+    CLineEdit * le_userName;
+    CLineEdit * le_password;
 
 
 

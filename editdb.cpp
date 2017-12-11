@@ -316,10 +316,10 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
 
     setWindowFlags(Qt::FramelessWindowHint);
-    showFullScreen();
+    setWindowState(Qt::WindowFullScreen);
 
-    kboard =new Keyboard(this);
-    kboard->hide();
+    Keyboard *kboard = new Keyboard(this);
+
 
     connect(le_set_title,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
     connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);

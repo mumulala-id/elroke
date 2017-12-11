@@ -1,4 +1,5 @@
 #include "keyboard.h"
+#include <clineedit.h>
 #include <QCoreApplication>
 #include <QGuiApplication>
 #include <QGridLayout>
@@ -23,32 +24,38 @@ Keyboard::Keyboard(QWidget *parent) :
     }
 
 
-    AeroButton *space = new AeroButton("\u2423", this);
+    QPushButton *space = new QPushButton("\u2423", this);
     space->setFocusPolicy(Qt::NoFocus);
     space->setObjectName("space");
-    space->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    space->setMaximumSize(QSize(48,48));
     connect(space,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
-    auto *del = new AeroButton("\u232B", this);
+    auto *del = new QPushButton("\u232B", this);
     del->setObjectName("backspace");
     del->setFocusPolicy(Qt::NoFocus);
     del->setMaximumSize(QSize(48,48));
     del->setAutoRepeat(true);
-    del->setAutoRepeatInterval(1000);
-    del->setCheckable(1);
+    del->setAutoRepeatInterval(30);
     connect(del,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
-    auto *clear = new AeroButton("\u239A", this);
+    auto *clear = new QPushButton("A/a", this);
+    clear->setFocusPolicy(Qt::NoFocus);
     clear->setMaximumSize(QSize(48,48));
     clear->setObjectName("clear");
-    connect(clear,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+    clear->setCheckable(1);
+    connect(clear,SIGNAL(toggled(bool)),this,SLOT(capsLock(bool)));
 
+    auto *button_hide = new QPushButton("\u21E9",this);
+    button_hide->setFocusPolicy(Qt::NoFocus);
+    button_hide->setMaximumSize(QSize(48,48));
+    connect(button_hide,SIGNAL(pressed()),this,SLOT(hideKeyboard()));
 
     main_layout->setHorizontalSpacing(0);
     main_layout->setVerticalSpacing(0);
-    main_layout->addWidget(space,1,16,1,2);
-    main_layout->addWidget(del,1,18,1,2);
-    main_layout->addWidget(clear,1,19,1,2);
+    main_layout->addWidget(space,1,16);
+    main_layout->addWidget(del,1,17);
+    main_layout->addWidget(clear,1,18);
+    main_layout->addWidget(button_hide,1,19);
     main_layout->setSpacing(0);
     main_layout->setMargin(0);
     main_layout->setSizeConstraint( QLayout::SetFixedSize );
@@ -61,9 +68,9 @@ Keyboard::Keyboard(QWidget *parent) :
 }
 
 
-AeroButton *Keyboard::createButton( const QString &text){
+QPushButton *Keyboard::createButton( const QString &text){
 
-    AeroButton *button = new AeroButton(text, this);
+    QPushButton *button = new QPushButton(text, this);
 
     button->setMaximumSize(QSize(48,48));
     QFont font;
@@ -87,7 +94,6 @@ void Keyboard::onButtonClicked(){
             QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
             QString objeck_name = clickedButton->objectName();
             QChar text = objeck_name.at(0);
-            qDebug()<<text;//"ukuran"<<clickedButton->text().size()<<text;
 
             Qt::Key key;
 if(objeck_name.size()>1){
@@ -110,17 +116,7 @@ if(objeck_name.size()>1){
             QCoreApplication::sendEvent(receiver,&releaseEvent);
 //            qDebug()<<"Del";
         }
-        if(objeck_name=="clear"){
-       QLineEdit *le =   qobject_cast<QLineEdit*>(QGuiApplication::focusObject());
-            le->clear();
-//            qDebug()<<"clear";
-//            key = Qt::Key_Clear;
-//            QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, 0,0);//Qt::NoModifier,QKeySequence(key).toString() );
-//            QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
-
-//            QCoreApplication::sendEvent(receiver, &pressEvent);
-//            QCoreApplication::sendEvent(receiver,&releaseEvent);
-        }
+//        }
 }
 
 else{
@@ -234,11 +230,20 @@ else{
         key = Qt::Key_Z;
         break;
        }
+
+    if(lowerCase){
+        QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier,QKeySequence(key).toString().toLower());
+    QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
+    QCoreApplication::sendEvent(receiver, &pressEvent);
+    QCoreApplication::sendEvent(receiver,&releaseEvent);}
+
+    else{
     QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier,QKeySequence(key).toString());
     QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
 
     QCoreApplication::sendEvent(receiver, &pressEvent);
     QCoreApplication::sendEvent(receiver,&releaseEvent);
+}
 }
 
 }
@@ -247,6 +252,35 @@ else{
 void Keyboard::showKeyboard(QPoint p){
 
     move(p);
+    show();
+
+
+}
+
+void Keyboard::hideKeyboard(){
+
+//    focusWidget()->clearFocus();
+//    clearFocus();
+    hide();
+
+}
+void Keyboard::capsLock(bool c){
+lowerCase=c;
+    if(c){
+        for(int i=0; i<26;i++){
+            keyButton[i]->setText(keyButton[i]->text().toLower());
+        }
+    }
+    else{
+        for(int i=0; i<26;i++){
+            keyButton[i]->setText(keyButton[i]->text().toUpper());
+
+        }
+
+    }
+
+
+
 
 
 }

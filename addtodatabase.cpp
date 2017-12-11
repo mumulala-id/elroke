@@ -64,6 +64,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      //list for show files
      lw_list = new QListWidget(this);
      lw_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
+     connect(lw_list,SIGNAL(itemSelectionChanged()),this,SLOT(enableStartButton()));
 
      QHBoxLayout *lo_drive = new QHBoxLayout;
      lo_drive->addWidget(combo_mounted);
@@ -487,3 +488,8 @@ QString addtodatabase::getSplitter(const QString &filename){
     
 }
 
+void addtodatabase::enableStartButton(){
+    QList<QListWidgetItem*> list = lw_list->selectedItems();
+    if(!list.isEmpty())
+        btn_start->setEnabled(1);
+}

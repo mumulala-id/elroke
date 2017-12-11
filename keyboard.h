@@ -5,7 +5,7 @@
 #include <QString>
 #include <QPushButton>
 
-#include "aerobutton.h"
+#include <QPushButton>
 
 class Keyboard : public QWidget
 {
@@ -16,13 +16,17 @@ public:
     ~Keyboard();
     void showKeyboard(QPoint);
 
+
 private:
 
          QPushButton *keyButton[36];
+         bool lowerCase=0;
 
 private slots:
-    AeroButton *createButton(const QString &);
+    QPushButton *createButton(const QString &);
     void onButtonClicked();
+     void hideKeyboard();
+    void capsLock(bool c);
 
 
 };

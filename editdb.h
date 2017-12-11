@@ -30,7 +30,6 @@ private :
     QComboBox *combo_search;
         CLineEdit *le_search;
     bool anyChange=false;
-    Keyboard *kboard;
 
 private slots:
     void swapItem(int, int);

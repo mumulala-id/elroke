@@ -59,6 +59,7 @@ private slots:
      void setToManual(bool);
      QString getSplitter(const QString &);
      void writeTextStream(const QString &file, QList<QString> set);
+     void enableStartButton();
 
 protected :
 
