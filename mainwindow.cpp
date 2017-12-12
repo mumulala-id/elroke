@@ -39,6 +39,7 @@ mainWindow::mainWindow(QWidget *parent)
     setBackground();
 
     getCategory();
+
     setWindowFlags(Qt::FramelessWindowHint);
   // setAttribute( Qt::AA_EnableHighDpiScaling);
 
@@ -50,9 +51,9 @@ void mainWindow::createWidgets(){
        resize(desktop_width, desktop_height);
 
 
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
 
-    QHBoxLayout *lo_top = new QHBoxLayout;
+    QHBoxLayout *layout_top = new QHBoxLayout;
 
     auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
     pb_menu->setFlat(1);
@@ -76,19 +77,19 @@ void mainWindow::createWidgets(){
     timer->start(60000);
     showClock();
 
-    lo_top->addWidget(pb_menu);
-    lo_top->addWidget(le_search);
-    lo_top->addSpacing(40);
-    lo_top->addWidget(pb_all);
-    lo_top->addWidget(button_cat_indonesia);
-    lo_top->addWidget(button_cat_barat);
-    lo_top->addWidget(button_cat_rock);
-    lo_top->addWidget(button_cat_pop);
-    lo_top->addWidget(button_cat_dangdut);
-    lo_top->addStretch();
-    lo_top->addWidget(clock);
-    lo_top->setSpacing(0);
-    lo_top->setMargin(0);
+    layout_top->addWidget(pb_menu);
+    layout_top->addWidget(le_search);
+    layout_top->addSpacing(40);
+    layout_top->addWidget(pb_all);
+    layout_top->addWidget(button_cat_indonesia);
+    layout_top->addWidget(button_cat_barat);
+    layout_top->addWidget(button_cat_rock);
+    layout_top->addWidget(button_cat_pop);
+    layout_top->addWidget(button_cat_dangdut);
+    layout_top->addStretch();
+    layout_top->addWidget(clock);
+    layout_top->setSpacing(0);
+    layout_top->setMargin(0);
 
     QWidget *widget_top = new QWidget(this);
     QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
@@ -100,18 +101,19 @@ void mainWindow::createWidgets(){
 
     widget_top->setAutoFillBackground(1);
     widget_top->setPalette(palette_bg);
-    widget_top->setLayout(lo_top);
+    widget_top->setLayout(layout_top);
 
 
-    QHBoxLayout *lo_table = new QHBoxLayout;
+    QHBoxLayout *layout_table = new QHBoxLayout;
 
-//    QVBoxLayout *lo_left = new QVBoxLayout;
+//    QVBoxLayout *layout_left = new QVBoxLayout;
 
     QPalette table_palette;
     table_palette.setColor(QPalette::Base, Qt::transparent);
     table_palette.setColor(QPalette::Text, Qt::white);
+//    table_palette.setColor(QPalette::Active,Qt::black);
     table_palette.setColor(QPalette::Highlight, Qt::transparent);
-    table_palette.setColor(QPalette::HighlightedText, Qt::white);
+    table_palette.setColor(QPalette::HighlightedText, Qt::blue);
 
     db = new dbmanager(dbmanager::show, this);
     db->connectToDB();
@@ -127,10 +129,10 @@ void mainWindow::createWidgets(){
     table->setModel(proxy_model);
     tableRule();
     QPalette header_palette = table->horizontalHeader()->palette();
-    header_palette.setBrush(QPalette::Button, Qt::blue);
+    header_palette.setBrush(QPalette::Button, Qt::transparent);
     header_palette.setColor(QPalette::Background, Qt::transparent);
-    header_palette.setColor(QPalette::ButtonText, Qt::red);
-      header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::red);
+    header_palette.setColor(QPalette::ButtonText, Qt::black);
+      header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
 
@@ -143,7 +145,7 @@ void mainWindow::createWidgets(){
     spLeft.setHorizontalStretch(3);
     table->setSizePolicy(spLeft);
 
-    auto *lo_playlist = new QVBoxLayout;
+    auto *layout_playlist = new QVBoxLayout;
     model_playlist =new QStandardItemModel(this);
     model_playlist->setColumnCount(5);
     model_playlist->setHeaderData(2,Qt::Horizontal, tr("PLAYLIST"));
@@ -169,10 +171,10 @@ void mainWindow::createWidgets(){
     table_playlist->installEventFilter(this);
     connect(table_playlist,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
 
-    auto *lo_button_playlist = new QHBoxLayout;
+    auto *layout_button_playlist = new QHBoxLayout;
 
     auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
-    button_menu->setFlat(1);
+//    button_menu->setFlat(1);
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
@@ -218,37 +220,37 @@ void mainWindow::createWidgets(){
     connect(button_lock_playlist,&QPushButton::clicked,this,&mainWindow::updateLockButton);
 //    button_lock_playlist->setCentang(1);
 
-    lo_button_playlist->addWidget(button_menu);
-    lo_button_playlist->addWidget(button_delete);
-    lo_button_playlist->addWidget(button_clear_playlist);
-    lo_button_playlist->addWidget(button_up);
-    lo_button_playlist->addWidget(button_down);
-    lo_button_playlist->addWidget(button_lock_playlist);
-    lo_button_playlist->setSpacing(0);
-    lo_button_playlist->setMargin(0);
+    layout_button_playlist->addWidget(button_menu);
+    layout_button_playlist->addWidget(button_delete);
+    layout_button_playlist->addWidget(button_clear_playlist);
+    layout_button_playlist->addWidget(button_up);
+    layout_button_playlist->addWidget(button_down);
+    layout_button_playlist->addWidget(button_lock_playlist);
+    layout_button_playlist->setSpacing(0);
+    layout_button_playlist->setMargin(0);
 
-    lo_playlist->addLayout(lo_button_playlist);
-    lo_playlist->addWidget(table_playlist);
-lo_playlist->setSpacing(0);
-    lo_playlist->setMargin(0);
+    layout_playlist->addLayout(layout_button_playlist);
+    layout_playlist->addWidget(table_playlist);
+layout_playlist->setSpacing(0);
+    layout_playlist->setMargin(0);
 
     //CREATE WIDGET TO APPLY SIZEPOLICY
     auto *w_table_right = new QWidget(this);
-    w_table_right->setLayout(lo_playlist);
+    w_table_right->setLayout(layout_playlist);
 
     QSizePolicy spRight(QSizePolicy::Preferred,QSizePolicy::Preferred);
     spRight.setHorizontalStretch(1);
     w_table_right->setSizePolicy(spRight);
 
-    lo_table->addWidget(table);
-    lo_table->addWidget(w_table_right);
-    lo_table->setMargin(0);
-    lo_table->setSpacing(0);
+    layout_table->addWidget(table);
+    layout_table->addWidget(w_table_right);
+    layout_table->setMargin(0);
+    layout_table->setSpacing(0);
 
 
     //CREATE WIDGET TO APPLY SIZEPOLICY(Height)
     auto *all_table = new QWidget(this);
-    all_table->setLayout(lo_table);
+    all_table->setLayout(layout_table);
 
     QSizePolicy spTable (QSizePolicy::Expanding,QSizePolicy::Expanding);
     spTable.setVerticalStretch(2);
@@ -257,7 +259,7 @@ lo_playlist->setSpacing(0);
 
 
 
-     auto *lo_player_control = new QHBoxLayout;
+     auto *layout_player_control = new QHBoxLayout;
 
      slider_pos = new QSlider(Qt::Horizontal, this);
      slider_pos->setRange(0,10000);
@@ -315,37 +317,27 @@ lo_playlist->setSpacing(0);
      button_audio_mute->setFlat(1);
      connect(button_audio_mute,SIGNAL(pressed()),this,SLOT(setMute()));
 
-     lo_player_control->addWidget( slider_pos);
-     lo_player_control->addStretch();
-     lo_player_control->addWidget(btn_next);
-     lo_player_control->addWidget(button_play_pause);
-     lo_player_control->addStretch();
-     lo_player_control->addWidget(button_audio_channel);
-     lo_player_control->addStretch();
-     lo_player_control->addWidget(button_vol_down);
-     lo_player_control->addWidget(slider_vol);
-     lo_player_control->addWidget(button_vol_up);
-     lo_player_control->addStretch();
-     lo_player_control->addWidget(button_audio_mute);
-     lo_player_control->setMargin(0);
+     layout_player_control->addWidget( slider_pos);
+     layout_player_control->addStretch();
+     layout_player_control->addWidget(btn_next);
+     layout_player_control->addWidget(button_play_pause);
+     layout_player_control->addStretch();
+     layout_player_control->addWidget(button_audio_channel);
+     layout_player_control->addStretch();
+     layout_player_control->addWidget(button_vol_down);
+     layout_player_control->addWidget(slider_vol);
+     layout_player_control->addWidget(button_vol_up);
+     layout_player_control->addStretch();
+     layout_player_control->addWidget(button_audio_mute);
+     layout_player_control->setMargin(0);
      QWidget *widget_bottom = new QWidget(this);
-
-//     QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
-//     QPalette palette_bg;
-
-//     bg_trans =   bg.scaled(widget_bottom->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
-//     palette_bg.setBrush(QPalette::Background, bg_trans);
-
 
      widget_bottom->setAutoFillBackground(1);
      widget_bottom->setPalette(palette_bg);
-     widget_bottom->setLayout(lo_player_control);
+     widget_bottom->setLayout(layout_player_control);
 
-
-
-
-    lo_main->addWidget(widget_top);
-    lo_main->addWidget(all_table);
+    layout_main->addWidget(widget_top);
+    layout_main->addWidget(all_table);
 
     //spacer willbe mask when video playing, keep lyric vicible
     spacer = new QWidget(this);
@@ -355,12 +347,11 @@ lo_playlist->setSpacing(0);
 
 
     spacer->setSizePolicy(spSpacer);
-    lo_main->addWidget(spacer);
+    layout_main->addWidget(spacer);
 
-//    lo_main->addLayout(lo_player_control);
-    lo_main->addWidget(widget_bottom);
-    lo_main->setMargin(0);
-    setLayout(lo_main);
+    layout_main->addWidget(widget_bottom);
+    layout_main->setMargin(0);
+    setLayout(layout_main);
 
 
 }
@@ -696,15 +687,15 @@ void mainWindow::almostEnd(){
             }
 
 
-    QHBoxLayout *lo_main = new QHBoxLayout;
+    QHBoxLayout *layout_main = new QHBoxLayout;
     dia->setWindowFlags(Qt::FramelessWindowHint);
 //    dia->setAttribute(Qt::WA_NoSystemBackground);
 //    dia->setAttribute(Qt::WA_TransparentForMouseEvents);
 //    dia->setAttribute(Qt::WA_TranslucentBackground);
     dia->setPalette(let);
     dia->setFont(f);
-    lo_main->addWidget(notif);
-    dia->setLayout(lo_main);
+    layout_main->addWidget(notif);
+    dia->setLayout(layout_main);
     dia->adjustSize();
     dia->move((desktop_width/2) - dia->rect().center().x(),0);
     QTimer::singleShot(5000, dia, SLOT(close()));
@@ -780,17 +771,17 @@ void mainWindow::dialogSavePlaylist(){
 
     QDialog *dialog_save_playlist = new QDialog(NULL);
 
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
 
     QLineEdit *le_playlist_name = new QLineEdit(dialog_save_playlist);
     QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/file/icon/backspace.png"), "", this);
     le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
     connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
-    lo_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
-    lo_main->addWidget(le_playlist_name);
+    layout_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
+    layout_main->addWidget(le_playlist_name);
 
-    QHBoxLayout *lo_btn = new QHBoxLayout;
+    QHBoxLayout *layout_btn = new QHBoxLayout;
 
     QPushButton *btn_close = new QPushButton("Cancel", dialog_save_playlist);
     connect(btn_close,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(close()));
@@ -798,14 +789,14 @@ void mainWindow::dialogSavePlaylist(){
     QPushButton *btn_save = new QPushButton("Save", dialog_save_playlist);
     connect(btn_save,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(accept()));
     Keyboard *key = new Keyboard(dialog_save_playlist);
-    lo_main->addWidget(key);
+    layout_main->addWidget(key);
 
-    lo_btn->addWidget(btn_close);
-    lo_btn->addStretch();
-    lo_btn->addWidget(btn_save);
+    layout_btn->addWidget(btn_close);
+    layout_btn->addStretch();
+    layout_btn->addWidget(btn_save);
 
-    lo_main->addLayout(lo_btn);
-    dialog_save_playlist->setLayout(lo_main);
+    layout_main->addLayout(layout_btn);
+    dialog_save_playlist->setLayout(layout_main);
 
    dialog_save_playlist->setWindowFlags( Qt::FramelessWindowHint);
    dialog_save_playlist->setAttribute(Qt::WA_DeleteOnClose);
@@ -838,15 +829,15 @@ void mainWindow::dialogLoadPlaylist(){
 
     }
 
-    auto *lo_main = new QVBoxLayout;
+    auto *layout_main = new QVBoxLayout;
 
     auto *_list = new QListWidget(dialog_load_playlist);
 
     _list->addItems(list_play);
 
-    lo_main->addWidget(new QLabel("Load Playlist :", dialog_load_playlist));
+    layout_main->addWidget(new QLabel("Load Playlist :", dialog_load_playlist));
 
-    auto *lo_btn = new QHBoxLayout;
+    auto *layout_btn = new QHBoxLayout;
 
     auto *btn_cancel = new QPushButton("Cancel", dialog_load_playlist);
     connect(btn_cancel,SIGNAL(clicked(bool)),dialog_load_playlist,SLOT(close()));
@@ -854,14 +845,14 @@ void mainWindow::dialogLoadPlaylist(){
     auto *btn_load = new QPushButton("Load", dialog_load_playlist);
     connect(btn_load,SIGNAL(clicked(bool)),dialog_load_playlist,SLOT(accept()));
 
-    lo_btn->addWidget(btn_cancel);
-    lo_btn->addStretch();
-    lo_btn->addWidget(btn_load);
+    layout_btn->addWidget(btn_cancel);
+    layout_btn->addStretch();
+    layout_btn->addWidget(btn_load);
 
-    lo_main->addWidget(_list);
-    lo_main->addLayout(lo_btn);
+    layout_main->addWidget(_list);
+    layout_main->addLayout(layout_btn);
 
-    dialog_load_playlist->setLayout(lo_main);
+    dialog_load_playlist->setLayout(layout_main);
 
     dialog_load_playlist->setWindowFlags(Qt::FramelessWindowHint);
     dialog_load_playlist->setAttribute(Qt::WA_TintedBackground);
@@ -1135,7 +1126,7 @@ void mainWindow::dialogAdmin(){
 
     QDialog *dialog_admin = new QDialog;
 
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
 
     auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
     connect(button_add_to_database,SIGNAL(pressed()),this,SLOT(dialogAddToDatabase()));
@@ -1155,19 +1146,22 @@ void mainWindow::dialogAdmin(){
     connect(button_exit,SIGNAL(pressed()),dialog_admin,SLOT(close()));
     connect(button_exit,SIGNAL(pressed()),this,SLOT(close()));
 
-    lo_main->addWidget(button_add_to_database);
-    lo_main->addWidget(button_manage_database);
-    lo_main->addWidget(button_preferences);
-    lo_main->addWidget(button_about);
-    lo_main->addWidget(button_close);
-    lo_main->addWidget(button_exit);
+    layout_main->addWidget(button_add_to_database);
+    layout_main->addWidget(button_manage_database);
+    layout_main->addWidget(button_preferences);
+    layout_main->addWidget(button_about);
+    layout_main->addWidget(button_close);
+    layout_main->addWidget(button_exit);
 
-    dialog_admin->setLayout(lo_main);
+    dialog_admin->setLayout(layout_main);
     dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
-    QPalette plt = palette();
-    plt.setColor(QPalette::Window, Qt::black);
-    plt.setColor(QPalette::Text, Qt::white);
-    dialog_admin->setPalette(plt);
+    QPalette palet;
+    palet.setColor(QPalette::Base, palette().dark().color());
+    palet.setColor(QPalette::Window, Qt::black);
+    palet.setColor(QPalette::Text, Qt::white);
+    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Button, palette().dark().color());
+    dialog_admin->setPalette(palet);
     dialog_admin->setAutoFillBackground(1);
     dialog_admin->setParent(this);
     dialog_admin->adjustSize();
@@ -1193,29 +1187,29 @@ void mainWindow::checkAdmin(){
 void mainWindow::dialogCreateAdmin(){
 
     QDialog *dialog = new QDialog;
-    QVBoxLayout *lo_main = new QVBoxLayout;
-    QHBoxLayout *lo_username = new QHBoxLayout;
-    QHBoxLayout *lo_password = new QHBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
+    QHBoxLayout *layout_username = new QHBoxLayout;
+    QHBoxLayout *layout_password = new QHBoxLayout;
 
     le_userName = new CLineEdit(dialog);
 
-    lo_username->addWidget(new QLabel(tr("Username"),dialog));
-    lo_username->addWidget(le_userName);
+    layout_username->addWidget(new QLabel(tr("Username"),dialog));
+    layout_username->addWidget(le_userName);
 
     le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
-    lo_password->addWidget(new QLabel(tr("Password"),dialog));
-    lo_password->addWidget(le_password);
+    layout_password->addWidget(new QLabel(tr("Password"),dialog));
+    layout_password->addWidget(le_password);
 
     auto *button_create_admin = new QPushButton(tr("Create Administrator"), dialog);
     connect(button_create_admin,SIGNAL(pressed()),this,SLOT(createAdminAccount()));
 
-    lo_main->addWidget(new QLabel(tr("First setup,  create administrator account"), dialog));
-    lo_main->addLayout(lo_username);
-    lo_main->addLayout(lo_password);
-    lo_main->addWidget(button_create_admin);
+    layout_main->addWidget(new QLabel(tr("First setup,  create administrator account"), dialog));
+    layout_main->addLayout(layout_username);
+    layout_main->addLayout(layout_password);
+    layout_main->addWidget(button_create_admin);
 
-     dialog->setLayout(lo_main);
+     dialog->setLayout(layout_main);
      connect(this,SIGNAL(usernameCreated()),dialog,SLOT(close()));
      dialog->setWindowFlags(Qt::FramelessWindowHint);
      dialog->setParent(this);
@@ -1226,7 +1220,7 @@ void mainWindow::dialogCreateAdmin(){
 void mainWindow::dialogLogin(){
 
     QDialog *dialog = new QDialog;
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
 
     le_userName = new CLineEdit(dialog);
 
@@ -1242,27 +1236,28 @@ void mainWindow::dialogLogin(){
     connect(le_password,SIGNAL(returnPressed()),button_login,SLOT(click()));
     connect(button_login,SIGNAL(pressed()),this,SLOT(login()));
 
-    QHBoxLayout *lo_button = new QHBoxLayout;
-    lo_button->addWidget(button_close);
-    lo_button->addWidget(button_login);
+    QHBoxLayout *layout_button = new QHBoxLayout;
+    layout_button->addWidget(button_close);
+    layout_button->addWidget(button_login);
 
-    lo_main->addStretch();
-    lo_main->addWidget(new QLabel(tr("Username"),dialog));
-    lo_main->addWidget(le_userName);
-    lo_main->addWidget(new QLabel(tr("Password"),dialog));
+    layout_main->addStretch();
+    layout_main->addWidget(new QLabel(tr("Username"),dialog));
+    layout_main->addWidget(le_userName);
+    layout_main->addWidget(new QLabel(tr("Password"),dialog));
 
-    lo_main->addWidget(le_password);
-    lo_main->addStretch();
-    lo_main->addLayout(lo_button);
+    layout_main->addWidget(le_password);
+    layout_main->addStretch();
+    layout_main->addLayout(layout_button);
 
-     dialog->setLayout(lo_main);
+     dialog->setLayout(layout_main);
      dialog->setAutoFillBackground(1);
-     QPalette *plt = new QPalette();
-     plt->setColor(QPalette::Window, Qt::black);
-     plt->setColor(QPalette::Text, Qt::white);
-     plt->setColor(QPalette::Button,Qt::white);
-     plt->setColor(QPalette::ButtonText,Qt::black);
-     dialog->setPalette(*plt);
+     QPalette palet;
+     palet.setColor(QPalette::Base, palette().dark().color());
+     palet.setColor(QPalette::Window, Qt::black);
+     palet.setColor(QPalette::Text, Qt::black);
+     palet.setColor(QPalette::WindowText, Qt::white);
+     palet.setColor(QPalette::Button, palette().dark().color());
+     dialog->setPalette(palet);
      connect(this,SIGNAL(loginAccepted()),dialog,SLOT(close()));
      dialog->setParent(this);
       dialog->adjustSize();

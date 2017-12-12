@@ -253,17 +253,10 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
-   connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
+    connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
 
-   QPalette header_palette = table->horizontalHeader()->palette();
-   header_palette.setBrush(QPalette::Button, Qt::blue);
-   header_palette.setColor(QPalette::Background, Qt::transparent);
-   header_palette.setColor(QPalette::ButtonText, Qt::red);
-   table->horizontalHeader()->setPalette(header_palette);
-   table->verticalHeader()->setPalette(header_palette);
 
-    QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    spRight.setHorizontalStretch(2);
+
 
     QVBoxLayout *lo_bottom_right = new QVBoxLayout;
 
@@ -284,12 +277,15 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     lo_bottom_right->addLayout(lo_label_total_count);
     lo_bottom_right->setMargin(0);
 
-    QWidget *w_bottom  = new QWidget(this);
-    w_bottom->setLayout(lo_bottom_right);
-    w_bottom->setSizePolicy(spRight);
+    QSizePolicy spRight(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    spRight.setHorizontalStretch(5);
+
+    QWidget *widget_bottom_right  = new QWidget(this);
+    widget_bottom_right->setLayout(lo_bottom_right);
+    widget_bottom_right->setSizePolicy(spRight);
 
 
-    lo_bottom->addWidget(w_bottom);
+    lo_bottom->addWidget(widget_bottom_right);
     lo_bottom->setMargin(0);
 
     QFrame *top = new QFrame(this);
@@ -313,19 +309,18 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     setLayout(lo_main);
     setWindowTitle(tr("Manage Database"));
 
+    QPalette palet;
+    palet.setColor(QPalette::Base, palette().dark().color());
+    palet.setColor(QPalette::Window, Qt::black);
+    palet.setColor(QPalette::Text, Qt::white);
+    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Button, palette().dark().color());
+    setPalette(palet);
+
 
 
     setWindowFlags(Qt::FramelessWindowHint);
     setWindowState(Qt::WindowFullScreen);
-
-    Keyboard *kboard = new Keyboard(this);
-
-
-    connect(le_set_title,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
-    connect(le_set_singer,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
-    connect(le_set_language,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
-    connect(le_set_category,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
-    connect(le_search,&CLineEdit::focussed,kboard,&Keyboard::setVisible);
 
 }
 

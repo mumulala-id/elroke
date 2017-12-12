@@ -2,12 +2,13 @@
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QTranslator>
-
+//#include <QStyleFactory>
 
 int main(int argc, char *argv[])
 {
     // turn on the DPI support**
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+QApplication::setStyle("plastique");
     QApplication a(argc, argv);
     QTranslator t;
     t.load(":/usr/share/elroke/indonesia.qm");

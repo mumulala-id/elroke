@@ -25,8 +25,7 @@ private:
 private slots:
     QPushButton *createButton(const QString &);
     void onButtonClicked();
-     void hideKeyboard();
-    void capsLock(bool c);
+
 
 
 };

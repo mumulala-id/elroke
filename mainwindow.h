@@ -150,7 +150,7 @@ protected:
 
                         if ((itemOption.state & QStyle::State_Selected) &&
                                 (itemOption.state & QStyle::State_Active))
-                                itemOption.palette.setColor(QPalette::Highlight, Qt::red);
+                                itemOption.palette.setColor(QPalette::Highlight, Qt::transparent);
                         QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
 
                         QStyledItemDelegate::paint(painter, itemOption, index);

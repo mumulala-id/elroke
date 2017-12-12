@@ -21,11 +21,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QHBoxLayout *lo_top = new QHBoxLayout;
     QVBoxLayout *lo_top_left = new QVBoxLayout;
 
-    QPalette dark_palet ;
-    dark_palet.setColor(QPalette::Window, palette().dark().color());
-    dark_palet.setColor(QPalette::WindowText, Qt::black);
-    dark_palet.setColor(QPalette::Base, palette().shadow().color());
-    dark_palet.setColor(QPalette::Button, palette().dark().color());
 
      combo_mounted = new QComboBox(this);
 
@@ -104,6 +99,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     lo_use_char->addStretch();
     lo_splitter->addWidget(cb_auto);
     lo_splitter->addLayout(lo_use_char);
+    lo_splitter->addStretch();
 
     QGroupBox *grup_splitter = new QGroupBox(tr("Splitter"), this);
     grup_splitter->setLayout(lo_splitter);
@@ -121,6 +117,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
     lo_pattern->addWidget(cmb_titlefirst);
     lo_pattern->addWidget(cmb_singerfirst);
+    lo_pattern->addStretch();
 
     QGroupBox *grup_pattern = new QGroupBox(tr("Pattern"), this);
     grup_pattern->setLayout(lo_pattern);
@@ -137,6 +134,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    lo_additional_item->addWidget(le_language,1,1);
    lo_additional_item->addWidget(new QLabel(tr("Category"), this),2,0);
    lo_additional_item->addWidget(le_category,2,1);
+   lo_additional_item->setVerticalSpacing(0);
 
 
    QGroupBox *gr_addcat = new QGroupBox(tr("Add data if not available"));
@@ -155,11 +153,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    gr_audio_channel->setLayout(lo_audio_channel);
 
-   QHBoxLayout *lo_g = new QHBoxLayout;
-   lo_g->addWidget(grup_splitter);
-   lo_g->addWidget(grup_pattern);
-   lo_g->addWidget(gr_addcat);
-   lo_g->addWidget(gr_audio_channel);
+   QHBoxLayout *layout_bottom = new QHBoxLayout;
+   layout_bottom->addWidget(grup_splitter);
+   layout_bottom->addWidget(grup_pattern);
+   layout_bottom->addWidget(gr_addcat);
+   layout_bottom->addWidget(gr_audio_channel);
 
    QHBoxLayout *lo_btn = new QHBoxLayout;
 
@@ -175,16 +173,36 @@ addtodatabase::addtodatabase(QWidget *parent) :
    lo_btn->addStretch();
    lo_btn->addWidget(btn_start);
 
-    lo_main->addLayout(lo_top);
-    lo_main->addLayout(lo_g);
+   QWidget *widget_top = new QWidget(this);
+   widget_top->setLayout(lo_top);
+   QSizePolicy spTop(QSizePolicy::Preferred, QSizePolicy::Preferred);
+   spTop.setVerticalStretch(2);
+   widget_top->setSizePolicy(spTop);
+
+   QWidget *widget_bottom = new QWidget(this);
+   widget_bottom->setLayout(layout_bottom);
+   QSizePolicy spBottom(QSizePolicy::Preferred, QSizePolicy::Preferred);
+   spBottom.setVerticalStretch(1);
+   widget_bottom->setSizePolicy(spBottom);
+
+
+    lo_main->addWidget(widget_top);
+    lo_main->addWidget(widget_bottom);
     lo_main->addLayout(lo_btn);
 
     setLayout(lo_main);
-    setPalette(dark_palet);
+    QPalette palet;
+    palet.setColor(QPalette::Base, palette().dark().color());
+    palet.setColor(QPalette::Window, Qt::black);
+    palet.setColor(QPalette::Text, Qt::white);
+    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Button, palette().dark().color());
+    setPalette(palet);
 
-    setMinimumSize(1000,400);
+    setMinimumSize(1000,600);
 
-    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowFlags(Qt::FramelessWindowHint );
+//setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::setDrive(const QString &drive){
@@ -436,13 +454,13 @@ void addtodatabase::setToManual(bool m){
 
 }
 
-void addtodatabase::paintEvent(QPaintEvent *){
+//void addtodatabase::paintEvent(QPaintEvent *){
 
-    QColor backgroundColor = palette().dark().color();
-    QPainter customPainter(this);
-    customPainter.fillRect(rect(), backgroundColor);
+//    QColor backgroundColor = palette().dark().color();
+//    QPainter customPainter(this);
+//    customPainter.fillRect(rect(), backgroundColor);
 
-}
+//}
 
 QString addtodatabase::getSplitter(const QString &filename){
     QStringList old_splitter;
