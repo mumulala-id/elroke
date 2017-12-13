@@ -293,12 +293,10 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     spTop.setVerticalStretch(1);
     top->setSizePolicy(spTop);
 
-
-    QFrame *bottom = new QFrame(this);
+    QWidget *bottom = new QWidget(this);
     QSizePolicy spBottom (QSizePolicy::Preferred,QSizePolicy::Preferred);
     spBottom.setVerticalStretch(2);
     bottom->setSizePolicy(spBottom);
-
 
     top->setLayout(lo_top);
     bottom->setLayout(lo_bottom);
@@ -307,17 +305,15 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     lo_main->addWidget(bottom);
     lo_main->setMargin(0);
     setLayout(lo_main);
-    setWindowTitle(tr("Manage Database"));
 
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
     palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, Qt::white);
-    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Text, palette().light().color());
+    palet.setColor(QPalette::WindowText, palette().light().color());
     palet.setColor(QPalette::Button, palette().dark().color());
+    palet.setColor(QPalette::ButtonText, palette().light().color());
     setPalette(palet);
-
-
 
     setWindowFlags(Qt::FramelessWindowHint);
     setWindowState(Qt::WindowFullScreen);

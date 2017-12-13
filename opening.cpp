@@ -9,8 +9,8 @@
 opening::opening(QString t, QString s, QWidget *parent) : QDialog(parent), title(t), singer(s)
 {
 
-    resize(parent->size());
-
+//    resize(parent->size());
+  resize(QSize(desktop_width,desktop_height));
     QFont fontTitle;
     fontTitle.setPointSize(32);
 
@@ -45,5 +45,7 @@ opening::opening(QString t, QString s, QWidget *parent) : QDialog(parent), title
 
     setPalette(let);
     setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    setWindowState(Qt::WindowFullScreen);
+
 }
 

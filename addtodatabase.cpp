@@ -16,13 +16,12 @@
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    QVBoxLayout *layout_main = new QVBoxLayout;
 
-    QHBoxLayout *lo_top = new QHBoxLayout;
-    QVBoxLayout *lo_top_left = new QVBoxLayout;
+    QHBoxLayout *layout_top = new QHBoxLayout;
+    QVBoxLayout *layout_top_left = new QVBoxLayout;
 
-
-     combo_mounted = new QComboBox(this);
+    combo_mounted = new QComboBox(this);
 
     combo_mounted->addItem(QDir::homePath());
 
@@ -31,9 +30,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
     connect(combo_mounted, SIGNAL(activated(QString)), this, SLOT(setDrive(QString)));
 
-    QPushButton *btn_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
-    btn_refresh->setFixedWidth(40);
-    connect(btn_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
+    QPushButton *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
+    button_refresh->setFixedWidth(40);
+    connect(button_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
 
      dir_model = new QFileSystemModel(this);
      dir_model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -47,7 +46,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      tv_folder->hideColumn(2);
      tv_folder->hideColumn(3);
      tv_folder->header()->hide();
-    connect(tv_folder, SIGNAL(clicked(QModelIndex)), this,SLOT(onTreeviewClicked(QModelIndex)));
+     connect(tv_folder, SIGNAL(clicked(QModelIndex)), this,SLOT(onTreeviewClicked(QModelIndex)));
 
      file_model = new QFileSystemModel(this);
      file_model->setFilter(QDir::Files | QDir::NoDotAndDotDot);
@@ -61,32 +60,31 @@ addtodatabase::addtodatabase(QWidget *parent) :
      lw_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
      connect(lw_list,SIGNAL(itemSelectionChanged()),this,SLOT(enableStartButton()));
 
-     QHBoxLayout *lo_drive = new QHBoxLayout;
-     lo_drive->addWidget(combo_mounted);
-     lo_drive->addWidget(btn_refresh);
-     lo_top_left->addLayout(lo_drive);
-     lo_top_left->addWidget(tv_folder);
-     lo_top ->addLayout(lo_top_left);
+     QHBoxLayout *layout_drive = new QHBoxLayout;
+     layout_drive->addWidget(combo_mounted);
+     layout_drive->addWidget(button_refresh);
+     layout_top_left->addLayout(layout_drive);
+     layout_top_left->addWidget(tv_folder);
+     layout_top ->addLayout(layout_top_left);
 
 
      QPushButton *button_select_all = new QPushButton(tr("Select All"), this);
      connect(button_select_all,SIGNAL(pressed()),lw_list,SLOT(selectAll()));
      //right
-     QVBoxLayout *lo_list = new QVBoxLayout;
-     lo_list->addWidget(lw_list);
-     lo_list->addWidget(button_select_all);
+     QVBoxLayout *layout_list = new QVBoxLayout;
+     layout_list->addWidget(lw_list);
+     layout_list->addWidget(button_select_all);
 
-     lo_top->addLayout(lo_list);
-
+     layout_top->addLayout(layout_list);
 
     // ----
 
-    QVBoxLayout *lo_splitter = new QVBoxLayout;
+    QVBoxLayout *layout_splitter = new QVBoxLayout;
     cb_auto = new QCheckBox(tr("Auto"), this);
     cb_auto->setChecked(automatic);
     connect(cb_auto,SIGNAL(toggled(bool)),this,SLOT(setToAuto(bool)));
 
-    QHBoxLayout *lo_use_char = new QHBoxLayout;
+    QHBoxLayout *layout_use_char = new QHBoxLayout;
     QCheckBox *cb_splitby= new QCheckBox(tr("Split by"), this);
     connect(cb_splitby,SIGNAL(toggled(bool)),this,SLOT(setToManual(bool)));
 
@@ -94,17 +92,17 @@ addtodatabase::addtodatabase(QWidget *parent) :
     le_splitter->setFixedWidth(30);
     le_splitter->setText(splitter);
     connect(le_splitter,SIGNAL(textChanged(QString)),this,SLOT(splitterChange(QString)));
-    lo_use_char->addWidget(cb_splitby);
-    lo_use_char->addWidget(le_splitter);
-    lo_use_char->addStretch();
-    lo_splitter->addWidget(cb_auto);
-    lo_splitter->addLayout(lo_use_char);
-    lo_splitter->addStretch();
+    layout_use_char->addWidget(cb_splitby);
+    layout_use_char->addWidget(le_splitter);
+    layout_use_char->addStretch();
+    layout_splitter->addWidget(cb_auto);
+    layout_splitter->addLayout(layout_use_char);
+    layout_splitter->addStretch();
 
     QGroupBox *grup_splitter = new QGroupBox(tr("Splitter"), this);
-    grup_splitter->setLayout(lo_splitter);
+    grup_splitter->setLayout(layout_splitter);
 
-    QVBoxLayout *lo_pattern = new QVBoxLayout;
+    QVBoxLayout *layout_pattern = new QVBoxLayout;
 
     cmb_titlefirst = new QCheckBox( this);
     cmb_titlefirst->setText(tr("Title")+splitter+tr("Singer"));
@@ -115,43 +113,43 @@ addtodatabase::addtodatabase(QWidget *parent) :
     cmb_singerfirst->setText(tr("Singer")+splitter+tr("Title"));
     connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
 
-    lo_pattern->addWidget(cmb_titlefirst);
-    lo_pattern->addWidget(cmb_singerfirst);
-    lo_pattern->addStretch();
+    layout_pattern->addWidget(cmb_titlefirst);
+    layout_pattern->addWidget(cmb_singerfirst);
+    layout_pattern->addStretch();
 
     QGroupBox *grup_pattern = new QGroupBox(tr("Pattern"), this);
-    grup_pattern->setLayout(lo_pattern);
+    grup_pattern->setLayout(layout_pattern);
 
-   QGridLayout *lo_additional_item = new QGridLayout;
+   QGridLayout *layout_additional_item = new QGridLayout;
 
    QLineEdit *le_singer = new QLineEdit(this);
    QLineEdit *le_language = new QLineEdit(this);
    QLineEdit *le_category = new QLineEdit(this);
 
-   lo_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
-   lo_additional_item->addWidget(le_singer,0,1);
-   lo_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
-   lo_additional_item->addWidget(le_language,1,1);
-   lo_additional_item->addWidget(new QLabel(tr("Category"), this),2,0);
-   lo_additional_item->addWidget(le_category,2,1);
-   lo_additional_item->setVerticalSpacing(0);
+   layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
+   layout_additional_item->addWidget(le_singer,0,1);
+   layout_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
+   layout_additional_item->addWidget(le_language,1,1);
+   layout_additional_item->addWidget(new QLabel(tr("Category"), this),2,0);
+   layout_additional_item->addWidget(le_category,2,1);
+   layout_additional_item->setVerticalSpacing(0);
 
 
    QGroupBox *gr_addcat = new QGroupBox(tr("Add data if not available"));
-   gr_addcat->setLayout(lo_additional_item);
+   gr_addcat->setLayout(layout_additional_item);
 
-   QVBoxLayout *lo_audio_channel = new QVBoxLayout;
+   QVBoxLayout *layout_audio_channel = new QVBoxLayout;
 
    QCheckBox *combo_channel_left = new QCheckBox("Left", this);
    QCheckBox *combo_channel_right = new QCheckBox("Right", this);
 
-   lo_audio_channel->addWidget(combo_channel_left);
-   lo_audio_channel->addWidget(combo_channel_right);
-   lo_audio_channel->addStretch();
+   layout_audio_channel->addWidget(combo_channel_left);
+   layout_audio_channel->addWidget(combo_channel_right);
+   layout_audio_channel->addStretch();
 
    QGroupBox *gr_audio_channel = new QGroupBox(tr("Audio Channel"), this);
 
-   gr_audio_channel->setLayout(lo_audio_channel);
+   gr_audio_channel->setLayout(layout_audio_channel);
 
    QHBoxLayout *layout_bottom = new QHBoxLayout;
    layout_bottom->addWidget(grup_splitter);
@@ -159,22 +157,22 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_bottom->addWidget(gr_addcat);
    layout_bottom->addWidget(gr_audio_channel);
 
-   QHBoxLayout *lo_btn = new QHBoxLayout;
+   QHBoxLayout *layout_btn = new QHBoxLayout;
 
-   btn_start = new QPushButton(tr("Start"), this);
-   btn_start->setEnabled(0);
-   connect(btn_start,SIGNAL(clicked(bool)),this,SLOT(saveToDatabase()));
+   button_start = new QPushButton(tr("Start"), this);
+   button_start->setEnabled(0);
+   connect(button_start,SIGNAL(clicked(bool)),this,SLOT(saveToDatabase()));
 
-   QPushButton *btn_cancel = new QPushButton(tr("Cancel"), this);
+   QPushButton *button_cancel = new QPushButton(tr("Cancel"), this);
 
-   connect(btn_cancel,SIGNAL(clicked(bool)),this,SLOT(close()));
+   connect(button_cancel,SIGNAL(clicked(bool)),this,SLOT(close()));
 
-   lo_btn->addWidget(btn_cancel);
-   lo_btn->addStretch();
-   lo_btn->addWidget(btn_start);
+   layout_btn->addWidget(button_cancel);
+   layout_btn->addStretch();
+   layout_btn->addWidget(button_start);
 
    QWidget *widget_top = new QWidget(this);
-   widget_top->setLayout(lo_top);
+   widget_top->setLayout(layout_top);
    QSizePolicy spTop(QSizePolicy::Preferred, QSizePolicy::Preferred);
    spTop.setVerticalStretch(2);
    widget_top->setSizePolicy(spTop);
@@ -185,12 +183,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
    spBottom.setVerticalStretch(1);
    widget_bottom->setSizePolicy(spBottom);
 
+    layout_main->addWidget(widget_top);
+    layout_main->addWidget(widget_bottom);
+    layout_main->addLayout(layout_btn);
 
-    lo_main->addWidget(widget_top);
-    lo_main->addWidget(widget_bottom);
-    lo_main->addLayout(lo_btn);
-
-    setLayout(lo_main);
+    setLayout(layout_main);
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
     palet.setColor(QPalette::Window, Qt::black);
@@ -199,10 +196,10 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
 
-    setMinimumSize(1000,600);
+    setAutoFillBackground(1);
 
     setWindowFlags(Qt::FramelessWindowHint );
-//setWindowState(Qt::WindowFullScreen);
+    setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::setDrive(const QString &drive){
@@ -242,7 +239,7 @@ void addtodatabase::splitterChange(QString split){
 void addtodatabase::saveToDatabase(){
 
     setCursor(Qt::BusyCursor);
-    btn_start->setEnabled(0);
+    button_start->setEnabled(0);
     splitter = le_splitter->text();
 
     QDirIterator it(working_path,QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
@@ -398,7 +395,7 @@ void addtodatabase::setTitleFirst(bool j){
         title_first=1;
         singer_first=0;
         cmb_singerfirst->setChecked(0);
-        //btn_start->setEnabled(1);
+        //button_start->setEnabled(1);
     }
     else{
         title_first=0;
@@ -509,5 +506,5 @@ QString addtodatabase::getSplitter(const QString &filename){
 void addtodatabase::enableStartButton(){
     QList<QListWidgetItem*> list = lw_list->selectedItems();
     if(!list.isEmpty())
-        btn_start->setEnabled(1);
+        button_start->setEnabled(1);
 }

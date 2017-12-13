@@ -28,7 +28,7 @@ private :
     QStringList filelist;
     QCheckBox *cmb_titlefirst;
     QCheckBox *cmb_singerfirst;
-    QPushButton *btn_start;
+    QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
     QComboBox *combo_mounted;

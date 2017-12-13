@@ -14,8 +14,10 @@ about::about(QWidget *parent) :
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
     palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Text, palette().light().color());
+    palet.setColor(QPalette::WindowText, palette().light().color());
     palet.setColor(QPalette::Button, palette().dark().color());
+    palet.setColor(QPalette::ButtonText, palette().light().color());
 
     QVBoxLayout *lo_details = new QVBoxLayout;
 

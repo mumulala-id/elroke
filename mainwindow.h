@@ -8,7 +8,7 @@
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
-
+#include <QApplication>
 #include <QDialog>
 #include <QComboBox>
 #include <QTableView>
@@ -77,6 +77,7 @@ private :
     QAction *autosave_playlist;
     CLineEdit * le_userName;
     CLineEdit * le_password;
+    CLineEdit *le_password_confirm;
 
 
 

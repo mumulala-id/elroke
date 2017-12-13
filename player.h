@@ -4,8 +4,8 @@
 #include "vlc/vlc.h"
 #include <QWidget>
 #include <QTimer>
-#include <QDesktopWidget>
-#include <QApplication>
+//#include <QDesktopWidget>
+//#include <QApplication>
 #include <QEvent>
 #define POSITION_RESOLUTION 10000
 
@@ -23,9 +23,7 @@ class Player : public QWidget
     libvlc_media_t *_m;
     bool replay=false;
     libvlc_event_manager_t *m_eventMgr;
-    QDesktopWidget *desktop = QApplication::desktop();
-    int desktop_width = desktop->width();
-    int desktop_height = desktop->height();
+
     QString _singer, _title;
 
 

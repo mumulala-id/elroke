@@ -27,7 +27,8 @@ Player::Player(QWidget *parent) : QWidget(parent)
     pal.setColor(QPalette::Foreground,Qt::white);
     setPalette(pal);
 
-   setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+   setWindowFlags( Qt::FramelessWindowHint);
+   setWindowState(Qt::WindowFullScreen);
     poller->start(1000);
 
 
@@ -53,7 +54,7 @@ void Player::play(){
         return;
     }
 
-       resize(QSize(desktop_width,desktop_height));
+//       resize(QSize(desktop_width,desktop_height));
        show();
 
         opening op(_singer,_title,this);

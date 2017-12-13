@@ -1,6 +1,8 @@
 #ifndef OPENING_H
 #define OPENING_H
 #include <QDialog>
+#include <QDesktopWidget>
+#include <QApplication>
 
 class opening : public QDialog
 {
@@ -9,6 +11,9 @@ class opening : public QDialog
 private :
     QString title;
     QString singer;
+    QDesktopWidget *desktop = QApplication::desktop();
+    int desktop_width = desktop->width();
+    int desktop_height = desktop->height();
 
 
 public:
