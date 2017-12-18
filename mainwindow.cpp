@@ -1,6 +1,20 @@
-/* -----------------------------------------------------------------
-+  CopyLeft Muhammad Mukharom                       +
-+ --------------------------------------------------------------*/
+/*
+    ElRoke
+    Copyright (C) Muhammad Mukharom
+
+    This file is part of ElRoke.
+    ElRoke is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ElRoke is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with ElRoke.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "mainwindow.h"
 #include "about.h"
@@ -64,6 +78,7 @@ void mainWindow::createWidgets(){
     le_search->setPlaceholderText(tr("SEARCH"));
 
     QPushButton *button_show_all = new QPushButton(tr("ALL"), this);
+    button_show_all->setFocusPolicy(Qt::NoFocus);
     QPushButton *button_cat_indonesia = new QPushButton("category1", this);
     QPushButton *button_cat_barat = new QPushButton("category2", this);
     QPushButton *button_cat_rock = new QPushButton("category3", this);
@@ -129,6 +144,7 @@ void mainWindow::createWidgets(){
     table->setModel(proxy_model);
     tableRule();
     QPalette header_palette = table->horizontalHeader()->palette();
+    header_palette.setColor(QPalette::Base, Qt::transparent);
     header_palette.setBrush(QPalette::Button, Qt::transparent);
     header_palette.setColor(QPalette::Background, Qt::transparent);
     header_palette.setColor(QPalette::ButtonText, Qt::black);
@@ -174,8 +190,7 @@ void mainWindow::createWidgets(){
 
     auto *layout_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
-//    button_menu->setFlat(1);
+    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),tr("Playlist"),this);
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
@@ -287,6 +302,12 @@ void mainWindow::createWidgets(){
      button_play_pause->setFocusPolicy(Qt::NoFocus);
      //connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPausePlayer()));
 
+     auto *button_favorit = new QPushButton(QIcon(":/usr/share/elroke/file/icon/favorit.png"), "", this);
+      button_favorit->setFlat(1);
+      button_favorit->setIconSize(QSize(64,64));
+      button_favorit->setFocusPolicy(Qt::NoFocus);
+      connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
+
     button_audio_channel = new QPushButton(this);
     button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/stereo.png"));
     button_audio_channel->setIconSize(QSize(64,64));
@@ -322,6 +343,7 @@ void mainWindow::createWidgets(){
      layout_player_control->addStretch();
      layout_player_control->addWidget(btn_next);
      layout_player_control->addWidget(button_play_pause);
+      layout_player_control->addWidget(button_favorit);
      layout_player_control->addStretch();
      layout_player_control->addWidget(button_audio_channel);
      layout_player_control->addStretch();
@@ -1344,6 +1366,17 @@ void mainWindow::login(){
      emit loginAccepted();
         dialogAdmin();
     }
+
+
+}
+
+void mainWindow::showHits(){
+
+//    proxy_model->sort(7, ProxyModel::sortRole, Qt::AscendingOrder);
+//proxy_model->setSortRole(ProxyModel::sortRole);
+proxy_model->sort(6, Qt::DescendingOrder);
+
+
 
 
 }

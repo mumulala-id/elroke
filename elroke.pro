@@ -39,13 +39,11 @@ HEADERS  += mainwindow.h \
         dbmanager.h \
         opening.h \
         liststringfileparser.h \
-    clineedit.h
+       clineedit.h
 
-TRANSLATIONS = indonesia.ts
+TRANSLATIONS = file/languages/elroke_id.ts
 
 DISTFILES +=
-
-#CONFIG += console
 
 RESOURCES += \
     file.qrc

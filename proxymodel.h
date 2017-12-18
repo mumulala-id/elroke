@@ -11,6 +11,8 @@ class ProxyModel : public QSortFilterProxyModel
 
 public:
       enum mode{column,smart};
+      enum role{sortRole=Qt::UserRole};
+
     ProxyModel(QObject* parent = 0);
     ProxyModel(mode, QObject *parent=0);
     bool filterAcceptsRow(int source_row,

@@ -1,3 +1,20 @@
+/*
+    ElRoke
+    Copyright (C) Muhammad Mukharom
+
+    This file is part of ElRoke.
+    ElRoke is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    ElRoke is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with ElRoke.  If not, see <http://www.gnu.org/licenses/>.
+*/
 #include "editdb.h"
 #include "dbmanager.h"
 #include "liststringfileparser.h"
@@ -447,11 +464,16 @@ setCursor(Qt::WaitCursor);
         return;
         }
     }
+    else{
 
     foreach (QModelIndex ind, listInd) {
-        table->hideRow(proxy_model->mapToSource(ind).row());// need to hiding row first, deleted row will disappear after submit.
-        sql_model->removeRow(proxy_model->mapToSource(ind).row());
+        int visible_row = ind.row();//visble row on table
+        int row = proxy_model->mapToSource(ind).row();//real row
+//        qDebug()<<"row"<<row;
+        table->hideRow(visible_row);// need to hiding row first, deleted row will disappear after submit.
+        sql_model->removeRow(row);
     }
+}
     QModelIndex index = table->indexAt(QPoint(0,0));
     if(!index.isValid())
         proxy_model->reset();

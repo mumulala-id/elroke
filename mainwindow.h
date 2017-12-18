@@ -127,6 +127,7 @@ private slots:
     void keyBoardInstance();
     void fontSetup();
     void updateLockButton(bool);
+    void showHits();
 
 
 protected :
