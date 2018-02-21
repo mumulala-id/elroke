@@ -30,6 +30,7 @@ int main(int argc, char *argv[])
     // turn on the DPI support**
 
 QApplication::setStyle("plastique");
+//QApplication::setFont(QFont().setFamily("Roboto"));
     QApplication a(argc, argv);
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setOrganizationName("mumulala");

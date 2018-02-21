@@ -23,9 +23,24 @@
         <file>file/icon/delete.png</file>
         <file>file/icon/lock.png</file>
         <file>file/icon/unlock.png</file>
+        <file>file/icon/bottom.png</file>
+        <file>file/icon/top.png</file>
         <file>file/icon/logo.png</file>
         <file>file/soundfx/applause.mp3</file>
         <file>file/languages/elroke_id.qm</file>
         <file>file/LICENSE</file>
+        <file>file/font/Roboto/Roboto-Black.ttf</file>
+        <file>file/font/Roboto/Roboto-LightItalic.ttf</file>
+        <file>file/font/Roboto/Roboto-Medium.ttf</file>
+        <file>file/font/Roboto/Roboto-Thin.ttf</file>
+        <file>file/font/Roboto/Roboto-ThinItalic.ttf</file>
+        <file>file/font/Roboto/Roboto-Black.ttf</file>
+        <file>file/font/Roboto/Roboto-BlackItalic.ttf</file>
+        <file>file/font/Roboto/Roboto-Bold.ttf</file>
+        <file>file/font/Roboto/Roboto-BoldItalic.ttf</file>
+        <file>file/font/Roboto/Roboto-Italic.ttf</file>
+        <file>file/font/Roboto/Roboto-Light.ttf</file>
+        <file>file/font/Roboto/Roboto-MediumItalic.ttf</file>
+        <file>file/font/Roboto/Roboto-Regular.ttf</file>
     </qresource>
 </RCC>

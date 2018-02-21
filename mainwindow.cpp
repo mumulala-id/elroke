@@ -73,8 +73,8 @@ void mainWindow::createWidgets(){
     QHBoxLayout *layout_top = new QHBoxLayout;
 
     QPushButton *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
-//    pb_menu->setFlat(1);
-//    pb_menu->setFocusPolicy(Qt::NoFocus);
+    pb_menu->setFlat(1);
+    pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
 
     le_search = new CLineEdit(this);
@@ -119,7 +119,7 @@ void mainWindow::createWidgets(){
 
     layout_top->addWidget(pb_menu);
     layout_top->addWidget(le_search);
-    layout_top->addSpacing(40);
+    layout_top->addStretch();
     layout_top->addWidget(button_show_all);
     layout_top->addWidget(button_cat_indonesia);
     layout_top->addWidget(button_cat_barat);
@@ -158,6 +158,7 @@ void mainWindow::createWidgets(){
 
     sql_model = new QSqlTableModel(this, db->database());
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+
     proxy_model = new ProxyModel(ProxyModel::smart, this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(1, Qt::AlignLeft);
@@ -166,6 +167,7 @@ void mainWindow::createWidgets(){
     table = new QTableView(this);
     table->setModel(proxy_model);
     tableRule();
+
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
     header_palette.setBrush(QPalette::Button, Qt::transparent);
@@ -191,8 +193,7 @@ void mainWindow::createWidgets(){
     playlist_widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     playlist_widget->setDragEnabled(true);
     playlist_widget->viewport()->setAcceptDrops(true);
-    playlist_widget->showDropIndicator();
-//    playlist_widget->setDropIndicatorShown(true);
+    playlist_widget->setDropIndicatorShown(true);
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
 //    playlist_widget->setMovement(QListView::Snap);
     playlist_widget->setPalette(table_palette);
@@ -225,12 +226,13 @@ void mainWindow::createWidgets(){
     menu_playlist->addAction(load_playlist);
 
     button_menu->setMenu(menu_playlist);
+       button_menu->setFocusPolicy(Qt::NoFocus);
 
-    auto *button_move_to_top = new QPushButton("T", this);
-    button_menu->setFocusPolicy(Qt::NoFocus);
+    auto *button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/file/icon/top.png"),"", this);
+
     connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
 
-    auto *button_moveTo_bottom = new QPushButton("B", this);
+    auto *button_moveTo_bottom = new QPushButton(QIcon(":/usr/share/elroke/file/icon/bottom.png"),"", this);
 
 
     auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
@@ -293,15 +295,13 @@ void mainWindow::createWidgets(){
     spTable.setVerticalStretch(2);
     all_table->setSizePolicy(spTable);
 
-
-
-
      auto *layout_player_control = new QHBoxLayout;
 
-     circle_bar = new QRoundProgressBar(this);
-circle_bar->setFixedSize(QSize(64,64));
-circle_bar->setRange(0,100);
-circle_bar->setValue(0);
+     circle = new ProgressCircle(this);
+    circle->setMaximum(100);
+    circle->setColor(Qt::red);
+    circle->setFixedSize(64,64);
+
 
 
      auto *btn_next = new QPushButton(this);
@@ -360,7 +360,7 @@ circle_bar->setValue(0);
      button_audio_mute->setFlat(1);
      connect(button_audio_mute,SIGNAL(pressed()),this,SLOT(setMute()));
 
-     layout_player_control->addWidget( circle_bar);
+     layout_player_control->addWidget( circle);
      layout_player_control->addStretch();
      layout_player_control->addWidget(btn_next);
      layout_player_control->addWidget(button_play_pause);
@@ -572,7 +572,7 @@ void mainWindow::dialogAbout(){
 
 void mainWindow::updateInterface(){
 //qDebug()<<video->position();
-    circle_bar->setValue(video->position());
+    circle->setValue(video->position());
     slider_vol->setSliderPosition(video->volume());
 
 }
@@ -684,6 +684,7 @@ void mainWindow::deleteItemPlaylist(){
 }
 
 void mainWindow::playPlayer(){
+    qDebug()<<"enter pla player";
 
     if(playlist_widget->count()==0){
         video->close();
@@ -738,6 +739,7 @@ void mainWindow::playPlayer(){
                 deleteItemPlaylist();
             }
 //           table_playlist->selectRow(0);
+            playlist_widget->setCurrentRow(0);
 }
 
 void mainWindow::setaudiochannelAuto(){
@@ -767,8 +769,12 @@ void mainWindow::errorHandling(){
 
 }
 
-void mainWindow::dialogNextSong(){
-// this will notify next item in playlist before song end
+void mainWindow::dialogNextSong()
+{
+
+    // this will notify next item in playlist before song end
+
+
     QDialog *dia = new QDialog;
 
     QPalette let;
@@ -780,16 +786,13 @@ void mainWindow::dialogNextSong(){
 
     QLabel *notif = new QLabel(dia);
 
-//            if(model_playlist->rowCount()==0)
-//                 notif->setText(tr("Playlist Is Empty"));
-//          else{
-
-////                int  index = table_playlist->selectionModel()->currentIndex().row();
-
-////                QString next_song = model_playlist->item(index,2)->text();
-////                  notif->setText(tr("Next song : ")+next_song);
-//            }
-
+            if(playlist_widget->count()==0)
+                 notif->setText(tr("Playlist Is Empty"));
+          else{
+                songitemwidget * widget_song = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->item(0)));
+                QString title = widget_song->song()->getTitle();
+                notif->setText(tr("Next song : ")+title );
+            }
 
     QHBoxLayout *layout_main = new QHBoxLayout;
     dia->setWindowFlags(Qt::FramelessWindowHint);
@@ -803,11 +806,13 @@ void mainWindow::dialogNextSong(){
     dia->setAttribute(Qt::WA_DeleteOnClose);
     QTimer::singleShot(5000, dia, SLOT(close()));
     dia->show();
+    qDebug()<<"enter next";
 
 }
 
 
-bool mainWindow::eventFilter(QObject *target, QEvent *event){
+bool mainWindow::eventFilter(QObject *target, QEvent *event)
+{
 
     if(target==video){
 
@@ -816,16 +821,15 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
             QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
             if(isKeyValid(keyEvent->key())){
-
-                this->activateWindow();
-                this->setMask(getMaska());
+                    this->activateWindow();
+                    this->setMask(getMaska());
                 }
 
-                le_search->setFocus();
-                le_search->setText(keyEvent->text());
+           le_search->setFocus();
+           le_search->setText(keyEvent->text());
 
 
-             }
+     }
 
     //if video is playing, user click, mainwindow will be shown
  if(event->type()==QEvent::MouseButtonPress){
@@ -844,7 +848,8 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event){
         return QObject::eventFilter(target, event);
 }
 
-void mainWindow::delayHideWindow(){
+void mainWindow::delayHideWindow()
+{
 
     qDebug()<<"tred started";
 
@@ -1189,6 +1194,7 @@ void mainWindow::showKeyboard(bool x){
 void mainWindow::videoInstance(){
     //video player
     video = new Player;
+    video->hide();
 
     video->installEventFilter(this);
 
@@ -1196,6 +1202,7 @@ void mainWindow::videoInstance(){
     connect(video,SIGNAL(reachEnded()),this,SLOT(videoEnds()));
     connect(video,SIGNAL(almostEnded()),this,SLOT(dialogNextSong()));
     connect(video,SIGNAL(playing()),this,SLOT(setaudiochannelAuto()));
+//    connect(video,SIGNAL(playing()),video,SLOT(show()));
     connect(video,SIGNAL(error()),this,SLOT(errorHandling()));
 //    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
     connect(slider_vol,&QSlider::sliderMoved,video,&Player::setVolume);
@@ -1210,13 +1217,16 @@ void mainWindow::keyBoardInstance(){
 void mainWindow::fontSetup(){
 
     //set font
-    QFontDatabase basefont;
-    int fontindex = basefont.addApplicationFont(":/usr/share/elroke/file/font/Xolonium.ttf");
+//    QFontDatabase basefont;
+//    int fontindex = basefont.addApplicationFont(":/usr/share/elroke/file/font/Roboto/Roboto-Black.ttf");
+////    basefont
 
-    if(fontindex==-1)
-        qDebug()<<"Failed to load custom font";
+//    if(fontindex==-1)
+//        qDebug()<<"Failed to load custom font";
 
-    QFont font= basefont.font("Xolonium", "normal", 16);
+    QFont font;//= basefont.font("Roboto-Black", "normal", 16);
+    font.setPointSize(16);
+    font.setFamily("Roboto");
     setFont(font);
 
 
@@ -1524,6 +1534,7 @@ void mainWindow::videoEnds(){
 void mainWindow::audioEffectInstance(){
 
     effect_player = new Player(this);
+    effect_player->setVisible(0);
 
 }
 
@@ -1536,6 +1547,7 @@ void mainWindow::randomNumberInstance(){
 void mainWindow::openingInstance(){
 
     cover = new opening();
+    connect(cover,SIGNAL(passed()),video,SLOT(show()));
     connect(cover,SIGNAL(passed()),video,SLOT(play()));
 
 }
@@ -1545,8 +1557,7 @@ Song* mainWindow::extractSong(){
     Song * the_song = qobject_cast<Song*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
     return the_song;
-//    songitemwidget *item_song_widget = new songitemwidget;
-//    item_song_widget->setSong(the_song);
+
 
 }
 

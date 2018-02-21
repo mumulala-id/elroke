@@ -18,7 +18,7 @@ SOURCES += main.cpp\
         player.cpp \
         about.cpp \
         addtodatabase.cpp \
-        aerobutton.cpp \
+#        aerobutton.cpp \
         proxymodel.cpp \
         delay.cpp \
         keyboard.cpp \
@@ -26,15 +26,15 @@ SOURCES += main.cpp\
         dbmanager.cpp \
         opening.cpp \
     clineedit.cpp \
-    QRoundProgressBar.cpp \
     song.cpp \
-    songitemwidget.cpp
+    songitemwidget.cpp \
+    ProgressCircle.cpp
 
 HEADERS  += mainwindow.h \
         player.h \
         about.h \
         addtodatabase.h \
-        aerobutton.h \
+#        aerobutton.h \
         proxymodel.h \
         delay.h \
         keyboard.h \
@@ -43,9 +43,9 @@ HEADERS  += mainwindow.h \
         opening.h \
         liststringfileparser.h \
        clineedit.h \
-    QRoundProgressBar.h \
     song.h \
-    songitemwidget.h
+    songitemwidget.h\
+    ProgressCircle.h
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

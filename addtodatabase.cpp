@@ -29,11 +29,17 @@
 #include <QSqlError>
 #include <QVariantList>
 #include <QtAlgorithms>//qSort
+#include <QTabBar>
+#include <QStackedLayout>
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
     QVBoxLayout *layout_main = new QVBoxLayout;
+
+    QTabBar *tabbar = new QTabBar(this);
+    tabbar->addTab("Local File");
+    tabbar->addTab("Network");
 
     QHBoxLayout *layout_top = new QHBoxLayout;
     QVBoxLayout *layout_top_left = new QVBoxLayout;
@@ -200,9 +206,33 @@ addtodatabase::addtodatabase(QWidget *parent) :
    spBottom.setVerticalStretch(1);
    widget_bottom->setSizePolicy(spBottom);
 
-    layout_main->addWidget(widget_top);
-    layout_main->addWidget(widget_bottom);
+   QWidget *local_widget = new QWidget(this);
+   QVBoxLayout *layout_local = new QVBoxLayout;
+   layout_local->addWidget(widget_top);
+   layout_local->addWidget(widget_bottom);
+   local_widget->setLayout(layout_local);
+
+
+
+//network widget
+   QWidget *network_widget = new QWidget(this);
+   QVBoxLayout *layout_network = new QVBoxLayout;
+   layout_network->addWidget(new QLabel("tes",this));
+   layout_network->addWidget(new QPushButton("test", this));
+network_widget->setLayout(layout_network);
+
+   QStackedLayout *stack = new QStackedLayout;
+   stack->addWidget(local_widget);
+   stack->addWidget(network_widget);
+
+   connect(tabbar,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
+
+   layout_main->addWidget(tabbar);
+    layout_main->addLayout(stack);
+
     layout_main->addLayout(layout_btn);
+
+
 
     setLayout(layout_main);
     QPalette palet;

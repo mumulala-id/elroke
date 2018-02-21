@@ -10,8 +10,8 @@
 #include "clineedit.h"
 #include "opening.h"
 #include "songitemwidget.h"
-//#include "qtmaterialtextfield.h"
-#include "QRoundProgressBar.h"
+#include "ProgressCircle.h"
+//#include "QRoundProgressBar.h"
 #include <QApplication>
 #include <QDialog>
 #include <QComboBox>
@@ -41,13 +41,14 @@ private :
 
     CLineEdit *le_search;
 
-   QRoundProgressBar *circle_bar;
+//   QRoundProgressBar *circle_bar;
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
     Player *video;
     QSqlTableModel *sql_model;
 
     QListWidget *playlist_widget;
+    ProgressCircle *circle;
 
 //    QStringList category;
 

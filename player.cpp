@@ -54,12 +54,7 @@ void Player::play(){
         return;
     }
 
-//       resize(QSize(desktop_width,desktop_height));
-       show();
-
-//        opening op(_singer,_title,this);
-//        QTimer::singleShot(3000,&op,SLOT(close()));
-//        op.exec();
+//       show();
 
     if(!_isPausing){
     _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
