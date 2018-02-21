@@ -1,6 +1,6 @@
 #include "player.h"
 #include<QDebug>
-#include "opening.h"
+//#include "opening.h"
 
 Player::Player(QWidget *parent) : QWidget(parent)
 
@@ -57,9 +57,9 @@ void Player::play(){
 //       resize(QSize(desktop_width,desktop_height));
        show();
 
-        opening op(_singer,_title,this);
-        QTimer::singleShot(3000,&op,SLOT(close()));
-        op.exec();
+//        opening op(_singer,_title,this);
+//        QTimer::singleShot(3000,&op,SLOT(close()));
+//        op.exec();
 
     if(!_isPausing){
     _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
@@ -112,6 +112,7 @@ void Player::changePosition(int newPosition){
         return;
 
     float pos = (float)(newPosition)/(float)POSITION_RESOLUTION;
+
     libvlc_media_player_set_position(_mp,pos);
 }
 
@@ -214,8 +215,8 @@ int Player::volume(){
 int Player::position(){
 
        float pos = libvlc_media_player_get_position(_mp);
-        int siderpos = (int)(pos * (float)(POSITION_RESOLUTION));
-        return siderpos;
+
+        return (int)(pos * (float)(100));
 }
 
 int Player::getAudioChannel(){
@@ -230,13 +231,13 @@ bool Player::isMute(){
 }
 
 
-void Player::setMeta(QString title, QString singer){
+//void Player::setMeta(QString title, QString singer){
 
-      _title = title;
-      _singer=singer;
+//      _title = title;
+//      _singer=singer;
 
 
-}
+//}
 
 Player::~Player()
 {

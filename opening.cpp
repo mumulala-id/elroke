@@ -17,51 +17,78 @@
 */
 #include "opening.h"
 
-#include <QLabel>
+//#include <QLabel>
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QDebug>
+#include <QTimer>
 
-opening::opening(QString t, QString s, QWidget *parent) : QDialog(parent), title(t), singer(s)
+opening::opening( QWidget *parent) : QWidget(parent)
 {
 
-//    resize(parent->size());
   resize(QSize(desktop_width,desktop_height));
+
     QFont fontTitle;
     fontTitle.setPointSize(32);
 
     QFont fontSinger;
     fontSinger.setPointSize(56);
 
-    auto *label_title = new QLabel(this);
-    label_title->setText(title);
+    label_title = new QLabel(this);
     label_title->setFont(fontTitle);
-    label_title->adjustSize();
 
-    auto *label_singer = new QLabel(this);
-    label_singer->setText(singer);
+
+    label_singer = new QLabel(this);
     label_singer->setFont(fontSinger);
-    label_singer->adjustSize();
 
-    auto *animation = new QPropertyAnimation(label_singer, "geometry", this);
-    animation->setDuration(800);
-     animation->setStartValue(QRect(0,0, width(),height()));
-     animation->setEndValue(QRect((width()-label_singer->width())/2 ,0, width(), height()));
-     animation->start();
+    singer_animation = new QPropertyAnimation(label_singer, "geometry", this);
+    singer_animation->setDuration(800);
 
-    auto *animation1 = new QPropertyAnimation(label_title, "geometry", this);
-    animation1->setDuration(800);
-    animation1->setStartValue(QRect(width(), 80, width(), height()));
-    animation1->setEndValue(QRect((width()-label_title->width())/2, 80, width(), height()));
-    animation1->start();
+    title_animaton = new QPropertyAnimation(label_title, "geometry", this);
+    title_animaton->setDuration(800);
 
     QPalette let;
     let.setColor(QPalette::Background,Qt::gray);
     let.setColor(QPalette::Foreground,Qt::black);
 
     setPalette(let);
-    setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    setWindowFlags( Qt::FramelessWindowHint);
     setWindowState(Qt::WindowFullScreen);
+    hide();
+
 
 }
 
+
+void opening::setData(QString title, QString singer){
+      label_title->setText(title);
+       label_title->adjustSize();
+        label_singer->setText(singer);
+         label_singer->adjustSize();
+
+}
+
+
+void opening::start(){
+
+    show();
+    singer_animation->setStartValue(QRect(0,0, width(),height()-label_singer->height()));
+    singer_animation->setEndValue(QRect((width()-label_singer->width())/2 ,0, width(), height()-label_singer->height()));
+
+
+    title_animaton->setStartValue(QRect(width(), 80, width(), height()));
+    title_animaton->setEndValue(QRect((width()-label_title->width())/2, 80, width(), height()));
+
+    singer_animation->start();
+    title_animaton->start();
+
+    QTimer::singleShot(4000,this,SLOT(finish()));
+}
+
+void opening::finish(){
+
+    hide();
+    emit passed();
+
+
+}

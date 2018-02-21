@@ -19,7 +19,6 @@
 #include "mainwindow.h"
 #include "about.h"
 #include "addtodatabase.h"
-//#include "QPushButton.h"
 #include "editdb.h"
 #include "liststringfileparser.h"
 
@@ -49,8 +48,12 @@ mainWindow::mainWindow(QWidget *parent)
     createWidgets();
     keyBoardInstance();
     videoInstance();
+    openingInstance();
+    audioEffectInstance();
+    randomNumberInstance();
     createShortcut();
     setBackground();
+
 
     getCategory();
 
@@ -69,9 +72,9 @@ void mainWindow::createWidgets(){
 
     QHBoxLayout *layout_top = new QHBoxLayout;
 
-    auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
-    pb_menu->setFlat(1);
-    pb_menu->setFocusPolicy(Qt::NoFocus);
+    QPushButton *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/logo.png"),"", this);
+//    pb_menu->setFlat(1);
+//    pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
 
     le_search = new CLineEdit(this);
@@ -79,12 +82,34 @@ void mainWindow::createWidgets(){
 
     QPushButton *button_show_all = new QPushButton(tr("ALL"), this);
     button_show_all->setFocusPolicy(Qt::NoFocus);
+    button_show_all->setFlat(1);
     QPushButton *button_cat_indonesia = new QPushButton("category1", this);
+    button_cat_indonesia->setFlat(1);
+    button_cat_indonesia->setFocusPolicy(Qt::NoFocus);
     QPushButton *button_cat_barat = new QPushButton("category2", this);
+    button_cat_barat->setFlat(1);
+    button_cat_barat->setFocusPolicy(Qt::NoFocus);
     QPushButton *button_cat_rock = new QPushButton("category3", this);
+    button_cat_rock->setFlat(1);
+    button_cat_rock->setFocusPolicy(Qt::NoFocus);
     QPushButton *button_cat_pop = new QPushButton("category4", this);
+    button_cat_pop->setFlat(1);
+    button_cat_pop->setFocusPolicy(Qt::NoFocus);
     QPushButton *button_cat_dangdut = new QPushButton("category5", this);
+    button_cat_dangdut->setFlat(1);
+    button_cat_dangdut->setFocusPolicy(Qt::NoFocus);
 
+    QPalette secon;
+
+    secon.setColor(QPalette::Button, QColor("#80cbc4"));
+    secon.setColor(QPalette::ButtonText,Qt::white);
+    button_show_all->setAutoFillBackground(1);
+    button_show_all->setPalette(secon);
+    button_cat_indonesia->setPalette(secon);
+    button_cat_barat->setPalette(secon);
+    button_cat_rock->setPalette(secon);
+    button_cat_pop->setPalette(secon);
+    button_cat_dangdut->setPalette(secon);
 //show clock
     clock =new QLabel(this);
     QTimer *timer = new QTimer(this);
@@ -107,28 +132,26 @@ void mainWindow::createWidgets(){
     layout_top->setMargin(0);
 
     QWidget *widget_top = new QWidget(this);
-    QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
-    QPalette palette_bg;
+//    QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
+    QPalette transparent_palette;
 
-    bg_trans =   bg_trans.scaled(widget_top->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
-    palette_bg.setBrush(QPalette::Background, bg_trans);
+//    bg_trans =   bg_trans.scaled(widget_top->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    transparent_palette.setBrush(QPalette::Background, QColor("#009688"));
 
 
     widget_top->setAutoFillBackground(1);
-    widget_top->setPalette(palette_bg);
+    widget_top->setPalette(transparent_palette);
     widget_top->setLayout(layout_top);
 
 
     QHBoxLayout *layout_table = new QHBoxLayout;
 
-//    QVBoxLayout *layout_left = new QVBoxLayout;
-
     QPalette table_palette;
     table_palette.setColor(QPalette::Base, Qt::transparent);
     table_palette.setColor(QPalette::Text, Qt::white);
 //    table_palette.setColor(QPalette::Active,Qt::black);
-    table_palette.setColor(QPalette::Highlight, Qt::transparent);
-    table_palette.setColor(QPalette::HighlightedText, Qt::blue);
+    table_palette.setColor(QPalette::Highlight, Qt::blue);
+    table_palette.setColor(QPalette::HighlightedText, Qt::yellow);
 
     db = new dbmanager(dbmanager::show, this);
     db->connectToDB();
@@ -163,34 +186,23 @@ void mainWindow::createWidgets(){
     table->setSizePolicy(spLeft);
 
     auto *layout_playlist = new QVBoxLayout;
-    model_playlist =new QStandardItemModel(this);
-    model_playlist->setColumnCount(5);
-    model_playlist->setHeaderData(2,Qt::Horizontal, tr("PLAYLIST"));
 
+    playlist_widget = new QListWidget(this);
+    playlist_widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    playlist_widget->setDragEnabled(true);
+    playlist_widget->viewport()->setAcceptDrops(true);
+    playlist_widget->showDropIndicator();
+//    playlist_widget->setDropIndicatorShown(true);
+    playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
+//    playlist_widget->setMovement(QListView::Snap);
+    playlist_widget->setPalette(table_palette);
 
-    table_playlist = new QTableView(this);
-    table_playlist->setModel(model_playlist);
-    table_playlist->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
-    table_playlist->hideColumn(0);
-    table_playlist->hideColumn(1);
-    table_playlist->hideColumn(3);
-    table_playlist->hideColumn(4);
-    table_playlist->horizontalHeader()->hide();
-    table_playlist->verticalHeader()->hide();
-    table_playlist->setShowGrid(0);
-    table_playlist->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table_playlist->setSelectionMode(QAbstractItemView::SingleSelection);
-    table_playlist->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    table_playlist->horizontalHeader()->setHighlightSections(0);
-    table_playlist->horizontalHeader()->setPalette(header_palette);
-    table_playlist->setItemDelegate(new NoFocusDelegate());
-    table_playlist->setPalette(table_palette);
-    table_playlist->installEventFilter(this);
-    connect(table_playlist,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
+    connect(playlist_widget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
+    connect(playlist_widget->model(),SIGNAL(rowsInserted(QModelIndex,int,int)),playlist_widget,SLOT(scrollToBottom()));
 
     auto *layout_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),tr("Playlist"),this);
+    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
@@ -213,6 +225,13 @@ void mainWindow::createWidgets(){
     menu_playlist->addAction(load_playlist);
 
     button_menu->setMenu(menu_playlist);
+
+    auto *button_move_to_top = new QPushButton("T", this);
+    button_menu->setFocusPolicy(Qt::NoFocus);
+    connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
+
+    auto *button_moveTo_bottom = new QPushButton("B", this);
+
 
     auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
     button_delete->setFocusPolicy(Qt::NoFocus);
@@ -239,6 +258,8 @@ void mainWindow::createWidgets(){
     layout_button_playlist->addWidget(button_menu);
     layout_button_playlist->addWidget(button_delete);
     layout_button_playlist->addWidget(button_clear_playlist);
+       layout_button_playlist->addWidget(button_move_to_top);
+       layout_button_playlist->addWidget(button_moveTo_bottom);
     layout_button_playlist->addWidget(button_up);
     layout_button_playlist->addWidget(button_down);
     layout_button_playlist->addWidget(button_lock_playlist);
@@ -246,7 +267,7 @@ void mainWindow::createWidgets(){
     layout_button_playlist->setMargin(0);
 
     layout_playlist->addLayout(layout_button_playlist);
-    layout_playlist->addWidget(table_playlist);
+    layout_playlist->addWidget(playlist_widget);
     layout_playlist->setSpacing(0);
     layout_playlist->setMargin(0);
 
@@ -277,11 +298,11 @@ void mainWindow::createWidgets(){
 
      auto *layout_player_control = new QHBoxLayout;
 
-     slider_pos = new QSlider(Qt::Horizontal, this);
-     slider_pos->setRange(0,10000);
-     slider_pos->setFixedWidth(200);
-     slider_pos->setFocusPolicy(Qt::NoFocus);
-     slider_pos->setFixedHeight(40);
+     circle_bar = new QRoundProgressBar(this);
+circle_bar->setFixedSize(QSize(64,64));
+circle_bar->setRange(0,100);
+circle_bar->setValue(0);
+
 
      auto *btn_next = new QPushButton(this);
      btn_next->setIcon(QIcon(":/usr/share/elroke/file/icon/next.png"));
@@ -339,7 +360,7 @@ void mainWindow::createWidgets(){
      button_audio_mute->setFlat(1);
      connect(button_audio_mute,SIGNAL(pressed()),this,SLOT(setMute()));
 
-     layout_player_control->addWidget( slider_pos);
+     layout_player_control->addWidget( circle_bar);
      layout_player_control->addStretch();
      layout_player_control->addWidget(btn_next);
      layout_player_control->addWidget(button_play_pause);
@@ -356,7 +377,7 @@ void mainWindow::createWidgets(){
      QWidget *widget_bottom = new QWidget(this);
 
      widget_bottom->setAutoFillBackground(1);
-     widget_bottom->setPalette(palette_bg);
+     widget_bottom->setPalette(transparent_palette);
      widget_bottom->setLayout(layout_player_control);
 
     layout_main->addWidget(widget_top);
@@ -432,41 +453,67 @@ void mainWindow::showClock(){
 
 void mainWindow::addToPlaylist(){
 
-  //  int rowCount = model_playlist->rowCount();
-    model_playlist->setRowCount(model_playlist->rowCount()+1);
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
     int id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toInt();
+
+   Song *song =   db->getSong(id);
+
+
+
+   songitemwidget *item_song_widget = new songitemwidget;
+   item_song_widget->setSong(song);
+
+   QListWidgetItem *item = new QListWidgetItem;
+
+   playlist_widget->addItem(item);
+   playlist_widget->setItemWidget(item, item_song_widget);
+
+//   item->setSizeHint(item_song_widget->sizeHint());
+
+   item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
+
+//playlist_widget->res
+     /*
+
     QString path =  sql_model->data(sql_model->index(row,7),Qt::DisplayRole).toString();
     QString title = sql_model->data(sql_model->index(row,1),Qt::DisplayRole).toString();
     QString singer = sql_model->data(sql_model->index(row,2),Qt::DisplayRole).toString();
-    QString channel = sql_model->data(sql_model->index(row,5),Qt::DisplayRole).toString();
+    QString channel = sql_model->data(sql_model->index(row,5),Qt::DisplayRole).toString();*/
 
-    QStandardItem *item_id = new QStandardItem;
-    item_id->setText(QString::number(id));
-    model_playlist->setItem(model_playlist->rowCount()-1,0,item_id);
+//    QStandardItem *item_id = new QStandardItem;
+//    item_id->setText(QString::number(id));
+//    model_playlist->setItem(model_playlist->rowCount()-1,0,item_id);
 
-    QStandardItem *item_path = new QStandardItem;
-    item_path ->setText( path);
-    model_playlist->setItem(model_playlist->rowCount()-1,1,item_path);
+//    QStandardItem *item_path = new QStandardItem;
+//    item_path ->setText( path);
+//    model_playlist->setItem(model_playlist->rowCount()-1,1,item_path);
 
-    QStandardItem *item_title = new QStandardItem;
-    item_title->setText(title);
-    item_title->setTextAlignment(Qt::AlignCenter);
-    model_playlist->setItem(model_playlist->rowCount()-1,2,item_title);
-
-    QStandardItem *item_singer = new QStandardItem;
-    item_singer->setText(singer);
-    model_playlist->setItem(model_playlist->rowCount()-1,3,item_singer);
+// song_item *s_item = new song_item;
+// s_item->setlabel1(title);
+// s_item->setlabel2(singer);
 
 
+// table_playlist->setIndexWidget(model_playlist->index(model_playlist-> rowCount()-1,2), s_item);
+// table_playlist->resizeColumnsToContents();
+// table_playlist->resizeRowsToContents();
+//    QStandardItem *item_title = new QStandardItem;
+//    item_title->setText(title);
+//    item_title->setTextAlignment(Qt::AlignCenter);
+//    model_playlist->setItem(model_playlist->rowCount()-1,2,item_title);
 
-    QStandardItem *item_channel = new QStandardItem;
-    item_channel->setText(channel);
-    model_playlist->setItem(model_playlist->rowCount()-1,4,item_channel);
+//    QStandardItem *item_singer = new QStandardItem;
+//    item_singer->setText(singer);
+//    model_playlist->setItem(model_playlist->rowCount()-1,3,item_singer);
+
+
+
+//    QStandardItem *item_channel = new QStandardItem;
+//    item_channel->setText(channel);
+//    model_playlist->setItem(model_playlist->rowCount()-1,4,item_channel);
 
 
     //set curretn item at 0
-    table_playlist->selectRow(0);
+//    table_playlist->selectRow(0);
 
 }
 
@@ -484,7 +531,7 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
                 addToPlaylist();
             }
             //play item with enter key
-            else if(focusWidget()==table_playlist){
+            else if(focusWidget()==playlist_widget){
                 playPlayer();
             }
         }
@@ -494,11 +541,11 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
         //move focus widget from table to playlist with right key
         else if(event->key()==Qt::Key_Right && qApp->focusWidget()==table){
 
-            table_playlist->setFocus();
+            playlist_widget->setFocus();
         }
 
         //move focus widget from playlist to table with left key
-        else if(event->key()==Qt::Key_Left && qApp->focusWidget()==table_playlist){
+        else if(event->key()==Qt::Key_Left && qApp->focusWidget()==playlist_widget){
             table->setFocus();
 
         }
@@ -524,22 +571,37 @@ void mainWindow::dialogAbout(){
 }
 
 void mainWindow::updateInterface(){
-
-    slider_pos->setSliderPosition(video->position());
+//qDebug()<<video->position();
+    circle_bar->setValue(video->position());
     slider_vol->setSliderPosition(video->volume());
 
 }
 
+void mainWindow::moveItemToTop(){
+//   int row = table_playlist->selectionModel()->currentIndex().row();
 
+//    if(!selection.isValid())
+//        return;
+
+//    int row = selection.row();
+//ignore first item
+//    if(row==0)
+//        return;
+
+//    QList<QStandardItem *> item_list = model_playlist->takeRow(row);
+//    model_playlist->insertRow(0, item_list);
+//    table_playlist->selectRow(0);
+
+
+}
 void mainWindow::moveItemUp(){
 //move up item in playlist
-    QModelIndex selection = table_playlist->selectionModel()->currentIndex();
+/*int row = table_playlist->selectionModel()->currentIndex().row();
 
     //ignore if empty
   if(model_playlist->rowCount()==0)
       return;
 
-    int row = selection.row();
 //ignore first item
     if(row==0)
         return;
@@ -548,30 +610,49 @@ void mainWindow::moveItemUp(){
     model_playlist->insertRow(row-1, item_list);
 
     //set new current row
-    QModelIndex new_index = table_playlist->model()->index(row-1,0);
-    table_playlist->setCurrentIndex(new_index);
+    table_playlist->setCurrentIndex(model_playlist->index(row-1,0));*/
 }
 
 void mainWindow::moveItemDown(){
 //move down item in playlist
-    QModelIndex selection = table_playlist->selectionModel()->currentIndex();
+    int row = playlist_widget->selectionModel()->currentIndex().row();
 
     //ignore if empty
-    if(model_playlist->rowCount()==0)
+    if(playlist_widget->count()==0)
         return;
 
-    int  row = selection.row();
-//ignore last item
-    if(row==model_playlist->rowCount()-1)
+////ignore last item
+    if(row==playlist_widget->count()-1)
         return;
 
-    QList<QStandardItem *> item_list = model_playlist->takeRow(row);//take row
+    QListWidgetItem * i = new QListWidgetItem;
+            i = playlist_widget->currentItem()->clone();
+    songitemwidget *siw = new songitemwidget;
+           siw =(songitemwidget*) playlist_widget->itemWidget(playlist_widget->currentItem());
+           qDebug()<<siw->song()->getTitle()<<"test";
 
-    model_playlist->insertRow(row+1, item_list);//insert row
+//    QPushButton *but = new QPushButton("BUT");
 
-    //set new current row
-     QModelIndex new_index = table_playlist->model()->index(row+1,0);
-     table_playlist->setCurrentIndex(new_index);
+//    QListWidgetItem *i = new QListWidgetItem;
+    playlist_widget->addItem(i);
+    playlist_widget->setItemWidget(i, siw);
+
+
+
+////    playlist_widget->insertItem(row+1, i);
+//           playlist_widget->addItem(i);
+////    playlist_widget->ins
+//    playlist_widget->setItemWidget(i, siw);
+////    delete playlist_widget->currentItem();
+
+//    playlist_widget->setCurrentRow(row+1);
+//////atek row
+//    QList<QStandardItem *> item_list = model_playlist->takeRow(row);
+////insert row
+//    model_playlist->insertRow(row+1, item_list);
+
+//    //set new current row
+//     table_playlist->setCurrentIndex(model_playlist->index(row+1,0));
 
 }
 
@@ -591,39 +672,38 @@ void mainWindow::setBackground(){
 
 void mainWindow::clearPlaylist(){
 
-    model_playlist->setRowCount(0);
+//    model_playlist->setRowCount(0);
+    playlist_widget->clear();
 
 }
 
 void mainWindow::deleteItemPlaylist(){
 
-         QModelIndex index = table_playlist->selectionModel()->currentIndex();
-        model_playlist->removeRow(index.row());
+    qDeleteAll(playlist_widget->selectedItems());
 
 }
 
 void mainWindow::playPlayer(){
 
+    if(playlist_widget->count()==0){
+        video->close();
+       clearMask();
 
-    //IF TABLE EMPTY RETURN
-            if(model_playlist->rowCount()==0){
+        return;
+    }
 
-                video->close();
-                clearMask();
 
-                 return;
-            }
-//STOP IF PLAYING
+////STOP IF PLAYING
             if(video->isPlaying()){
                 video->stop();
             }
+           songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
-            int cur = table_playlist->selectionModel()->currentIndex().row();
-int id = model_playlist->item(cur,0)->text().toInt();
-            QString file= model_playlist->item(cur,1)->text();
-            QString title = model_playlist->item(cur,2)->text();
-            QString singer = model_playlist->item(cur,3)->text();
-            channel = model_playlist->item(cur,4)->text();
+            int id = item_widget->song()->getId();
+            QString file= item_widget->song()->getPath();
+            QString title = item_widget->song()->getTitle();
+            QString singer = item_widget->song()->getSinger();
+//            channel = model_playlist->item(cur,4)->text();
 
 
             //CHECK IF FILE EXIST
@@ -636,28 +716,28 @@ int id = model_playlist->item(cur,0)->text().toInt();
                message.setStandardButtons(QMessageBox::Close);
                message.exec();
 
-
-              return;
+               return;
            }
 
            video->setFile(file);
-           video->setMeta(title, singer);
 
-           video->play();
+    cover->setData(title, singer);
+    cover->raise();
+    cover->start();
 
            db->updatePlayedTime(id);
            sql_model->select();
-//tableRule();
+////tableRule();
 
             if(button_lock_playlist->isChecked()){
-                //move to last
-                QList<QStandardItem *> item_list = model_playlist->takeRow(cur);
-                model_playlist->insertRow(model_playlist->rowCount(), item_list);
+//                //move to last
+//                QList<QStandardItem *> item_list = model_playlist->takeRow(cur);
+//                model_playlist->insertRow(model_playlist->rowCount(), item_list);
 
             }else{
-                       model_playlist->removeRow(cur);
+                deleteItemPlaylist();
             }
-           table_playlist->selectRow(0);
+//           table_playlist->selectRow(0);
 }
 
 void mainWindow::setaudiochannelAuto(){
@@ -687,7 +767,7 @@ void mainWindow::errorHandling(){
 
 }
 
-void mainWindow::almostEnd(){
+void mainWindow::dialogNextSong(){
 // this will notify next item in playlist before song end
     QDialog *dia = new QDialog;
 
@@ -700,15 +780,15 @@ void mainWindow::almostEnd(){
 
     QLabel *notif = new QLabel(dia);
 
-            if(model_playlist->rowCount()==0)
-                 notif->setText("Playlist Is Empty");
-          else{
+//            if(model_playlist->rowCount()==0)
+//                 notif->setText(tr("Playlist Is Empty"));
+//          else{
 
-                int  index = table_playlist->selectionModel()->currentIndex().row();
+////                int  index = table_playlist->selectionModel()->currentIndex().row();
 
-                QString next_song = model_playlist->item(index,2)->text();
-                  notif->setText("Next song : "+next_song);
-            }
+////                QString next_song = model_playlist->item(index,2)->text();
+////                  notif->setText(tr("Next song : ")+next_song);
+//            }
 
 
     QHBoxLayout *layout_main = new QHBoxLayout;
@@ -919,15 +999,15 @@ void mainWindow::writePlaylist(const QString &playlistname){
 
      stream << "[elroke playlist]\n";
 
-     for(int i=0; i<model_playlist->rowCount(); i++){
-            for (int x=0; x<5; x++){
-                stream<<model_playlist->item(i,x)->text();
-                if(x<=3)
-                    stream<<'\t';
+//     for(int i=0; i<model_playlist->rowCount(); i++){
+//            for (int x=0; x<5; x++){
+//                stream<<model_playlist->item(i,x)->text();
+//                if(x<=3)
+//                    stream<<'\t';
 
-            }
-            stream<<'\n';
-     }
+//            }
+//            stream<<'\n';
+//     }
 
      file.close();
 
@@ -941,64 +1021,64 @@ void mainWindow::loadPlaylist(){
 
 void mainWindow::loadPlaylist(const QString &s){
 
-    model_playlist->setRowCount(0);
+////    /*model_playlist->setRowCount(0);
 
 
-    QFile file(QDir::homePath()+"/.elroke/playlist/"+s+".elp");
+//    QFile file(QDir::homePath()+"/.elroke/playlist/"+s+".elp");
 
-    if(!file.exists())
-        return;
+//    if(!file.exists())
+//        return;
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        qDebug() << "cant read playlist" << s;
+//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+//        qDebug() << "cant read playlist" << s;
 
-    QTextStream stream(&file);
+//    QTextStream stream(&file);
 
-    QString stuff= stream.readLine();
-    //validate first line
-    if(stuff!="[elroke playlist]")
-        return;
+//    QString stuff= stream.readLine();
+//    //validate first line
+//    if(stuff!="[elroke playlist]")
+//        return;
 
 
-    stuff= stream.readLine();//move to next line
-    int line_number=0;
+//    stuff= stream.readLine();//move to next line
+//    int line_number=0;
 
-    QStandardItem *item_id, *item_path, *item_title, *item_singer, *item_channel;
+//    QStandardItem *item_id, *item_path, *item_title, *item_singer, *item_channel;
 
-    while(stuff!=NULL){
-        QString id=stuff.split('\t').at(0);
-        QString path=stuff.split('\t').at(1);
-        QString title=stuff.split('\t').at(2);
-        QString singer=stuff.split('\t').at(3);
-        QString channel=stuff.split('\t').at(4);
-        model_playlist->setRowCount(line_number+1);
+//    while(stuff!=NULL){
+//        QString id=stuff.split('\t').at(0);
+//        QString path=stuff.split('\t').at(1);
+//        QString title=stuff.split('\t').at(2);
+//        QString singer=stuff.split('\t').at(3);
+//        QString channel=stuff.split('\t').at(4);
+////        model_playlist->setRowCount(line_number+1);
 
-        item_id =  new QStandardItem;
-        item_id->setText(path);
-        model_playlist->setItem(line_number,0, item_id);
+//        item_id =  new QStandardItem;
+//        item_id->setText(path);
+//        model_playlist->setItem(line_number,0, item_id);
 
-        item_path =  new QStandardItem;
-        item_path->setText(path);
-        model_playlist->setItem(line_number,1, item_path);
+//        item_path =  new QStandardItem;
+//        item_path->setText(path);
+//        model_playlist->setItem(line_number,1, item_path);
 
-        item_title = new QStandardItem;
-        item_title->setText(title);
-        item_title->setTextAlignment(Qt::AlignCenter);
-        model_playlist->setItem(line_number,2,item_title);
+//        item_title = new QStandardItem;
+//        item_title->setText(title);
+//        item_title->setTextAlignment(Qt::AlignCenter);
+//        model_playlist->setItem(line_number,2,item_title);
 
-        item_singer = new QStandardItem;
-        item_singer->setText(singer);
-        model_playlist->setItem(line_number,3,item_singer);
+//        item_singer = new QStandardItem;
+//        item_singer->setText(singer);
+//        model_playlist->setItem(line_number,3,item_singer);
 
-        item_channel = new QStandardItem;
-        item_channel->setText(channel);
-        model_playlist->setItem(line_number,4, item_channel);
+//        item_channel = new QStandardItem;
+//        item_channel->setText(channel);
+//        model_playlist->setItem(line_number,4, item_channel);
 
-         line_number++;
-         stuff= stream.readLine();
-    }
+//         line_number++;
+//         stuff= stream.readLine();
+//    }
 
-    table_playlist->selectRow(0);
+//    table_playlist->selectRow(0);*/
 
 }
 
@@ -1099,6 +1179,7 @@ void mainWindow::showKeyboard(bool x){
         int y = table->mapToGlobal(table->rect().bottomLeft()).y()-keyboard->height();
         //key show on the midle of table
          keyboard->showKeyboard(QPoint(x,y));
+        keyboard->show();
     }
       else
             keyboard->hide();
@@ -1112,16 +1193,17 @@ void mainWindow::videoInstance(){
     video->installEventFilter(this);
 
     connect(video, SIGNAL(positionChanged()),this,SLOT(updateInterface()));
-    connect(video,SIGNAL(reachEnded()),this,SLOT(playPlayer()));
-    connect(video,SIGNAL(almostEnded()),this,SLOT(almostEnd()));
+    connect(video,SIGNAL(reachEnded()),this,SLOT(videoEnds()));
+    connect(video,SIGNAL(almostEnded()),this,SLOT(dialogNextSong()));
     connect(video,SIGNAL(playing()),this,SLOT(setaudiochannelAuto()));
     connect(video,SIGNAL(error()),this,SLOT(errorHandling()));
-    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
+//    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
     connect(slider_vol,&QSlider::sliderMoved,video,&Player::setVolume);
 }
 
 void mainWindow::keyBoardInstance(){
     keyboard = new Keyboard(this);
+
     keyboard->hide();
 }
 
@@ -1200,6 +1282,8 @@ void mainWindow::dialogAdmin(){
 
 void mainWindow::checkAdmin(){
 
+    qDebug()<<"check admin";
+
     QSettings settings("elroke","elroke");
     QString user;
     settings.beginGroup(group_auth);
@@ -1219,8 +1303,6 @@ void mainWindow::dialogCreateAdmin(){
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     le_userName = new CLineEdit(dialog);
-
-
 
     le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
@@ -1383,7 +1465,94 @@ proxy_model->sort(6, Qt::DescendingOrder);
 mainWindow::~mainWindow()
 {
     delete video;
+    delete cover;
     if(autosave_playlist->isChecked())
         writePlaylist();
+
+}
+
+int mainWindow::getRandomNumber(){
+
+//    max 100 min 55
+
+    return (qrand()%46)+60;
+}
+
+void mainWindow::videoEnds(){
+
+    auto *dialog_random_number = new QDialog;
+    dialog_random_number->setAttribute(Qt::WA_DeleteOnClose);
+    dialog_random_number->setWindowFlags(Qt::FramelessWindowHint);
+
+    QLabel *value_label = new QLabel(dialog_random_number);
+
+    effect_player->setFile("/home/gafi/applause.mp3");
+    effect_player->play();
+
+
+
+    QFont font;
+    font.setPointSize(156);
+    font.setBold(1);
+
+    value_label->setFont(font);
+
+    QVBoxLayout *layout = new QVBoxLayout;
+
+    layout->addWidget(value_label);
+
+    dialog_random_number->setLayout(layout);
+
+
+    value_label->setText(QString::number(getRandomNumber()));
+    QPalette pal;
+
+    pal.setColor(QPalette::WindowText,Qt::blue);
+    pal.setColor(QPalette::Window,Qt::white);
+
+    dialog_random_number->setPalette(pal);
+    dialog_random_number->show();
+
+    connect(effect_player,SIGNAL(reachEnded()),dialog_random_number,SLOT(close()));
+    connect(effect_player,SIGNAL(reachEnded()),this,SLOT(playPlayer()));
+
+
+
+
+}
+
+void mainWindow::audioEffectInstance(){
+
+    effect_player = new Player(this);
+
+}
+
+void mainWindow::randomNumberInstance(){
+    //need to generate random number, for random scoring.
+      qsrand(static_cast<uint>(QTime::currentTime().msec()));
+}
+
+
+void mainWindow::openingInstance(){
+
+    cover = new opening();
+    connect(cover,SIGNAL(passed()),video,SLOT(play()));
+
+}
+
+Song* mainWindow::extractSong(){
+
+    Song * the_song = qobject_cast<Song*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
+
+    return the_song;
+//    songitemwidget *item_song_widget = new songitemwidget;
+//    item_song_widget->setSong(the_song);
+
+}
+
+void mainWindow::moveItemToBottom(){
+
+
+
 
 }

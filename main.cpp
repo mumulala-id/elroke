@@ -22,14 +22,14 @@
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QBitmap>
-//#include <QStyleFactory>
-#include <stdlib.h>
+#include <QStyleFactory>
+//#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
     // turn on the DPI support**
 
-//QApplication::setStyle("plastique");
+QApplication::setStyle("plastique");
     QApplication a(argc, argv);
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QCoreApplication::setOrganizationName("mumulala");
@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
    QSplashScreen splash(pic);
 
    splash.show();
-
+  a.processEvents();
    a.thread()->sleep(3);
-   a.processEvents();
+
 
     QTranslator t;
     t.load(":/usr/share/elroke/file/languages/elroke_id.qm");

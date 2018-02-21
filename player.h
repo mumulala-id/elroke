@@ -50,7 +50,7 @@ public slots:
     int getAudioChannel();
     bool isPlaying(){return _isplaying;}
     bool isPausing(){return _isPausing;}
-      void setMeta(QString title, QString singer);//title & singer
+//      void setMeta(QString title, QString singer);//title & singer
 
     //event manager
     void registerEvents();

@@ -97,7 +97,6 @@ managedb::managedb(QWidget *parent) :
 
     //DATABASE
     dbmanager *db = new dbmanager(dbmanager::edit, this);
-
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
@@ -220,7 +219,6 @@ managedb::managedb(QWidget *parent) :
     spLeft.setHorizontalStretch(1);
     frame_left_bottom->setSizePolicy(spLeft);
 
-
     lo_bottom->addWidget(frame_left_bottom);
 
 //right bottom
@@ -230,17 +228,15 @@ managedb::managedb(QWidget *parent) :
     combo_search->addItem(tr("Singer"));
     connect(combo_search,SIGNAL(activated(int)),this,SLOT(comboSearchChange(int)));
 
-
-
     le_search = new CLineEdit(this);
     le_search->setMaximumWidth(300);
     le_search->setPlaceholderText(tr("SEARCH"));
     connect(le_search,&CLineEdit::textChanged,this,&managedb::receiverSearch);
 
     CLineEdit *le_jump = new CLineEdit(this);
-le_jump->setFixedWidth(100);
-le_jump->setValidator(new QIntValidator(this));
-connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
+    le_jump->setFixedWidth(100);
+    le_jump->setValidator(new QIntValidator(this));
+    connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
 
 auto *scroll_top = new QPushButton(tr("Top"), this);
 connect(scroll_top,SIGNAL(pressed()),table,SLOT(scrollToTop()));
@@ -325,7 +321,7 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, Qt::black);
+    palet.setColor(QPalette::Window, palette().dark().color());
     palet.setColor(QPalette::Text, palette().light().color());
     palet.setColor(QPalette::WindowText, palette().light().color());
     palet.setColor(QPalette::Button, palette().dark().color());
@@ -340,7 +336,7 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 void managedb::swapTitleSinger(){
 
     swapItem(1,2);
-      anyChange=true;
+    anyChange=true;
 
 }
 
@@ -364,19 +360,20 @@ void managedb::swapItem(int column1, int column2){
 void managedb::swapSingerLanguage(){
 
     swapItem(2,3);
-  anyChange=true;
+    anyChange=true;
 }
 
 void managedb::swapTitleLanguage(){
 
+   swapItem(1,3);
+   anyChange=true;
 
-    swapItem(1,3);
-
-  anyChange=true;
 }
 void managedb::swapSingerCategory(){
-    swapItem(2,4);
-      anyChange=true;
+
+   swapItem(2,4);
+   anyChange=true;
+
 }
 
 void managedb::swapTitleCategory(){

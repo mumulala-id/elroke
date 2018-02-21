@@ -3,7 +3,7 @@
         <file>file/font/Xolonium.ttf</file>
         <file>file/background/background.jpg</file>
         <file>file/background/backgroundTrans.png</file>
-         <file>file/background/splash.png</file>
+        <file>file/background/splash.png</file>
         <file>file/icon/next.png</file>
         <file>file/icon/left.png</file>
         <file>file/icon/play.png</file>
@@ -24,10 +24,8 @@
         <file>file/icon/lock.png</file>
         <file>file/icon/unlock.png</file>
         <file>file/icon/logo.png</file>
+        <file>file/soundfx/applause.mp3</file>
         <file>file/languages/elroke_id.qm</file>
         <file>file/LICENSE</file>
-    </qresource>
-    <qresource prefix="/">
-        <file>file/icon/favorit.png</file>
     </qresource>
 </RCC>

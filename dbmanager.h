@@ -4,6 +4,8 @@
 #include <QSqlDatabase>
 #include <QDir>
 #include <QVariantList>
+#include "song.h"
+#include <QStandardPaths>
 
 class dbmanager
 {
@@ -16,8 +18,9 @@ private:
 
     dbcontype contype;
     QSqlDatabase db;
-    QString dbname=QDir::homePath()+"/.elroke/elroke.db";
-    QString dbdir = QDir::homePath()+"/.elroke";
+//    QString dbname=QDir::homePath()+"/.elroke/elroke.db";
+    QString dbname;// = +"elroke.db";
+    QString dbdir;// = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QString conname="";
 
 public slots:
@@ -30,6 +33,7 @@ public slots:
       void rollBack();
       bool insertIntoTable(const QVariantList & );
       void updatePlayedTime(int id);
+      Song *getSong(int id);
 
 private slots:
     bool restoreDB();

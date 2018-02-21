@@ -16,6 +16,7 @@ signals :
 protected :
     virtual void focusInEvent(QFocusEvent *);
     virtual void focusOutEvent(QFocusEvent *);
+
 };
 
 #endif // CLINEEDIT_H

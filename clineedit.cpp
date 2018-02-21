@@ -1,5 +1,5 @@
 #include "clineedit.h"
-
+#include <QPainter>
 CLineEdit::CLineEdit(QWidget *parent) :
     QLineEdit(parent)
 {
@@ -24,3 +24,5 @@ void CLineEdit::focusOutEvent(QFocusEvent *e){
     setReadOnly(true);
     emit(focussed(false));
 }
+
+

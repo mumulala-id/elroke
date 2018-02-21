@@ -25,7 +25,10 @@ SOURCES += main.cpp\
         editdb.cpp \
         dbmanager.cpp \
         opening.cpp \
-    clineedit.cpp
+    clineedit.cpp \
+    QRoundProgressBar.cpp \
+    song.cpp \
+    songitemwidget.cpp
 
 HEADERS  += mainwindow.h \
         player.h \
@@ -39,7 +42,10 @@ HEADERS  += mainwindow.h \
         dbmanager.h \
         opening.h \
         liststringfileparser.h \
-       clineedit.h
+       clineedit.h \
+    QRoundProgressBar.h \
+    song.h \
+    songitemwidget.h
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

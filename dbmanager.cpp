@@ -3,6 +3,7 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QDate>
+#include <QSqlRecord>
 dbmanager::dbmanager(dbcontype contype, QObject *parent)
 {
     Q_UNUSED(parent)
@@ -22,16 +23,19 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
 
     }
 
+    dbdir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    qDebug()<<dbdir;
+    dbname = dbdir+"/elroke.db";
 
     db = QSqlDatabase::database(conname);
-    QSqlQuery query(db);
+//    QSqlQuery query(db);
     db.setDatabaseName(dbname);
 
 }
 
 void dbmanager::connectToDB(){
 
-    if(!QFile(QDir::homePath()+"/.elroke/elroke.db").exists()){
+    if(!QFile(dbname).exists()){
 
         restoreDB();
 
@@ -158,4 +162,62 @@ void dbmanager::updatePlayedTime(int id){
 
     query.clear();
 
+}
+
+Song* dbmanager::getSong(int id){
+    qDebug()<<"id"<<id;
+    QSqlQuery query(db);
+    
+    QSqlRecord rec;
+    query.prepare("SELECT * FROM ELROKE123 WHERE ID="+QString::number(id));
+    
+    if(query.exec()){
+            while(query.next()){
+                rec = query.record();
+                
+            }
+    }
+
+////            for(int i=0; rec.count();i++){
+////            qDebug()<<rec.value(i).toString();
+//////            qDebug()<<rec.value(1).toString();
+////            }
+            
+            
+            
+//}
+
+////    qDebug()<<rec.count();
+//    for(int i=0; i<rec.count();i++){
+//               qDebug()<<i<<rec.value(i).toString();
+////               qDebug()<<rec.value(1).toString();
+//}
+    
+    Song *the_song  = new Song;
+
+    the_song->setTitle(rec.value(1).toString());
+    the_song->setSinger(rec.value(2).toString());
+    the_song->setLanguage(rec.value(3).toString());
+    the_song->setCategory(rec.value(4).toString());
+    the_song->setPlaytimes(rec.value(6).toInt());
+    the_song->setPath(rec.value(7).toString());
+QString channel = rec.value(5).toString();
+
+if(QString::compare(channel, "LEFT", Qt::CaseInsensitive)==0){
+
+    the_song->setAudioChannel(Song::audioChannel::left);
+
+}
+else if(QString::compare(channel, "RIGHT", Qt::CaseInsensitive)==0){
+ the_song->setAudioChannel(Song::audioChannel::right);
+}
+ else{
+     the_song->setAudioChannel(Song::audioChannel::stereo);
+
+}
+
+    return the_song;
+    
+    
+    
 }

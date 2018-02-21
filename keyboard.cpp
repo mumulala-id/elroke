@@ -71,6 +71,9 @@ Keyboard::Keyboard(QWidget *parent) :
     setWindowFlags(Qt::FramelessWindowHint );
     setMinimumSize(960,96);
 
+
+
+
 }
 
 

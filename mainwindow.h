@@ -8,6 +8,10 @@
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
+#include "opening.h"
+#include "songitemwidget.h"
+//#include "qtmaterialtextfield.h"
+#include "QRoundProgressBar.h"
 #include <QApplication>
 #include <QDialog>
 #include <QComboBox>
@@ -19,8 +23,8 @@
 #include <QDesktopWidget>
 #include <QSqlTableModel>
 #include <QPainter>
-
 #include <QLabel>
+#include <QListWidget>
 class mainWindow : public QDialog
 {
     Q_OBJECT
@@ -33,17 +37,17 @@ public:
 private :
     QComboBox *combo_cat;
     QTableView *table;
-    QTableView *table_playlist;
     ProxyModel *proxy_model;
 
     CLineEdit *le_search;
-    QSlider *slider;
-    QSlider *slider_pos;
+
+   QRoundProgressBar *circle_bar;
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
     Player *video;
     QSqlTableModel *sql_model;
-    QStandardItemModel *model_playlist;
+
+    QListWidget *playlist_widget;
 
 //    QStringList category;
 
@@ -70,7 +74,9 @@ private :
     QString password;
     QString group_auth = "Authentication";
 
+    Player *effect_player;
 
+    opening *cover;
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
@@ -87,9 +93,10 @@ private slots:
     void checkAdmin();
     void createAdminAccount();
     void dialogCreateAdmin();
+    void openingInstance();
     void dialogLogin();
     void login();
-    void almostEnd();
+    void dialogNextSong();
     void createShortcut();
     void createWidgets();
     void errorHandling();
@@ -97,12 +104,15 @@ private slots:
     void updateInterface();
     void moveItemUp();
     void moveItemDown();
+    void moveItemToTop();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
     void dialogEditDatabase();
     void setVolStepDown();
     void setVolStepUp();
     void setMute();
+    void audioEffectInstance();
+    void randomNumberInstance();
     void setaudiochannelAuto();
     void setAudioChannelManual();
     void showClock();
@@ -127,7 +137,11 @@ private slots:
     void keyBoardInstance();
     void fontSetup();
     void updateLockButton(bool);
+    void videoEnds();
+    int getRandomNumber();
     void showHits();
+    void moveItemToBottom();
+    Song *extractSong();
 
 
 protected :
