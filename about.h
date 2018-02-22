@@ -21,6 +21,7 @@ private slots:
     void showLicense();
     void showCredit();
     void showDonatur();
+    void donate();
 
 };
 

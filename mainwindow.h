@@ -24,7 +24,8 @@
 #include <QSqlTableModel>
 #include <QPainter>
 #include <QLabel>
-#include <QListWidget>
+//#include <QListWidget>
+#include "listwidget.h"
 class mainWindow : public QDialog
 {
     Q_OBJECT
@@ -47,7 +48,7 @@ private :
     Player *video;
     QSqlTableModel *sql_model;
 
-    QListWidget *playlist_widget;
+    ListWidget *playlist_widget;
     ProgressCircle *circle;
 
 //    QStringList category;

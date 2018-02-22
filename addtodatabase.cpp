@@ -158,7 +158,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_additional_item->setVerticalSpacing(0);
 
 
-   QGroupBox *gr_addcat = new QGroupBox(tr("Add data if not available"));
+   QGroupBox *gr_addcat = new QGroupBox(tr("Add metadata if not available"));
    gr_addcat->setLayout(layout_additional_item);
 
    QVBoxLayout *layout_audio_channel = new QVBoxLayout;

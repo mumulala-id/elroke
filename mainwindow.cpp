@@ -161,8 +161,8 @@ void mainWindow::createWidgets(){
 
     proxy_model = new ProxyModel(ProxyModel::smart, this);
     proxy_model->setSourceModel(sql_model);
-    proxy_model->setAlignment(1, Qt::AlignLeft);
-    proxy_model->setAlignment(2, Qt::AlignRight);
+    proxy_model->setAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+    proxy_model->setAlignment(2, Qt::AlignRight | Qt::AlignVCenter);
 
     table = new QTableView(this);
     table->setModel(proxy_model);
@@ -174,8 +174,12 @@ void mainWindow::createWidgets(){
     header_palette.setColor(QPalette::Background, Qt::transparent);
     header_palette.setColor(QPalette::ButtonText, Qt::black);
     header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
+
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
+//space vertical each item prevent too close beetween items
+    QHeaderView *vertical = table->verticalHeader();
+    vertical->setDefaultSectionSize(vertical->fontMetrics().height()+30);
 
     connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
 
@@ -189,13 +193,14 @@ void mainWindow::createWidgets(){
 
     auto *layout_playlist = new QVBoxLayout;
 
-    playlist_widget = new QListWidget(this);
+    playlist_widget = new ListWidget(this);
     playlist_widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     playlist_widget->setDragEnabled(true);
     playlist_widget->viewport()->setAcceptDrops(true);
     playlist_widget->setDropIndicatorShown(true);
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
 //    playlist_widget->setMovement(QListView::Snap);
+//    playlist_widget->setAutoFillBackground(1);
     playlist_widget->setPalette(table_palette);
 
     connect(playlist_widget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
@@ -299,7 +304,7 @@ void mainWindow::createWidgets(){
 
      circle = new ProgressCircle(this);
     circle->setMaximum(100);
-    circle->setColor(Qt::red);
+    circle->setColor(Qt::gray);
     circle->setFixedSize(64,64);
 
 
@@ -468,52 +473,10 @@ void mainWindow::addToPlaylist(){
    playlist_widget->addItem(item);
    playlist_widget->setItemWidget(item, item_song_widget);
 
-//   item->setSizeHint(item_song_widget->sizeHint());
+   connect(item_song_widget->dragButton(),SIGNAL(pressed()),playlist_widget,SLOT(dragWithButton()));
 
+//resize itemwidget to songitemwidget
    item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
-
-//playlist_widget->res
-     /*
-
-    QString path =  sql_model->data(sql_model->index(row,7),Qt::DisplayRole).toString();
-    QString title = sql_model->data(sql_model->index(row,1),Qt::DisplayRole).toString();
-    QString singer = sql_model->data(sql_model->index(row,2),Qt::DisplayRole).toString();
-    QString channel = sql_model->data(sql_model->index(row,5),Qt::DisplayRole).toString();*/
-
-//    QStandardItem *item_id = new QStandardItem;
-//    item_id->setText(QString::number(id));
-//    model_playlist->setItem(model_playlist->rowCount()-1,0,item_id);
-
-//    QStandardItem *item_path = new QStandardItem;
-//    item_path ->setText( path);
-//    model_playlist->setItem(model_playlist->rowCount()-1,1,item_path);
-
-// song_item *s_item = new song_item;
-// s_item->setlabel1(title);
-// s_item->setlabel2(singer);
-
-
-// table_playlist->setIndexWidget(model_playlist->index(model_playlist-> rowCount()-1,2), s_item);
-// table_playlist->resizeColumnsToContents();
-// table_playlist->resizeRowsToContents();
-//    QStandardItem *item_title = new QStandardItem;
-//    item_title->setText(title);
-//    item_title->setTextAlignment(Qt::AlignCenter);
-//    model_playlist->setItem(model_playlist->rowCount()-1,2,item_title);
-
-//    QStandardItem *item_singer = new QStandardItem;
-//    item_singer->setText(singer);
-//    model_playlist->setItem(model_playlist->rowCount()-1,3,item_singer);
-
-
-
-//    QStandardItem *item_channel = new QStandardItem;
-//    item_channel->setText(channel);
-//    model_playlist->setItem(model_playlist->rowCount()-1,4,item_channel);
-
-
-    //set curretn item at 0
-//    table_playlist->selectRow(0);
 
 }
 
@@ -565,7 +528,8 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
 
 void mainWindow::dialogAbout(){
 
-    about About;
+    about About(this);
+//    About.setAutoFillBackground(1);
     About.exec();
 
 }
@@ -699,7 +663,7 @@ void mainWindow::playPlayer(){
                 video->stop();
             }
            songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
-
+qDebug()<<"setelah item eidget";
             int id = item_widget->song()->getId();
             QString file= item_widget->song()->getPath();
             QString title = item_widget->song()->getTitle();
@@ -723,9 +687,10 @@ void mainWindow::playPlayer(){
            video->setFile(file);
 
     cover->setData(title, singer);
-    cover->raise();
+    qDebug()<<"setealah setdata";
+//    cover->raise();
     cover->start();
-
+qDebug()<<cover->isVisible();
            db->updatePlayedTime(id);
            sql_model->select();
 ////tableRule();
@@ -738,8 +703,11 @@ void mainWindow::playPlayer(){
             }else{
                 deleteItemPlaylist();
             }
-//           table_playlist->selectRow(0);
-            playlist_widget->setCurrentRow(0);
+
+            if(playlist_widget->count()>1){
+                playlist_widget->setCurrentRow(0);
+}
+
 }
 
 void mainWindow::setaudiochannelAuto(){
@@ -1498,8 +1466,8 @@ void mainWindow::videoEnds(){
 
     effect_player->setFile("/home/gafi/applause.mp3");
     effect_player->play();
-
-
+    connect(effect_player,SIGNAL(reachEnded()),dialog_random_number,SLOT(close()));
+    connect(effect_player,SIGNAL(reachEnded()),this,SLOT(playPlayer()));
 
     QFont font;
     font.setPointSize(156);
@@ -1523,8 +1491,7 @@ void mainWindow::videoEnds(){
     dialog_random_number->setPalette(pal);
     dialog_random_number->show();
 
-    connect(effect_player,SIGNAL(reachEnded()),dialog_random_number,SLOT(close()));
-    connect(effect_player,SIGNAL(reachEnded()),this,SLOT(playPlayer()));
+
 
 
 
@@ -1548,6 +1515,7 @@ void mainWindow::openingInstance(){
 
     cover = new opening();
     connect(cover,SIGNAL(passed()),video,SLOT(show()));
+    connect(cover,SIGNAL(passed()),video,SLOT(raise()));
     connect(cover,SIGNAL(passed()),video,SLOT(play()));
 
 }

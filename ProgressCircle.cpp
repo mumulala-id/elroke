@@ -192,13 +192,13 @@ QPixmap ProgressCircle::generatePixmap() const
     rect.adjust(margin,margin,-margin,-margin);
     qreal innerRadius = mInnerRadius*rect.width()/2.0;
 
-    //background grey circle
-    painter.setBrush(QColor(225,225,225));
+    //background  circle
+    painter.setBrush(Qt::white);
     painter.setPen(QColor(225,225,225));
     painter.drawPie(rect, 0, 360*16);
 
     painter.setBrush(mColor);
-    painter.setPen(mColor);
+    painter.setPen(Qt::transparent);
 
     if(mMaximum == 0)
     {
@@ -219,7 +219,7 @@ QPixmap ProgressCircle::generatePixmap() const
 
     //inner circle and frame
     painter.setBrush(parentWidget()->palette().color(QPalette::Window));
-    painter.setPen(QColor(0,0,0, 60));
+    painter.setPen(Qt::transparent);
     painter.drawEllipse(rect.center(), innerRadius, innerRadius);
 
     //outer frame

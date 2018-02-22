@@ -26,6 +26,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QPainter>
+#include <QDesktopServices>
 
 about::about(QWidget *parent) :
     QDialog(parent)
@@ -47,14 +48,13 @@ about::about(QWidget *parent) :
     label_name_version->setAlignment(Qt::AlignCenter);
 
     QLabel *description = new QLabel(this);
-    description->setText("\tElroke is free and open source apllication for karaoke entertianment. Feel free to use this app for commercial and home use without any fee. But do not forget to  get part for donation to support us. We do not responsible of the contents you used within app");
-   description->setWordWrap(true);
+    description->setText("\tElroke is free and open source apllication for karaoke entertainment. Feel free to use this app for commercial and home use without any fee. But do not forget to  get part for donation to support us. We do not responsible of the contents you used within app");
+    description->setWordWrap(true);
     lo_details->addWidget(label_name_version);
     lo_details->addWidget(description);
 
     QWidget *widget_description = new QWidget(this);
     widget_description->setLayout(lo_details);
-
 
     //license
     QTextEdit *license_txt = new QTextEdit(this);
@@ -88,12 +88,12 @@ about::about(QWidget *parent) :
 
     QTextEdit *credit_text = new QTextEdit(this);
 
-    credit_text->setText("Thank to :\n"
+    credit_text->setText(tr("Thank to")+" :\n"
                          "Qt\n"
                          "VLC\n"
-                         "\n"
-                         "all contributor :\n\n"
-                "Muhammad Mukharom(mumulala)\n"
+                         "All Open Source Community\n\n"
+                         "Contributor :\n"
+                         "Muhammad Mukharom(mumulala)\n"
                          //keep my name first :D
                          "you");
     credit_text->setReadOnly(1);
@@ -119,15 +119,20 @@ about::about(QWidget *parent) :
     stack->addWidget(credit_text);
     stack->addWidget(donatur);
 
-
+    QPushButton *support =new QPushButton(this);
+    support->setIcon(QIcon(":/usr/share/elroke/file/icon/paypal_donate.png"));
+    support->setIconSize(QSize(200,100));
+    connect(support,SIGNAL(pressed()),this,SLOT(donate()));
 
        lo_main->addLayout(stack);
+       lo_main->addWidget(support,1,Qt::AlignRight);
        lo_main->addLayout(lo_btn);
 
     setLayout(lo_main);
 
-    setFixedSize(800,360);
-    setWindowTitle(tr("About")+"  Elroke");
+    setMinimumSize(800,600);
+    setWindowTitle(tr("About")+ " ELroke");
+    setAutoFillBackground(1);
     setWindowFlags(Qt::FramelessWindowHint);
     setPalette(palet);
 
@@ -157,3 +162,8 @@ void about::showDonatur(){
     stack->setCurrentIndex(3);
 }
 
+void about::donate(){
+
+    QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
+
+}

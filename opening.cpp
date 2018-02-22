@@ -37,7 +37,6 @@ opening::opening( QWidget *parent) : QWidget(parent)
     label_title = new QLabel(this);
     label_title->setFont(fontTitle);
 
-
     label_singer = new QLabel(this);
     label_singer->setFont(fontSinger);
 
@@ -45,7 +44,7 @@ opening::opening( QWidget *parent) : QWidget(parent)
     singer_animation->setDuration(800);
 
     title_animaton = new QPropertyAnimation(label_title, "geometry", this);
-    title_animaton->setDuration(800);
+    title_animaton->setDuration(500);
 
     QPalette let;
     let.setColor(QPalette::Background,Qt::gray);
@@ -54,6 +53,7 @@ opening::opening( QWidget *parent) : QWidget(parent)
     setPalette(let);
     setWindowFlags( Qt::FramelessWindowHint);
     setWindowState(Qt::WindowFullScreen);
+//    setAutoFillBackground(1);
     hide();
 
 
@@ -72,6 +72,7 @@ void opening::setData(QString title, QString singer){
 void opening::start(){
 
     show();
+    raise();
     singer_animation->setStartValue(QRect(0,0, width(),height()-label_singer->height()));
     singer_animation->setEndValue(QRect((width()-label_singer->width())/2 ,0, width(), height()-label_singer->height()));
 

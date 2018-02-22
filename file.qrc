@@ -7,6 +7,7 @@
         <file>file/icon/next.png</file>
         <file>file/icon/left.png</file>
         <file>file/icon/play.png</file>
+         <file>file/icon/drag.png</file>
         <file>file/icon/clear.png</file>
         <file>file/icon/backspace.png</file>
         <file>file/icon/mute.png</file>
@@ -26,6 +27,7 @@
         <file>file/icon/bottom.png</file>
         <file>file/icon/top.png</file>
         <file>file/icon/logo.png</file>
+          <file>file/icon/paypal_donate.png</file>
         <file>file/soundfx/applause.mp3</file>
         <file>file/languages/elroke_id.qm</file>
         <file>file/LICENSE</file>
