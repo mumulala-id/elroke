@@ -57,7 +57,26 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
 
 QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int role) const {
 
-    return sourceModel()->headerData(section, orientation, role);
+    if(orientation == Qt::Horizontal){
+        if(role == Qt::DisplayRole)
+
+            switch (section) {
+            case 0: return tr("ID");    break;
+            case 1: return tr("TITLE"); break;
+            case 2: return tr("SINGER"); break;
+            case 3: return tr("LANGUAGE"); break;
+            case 4: return tr("CATEGORY"); break;
+            case 5 : return tr("CHANNEL"); break;
+            case 6 : return tr("PLAYTIMES"); break;
+            case 7 : return tr("PATH"); break;
+            case 8 : return tr("DATE"); break;
+            default:
+                return QString(tr("COLUMN %1").arg(section+1));
+                break;
+            }
+    }
+//    return sourceModel()->headerData(section, orientation, role);
+    return QVariant();
 }
 
 QVariant ProxyModel::data(const QModelIndex &index, int role) const{

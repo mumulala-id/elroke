@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QComboBox>
+#include "youtube_downloader.h"
 
 class addtodatabase : public QDialog
 {
@@ -37,6 +38,7 @@ private :
     QString default_singer;
     QString defafult_language;
     QString default_category;
+    YoutubeDownloader *ydownloader;
 
      bool title_first=true;
      bool singer_first=false;

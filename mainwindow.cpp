@@ -166,23 +166,27 @@ void mainWindow::createWidgets(){
 
     table = new QTableView(this);
     table->setModel(proxy_model);
+//    table->setSortingEnabled(0);
     tableRule();
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
-    header_palette.setBrush(QPalette::Button, Qt::transparent);
+    header_palette.setColor(QPalette::Button, Qt::transparent);
     header_palette.setColor(QPalette::Background, Qt::transparent);
     header_palette.setColor(QPalette::ButtonText, Qt::black);
     header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
 
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
+
+//    QHeaderView *horizontal = table->horizontalHeader();
+//    horizontal->set
+
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
     vertical->setDefaultSectionSize(vertical->fontMetrics().height()+30);
 
     connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
-
     connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
     connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
     connect(button_show_all,SIGNAL(pressed()),proxy_model,SLOT(reset()));
@@ -1515,7 +1519,6 @@ void mainWindow::openingInstance(){
 
     cover = new opening();
     connect(cover,SIGNAL(passed()),video,SLOT(show()));
-    connect(cover,SIGNAL(passed()),video,SLOT(raise()));
     connect(cover,SIGNAL(passed()),video,SLOT(play()));
 
 }

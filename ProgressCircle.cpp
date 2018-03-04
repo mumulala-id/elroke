@@ -194,7 +194,7 @@ QPixmap ProgressCircle::generatePixmap() const
 
     //background  circle
     painter.setBrush(Qt::white);
-    painter.setPen(QColor(225,225,225));
+    painter.setPen(Qt::transparent);
     painter.drawPie(rect, 0, 360*16);
 
     painter.setBrush(mColor);

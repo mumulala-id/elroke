@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql
+QT       += core gui sql webkitwidgets xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,7 +28,8 @@ HEADERS  += mainwindow.h \
     song.h \
     songitemwidget.h\
     ProgressCircle.h \
-    listwidget.h
+    listwidget.h \
+    youtube_downloader.h
 
 
 SOURCES += main.cpp\
@@ -46,7 +47,8 @@ SOURCES += main.cpp\
     song.cpp \
     songitemwidget.cpp \
     ProgressCircle.cpp \
-    listwidget.cpp
+    listwidget.cpp \
+    youtube_downloader.cpp
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

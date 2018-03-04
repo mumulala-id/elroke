@@ -180,19 +180,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_bottom->addWidget(gr_addcat);
    layout_bottom->addWidget(gr_audio_channel);
 
-   QHBoxLayout *layout_btn = new QHBoxLayout;
 
-   button_start = new QPushButton(tr("Start"), this);
-   button_start->setEnabled(0);
-   connect(button_start,SIGNAL(clicked(bool)),this,SLOT(saveToDatabase()));
-
-   QPushButton *button_cancel = new QPushButton(tr("Cancel"), this);
-
-   connect(button_cancel,SIGNAL(clicked(bool)),this,SLOT(close()));
-
-   layout_btn->addWidget(button_cancel);
-   layout_btn->addStretch();
-   layout_btn->addWidget(button_start);
 
    QWidget *widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
@@ -215,24 +203,17 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
 
 //network widget
-   QWidget *network_widget = new QWidget(this);
-   QVBoxLayout *layout_network = new QVBoxLayout;
-   layout_network->addWidget(new QLabel("tes",this));
-   layout_network->addWidget(new QPushButton("test", this));
-network_widget->setLayout(layout_network);
+   ydownloader = new YoutubeDownloader(this);
 
    QStackedLayout *stack = new QStackedLayout;
    stack->addWidget(local_widget);
-   stack->addWidget(network_widget);
+   stack->addWidget(ydownloader);
 
    connect(tabbar,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
 
    layout_main->addWidget(tabbar);
-    layout_main->addLayout(stack);
-
-    layout_main->addLayout(layout_btn);
-
-
+   layout_main->addLayout(stack);
+//   layout_main->addLayout(layout_btn);
 
     setLayout(layout_main);
     QPalette palet;
