@@ -1,5 +1,4 @@
 #include "clineedit.h"
-#include <QPainter>
 CLineEdit::CLineEdit(QWidget *parent) :
     QLineEdit(parent)
 {

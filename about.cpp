@@ -25,8 +25,8 @@
 #include <QTextEdit>
 #include <QTextStream>
 #include <QFile>
-#include <QPainter>
 #include <QDesktopServices>
+#include <QTabBar>
 
 about::about(QWidget *parent) :
     QDialog(parent)
@@ -39,6 +39,15 @@ about::about(QWidget *parent) :
     palet.setColor(QPalette::WindowText, palette().light().color());
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, palette().light().color());
+
+    QVBoxLayout *lo_main = new QVBoxLayout;
+
+    QTabBar *tab = new QTabBar(this);
+    tab->addTab(tr("Description"));
+    tab->addTab(tr("License"));
+    tab->addTab(tr("Credit"));
+    tab->addTab(tr("Donatur"));
+//    tab->addTab(tr("Close"));
 
     QVBoxLayout *lo_details = new QVBoxLayout;
 
@@ -67,23 +76,6 @@ about::about(QWidget *parent) :
     license_txt->setText(readfile.readAll());
     license_txt->setReadOnly(1);
 
-    QVBoxLayout *lo_main = new QVBoxLayout;
-
-    QPushButton *btn_desc = new QPushButton(tr("Description"), this);
-    connect(btn_desc,SIGNAL(pressed()),this,SLOT(showDescription()));
-
-    QPushButton *btn_license = new QPushButton(tr("License"), this);
-    connect(btn_license,SIGNAL(pressed()),this,SLOT(showLicense()));
-
-    QPushButton *btn_credit = new QPushButton(tr("Credit"), this);
-    connect(btn_credit,SIGNAL(pressed()),this,SLOT(showCredit()));
-
-    QPushButton *btn_donatur =new QPushButton(tr("Donatur"), this);
-    connect(btn_donatur,SIGNAL(pressed()),this,SLOT(showDonatur()));
-
-    QPushButton *btn_close = new QPushButton(tr("Close"), this);
-    connect(btn_close,SIGNAL(clicked(bool)),this,SLOT(close()));
-
     //Credit
 
     QTextEdit *credit_text = new QTextEdit(this);
@@ -91,6 +83,7 @@ about::about(QWidget *parent) :
     credit_text->setText(tr("Thank to")+" :\n"
                          "Qt\n"
                          "VLC\n"
+                         "youtube-dl\n"
                          "All Open Source Community\n\n"
                          "Contributor :\n"
                          "Muhammad Mukharom(mumulala)\n"
@@ -105,28 +98,22 @@ about::about(QWidget *parent) :
                      "Due\n");
     donatur->setReadOnly(1);
 
-    QHBoxLayout *lo_btn = new QHBoxLayout;
-    lo_btn->addWidget(btn_desc);
-    lo_btn->addWidget(btn_license);
-    lo_btn->addWidget(btn_credit);
-    lo_btn->addWidget(btn_donatur);
-    lo_btn->addWidget(btn_close);
-
     stack = new QStackedLayout;
-
     stack->addWidget(widget_description);
     stack->addWidget(license_txt);
     stack->addWidget(credit_text);
     stack->addWidget(donatur);
+
+    connect(tab,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
 
     QPushButton *support =new QPushButton(this);
     support->setIcon(QIcon(":/usr/share/elroke/file/icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
     connect(support,SIGNAL(pressed()),this,SLOT(donate()));
 
-       lo_main->addLayout(stack);
-       lo_main->addWidget(support,1,Qt::AlignRight);
-       lo_main->addLayout(lo_btn);
+    lo_main->addWidget(tab,0,Qt::AlignCenter);
+    lo_main->addLayout(stack);
+    lo_main->addWidget(support,1,Qt::AlignRight);
 
     setLayout(lo_main);
 
@@ -137,29 +124,6 @@ about::about(QWidget *parent) :
     setPalette(palet);
 
 
-}
-
-void about::showDescription(){
-
-    stack->setCurrentIndex(0);
-
-}
-
-void about::showLicense(){
-
-    stack->setCurrentIndex(1);
-
-}
-
-void about::showCredit(){
-
-    stack->setCurrentIndex(2);
-
-}
-
-void about::showDonatur(){
-
-    stack->setCurrentIndex(3);
 }
 
 void about::donate(){

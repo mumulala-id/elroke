@@ -4,8 +4,6 @@
 #include "vlc/vlc.h"
 #include <QWidget>
 #include <QTimer>
-//#include <QDesktopWidget>
-//#include <QApplication>
 #include <QEvent>
 #define POSITION_RESOLUTION 10000
 
@@ -14,7 +12,6 @@ class Player : public QWidget
     Q_OBJECT
 
     QString filename;
-
     QTimer *poller;
     bool _isplaying;
     bool _isPausing;
@@ -23,9 +20,6 @@ class Player : public QWidget
     libvlc_media_t *_m;
     bool replay=false;
     libvlc_event_manager_t *m_eventMgr;
-
-    QString _singer, _title;
-
 
 public:
     Player(QWidget *parent = 0);
@@ -50,7 +44,6 @@ public slots:
     int getAudioChannel();
     bool isPlaying(){return _isplaying;}
     bool isPausing(){return _isPausing;}
-//      void setMeta(QString title, QString singer);//title & singer
 
     //event manager
     void registerEvents();

@@ -40,12 +40,14 @@ private slots:
     void on_search();
     void processSearchReply();
     void on_searchWebView_linkClicked(QUrl url);
-//    void setOutputDir();
     void beginDownload();
     void download(int exit);
     void errorHandler(QNetworkReply::NetworkError);
 
-    public slots:
+public slots:
+    QString getPath()const{
+        return Dir;
+    }
 
 signals :
     void finished();

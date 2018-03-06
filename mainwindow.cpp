@@ -149,7 +149,7 @@ void mainWindow::createWidgets(){
     QPalette table_palette;
     table_palette.setColor(QPalette::Base, Qt::transparent);
     table_palette.setColor(QPalette::Text, Qt::white);
-//    table_palette.setColor(QPalette::Active,Qt::black);
+//    table_palette.setColor(QPalette::Active,Qt::red);
     table_palette.setColor(QPalette::Highlight, Qt::blue);
     table_palette.setColor(QPalette::HighlightedText, Qt::yellow);
 
@@ -203,8 +203,6 @@ void mainWindow::createWidgets(){
     playlist_widget->viewport()->setAcceptDrops(true);
     playlist_widget->setDropIndicatorShown(true);
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
-//    playlist_widget->setMovement(QListView::Snap);
-//    playlist_widget->setAutoFillBackground(1);
     playlist_widget->setPalette(table_palette);
 
     connect(playlist_widget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
@@ -252,13 +250,13 @@ void mainWindow::createWidgets(){
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
     connect(button_clear_playlist,SIGNAL(pressed()),this,SLOT(clearPlaylist()));
 
-    auto *button_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/up.png"),"", this);
-    button_up->setFocusPolicy(Qt::NoFocus);
-    connect(button_up,SIGNAL(pressed()),this,SLOT(moveItemUp()));
+//    auto *button_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/up.png"),"", this);
+//    button_up->setFocusPolicy(Qt::NoFocus);
+//    connect(button_up,SIGNAL(pressed()),this,SLOT(moveItemUp()));
 
-    auto *button_down = new QPushButton(QIcon(":/usr/share/elroke/file/icon/down.png"), "",this);
-    button_down->setFocusPolicy(Qt::NoFocus);
-    connect(button_down,SIGNAL(pressed()),this,SLOT(moveItemDown()));
+//    auto *button_down = new QPushButton(QIcon(":/usr/share/elroke/file/icon/down.png"), "",this);
+//    button_down->setFocusPolicy(Qt::NoFocus);
+//    connect(button_down,SIGNAL(pressed()),this,SLOT(moveItemDown()));
 
     button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
@@ -271,8 +269,8 @@ void mainWindow::createWidgets(){
     layout_button_playlist->addWidget(button_clear_playlist);
        layout_button_playlist->addWidget(button_move_to_top);
        layout_button_playlist->addWidget(button_moveTo_bottom);
-    layout_button_playlist->addWidget(button_up);
-    layout_button_playlist->addWidget(button_down);
+//    layout_button_playlist->addWidget(button_up);
+//    layout_button_playlist->addWidget(button_down);
     layout_button_playlist->addWidget(button_lock_playlist);
     layout_button_playlist->setSpacing(0);
     layout_button_playlist->setMargin(0);
@@ -477,7 +475,6 @@ void mainWindow::addToPlaylist(){
    playlist_widget->addItem(item);
    playlist_widget->setItemWidget(item, item_song_widget);
 
-   connect(item_song_widget->dragButton(),SIGNAL(pressed()),playlist_widget,SLOT(dragWithButton()));
 
 //resize itemwidget to songitemwidget
    item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));

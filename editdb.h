@@ -1,15 +1,18 @@
 #ifndef MANAGEDB_H
 #define MANAGEDB_H
-#include <QDialog>
-#include <QListWidget>
-#include <QLineEdit>
-#include <QTableView>
+
 #include "proxymodel.h"
 #include "keyboard.h"
+#include "clineedit.h"
+
+#include <QDialog>
+#include <QListWidget>
+//#include <QLineEdit>
+#include <QTableView>
 #include <QLabel>
 #include <QSqlTableModel>
 #include <QComboBox>
-#include "clineedit.h"
+
 
 class managedb : public QDialog
 {
@@ -28,7 +31,7 @@ private :
     QLabel *selected_count_label;
     QComboBox *combo_audio_channel;
     QComboBox *combo_search;
-        CLineEdit *le_search;
+    CLineEdit *le_search;
     bool anyChange=false;
 
 private slots:

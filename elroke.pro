@@ -53,6 +53,6 @@ SOURCES += main.cpp\
 TRANSLATIONS = file/languages/elroke_id.ts
 
 DISTFILES +=
-
+CONFIG += c++14
 RESOURCES += \
     file.qrc

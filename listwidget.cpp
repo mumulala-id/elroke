@@ -14,5 +14,4 @@ void ListWidget::dragWithButton(){
     drag->exec((Qt::MoveAction));
     }
 
-//    dragEnterEvent()
 }

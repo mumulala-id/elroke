@@ -18,9 +18,8 @@ private:
 
     dbcontype contype;
     QSqlDatabase db;
-//    QString dbname=QDir::homePath()+"/.elroke/elroke.db";
-    QString dbname;// = +"elroke.db";
-    QString dbdir;// = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString dbname;
+    QString dbdir;
     QString conname="";
 
 public slots:
@@ -28,12 +27,12 @@ public slots:
     QSqlDatabase database(){return db;}
     void prepare();
     void submit();
-     QString dbName();
-      void closeDB();
-      void rollBack();
-      bool insertIntoTable(const QVariantList & );
-      void updatePlayedTime(int id);
-      Song *getSong(int id);
+    QString dbName();
+    void closeDB();
+    void rollBack();
+    bool insertIntoTable(const QVariantList & );
+    void updatePlayedTime(int id);
+    Song *getSong(int id);
 
 private slots:
     bool restoreDB();

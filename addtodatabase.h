@@ -8,6 +8,7 @@
 #include <QListWidget>
 #include <QPushButton>
 #include <QComboBox>
+#include <QStandardPaths>
 #include "youtube_downloader.h"
 
 class addtodatabase : public QDialog
@@ -22,6 +23,7 @@ private :
 
     QString dir_;
     QString working_path;
+    QString data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QFileSystemModel *dir_model;
     QTreeView *tv_folder;
     QFileSystemModel *file_model;
@@ -48,7 +50,6 @@ private :
 private slots:
 
      QString pakDir() const {return dir_;}
-     void setDrive(const QString &drive);
      void onTreeviewClicked(const QModelIndex &);
      void splitterChange(QString);
      void saveToDatabase();

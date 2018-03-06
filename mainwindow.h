@@ -11,7 +11,8 @@
 #include "opening.h"
 #include "songitemwidget.h"
 #include "ProgressCircle.h"
-//#include "QRoundProgressBar.h"
+#include "listwidget.h"
+
 #include <QApplication>
 #include <QDialog>
 #include <QComboBox>
@@ -23,9 +24,8 @@
 #include <QDesktopWidget>
 #include <QSqlTableModel>
 #include <QPainter>
-#include <QLabel>
-//#include <QListWidget>
-#include "listwidget.h"
+//#include <QLabel>
+
 class mainWindow : public QDialog
 {
     Q_OBJECT
@@ -67,8 +67,6 @@ private :
     QPushButton *button_lock_playlist;
 
     delay * m_worker;
-//    QThread *m_thread ;
-//    QTimer delay_timer;
     bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;

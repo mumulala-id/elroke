@@ -11,16 +11,9 @@ public:
    explicit  about(QWidget *parent=0);
 
 private :
-
     QStackedLayout *stack;
 
-
-
 private slots:
-    void showDescription();
-    void showLicense();
-    void showCredit();
-    void showDonatur();
     void donate();
 
 };

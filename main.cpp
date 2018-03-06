@@ -23,27 +23,24 @@
 #include <QSplashScreen>
 #include <QBitmap>
 #include <QStyleFactory>
-//#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
     // turn on the DPI support**
 
-QApplication::setStyle("plastique");
-//QApplication::setFont(QFont().setFamily("Roboto"));
     QApplication a(argc, argv);
+    QApplication::setStyle("plastique");
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setOrganizationName("mumulala");
-   QCoreApplication::setOrganizationDomain("");
-   QCoreApplication::setApplicationName("ElRoke");
-   QCoreApplication::setApplicationVersion("3.4.2");
-   QPixmap pic(":/usr/share/elroke/file/background/splash.png");
-   QSplashScreen splash(pic);
+    QApplication::setOrganizationName("mumulala");
+    QApplication::setOrganizationDomain("");
+    QApplication::setApplicationName("ElRoke");
+    QApplication::setApplicationVersion("0.0.1");
+    QPixmap pic(":/usr/share/elroke/file/background/splash.png");
+    QSplashScreen splash(pic);
 
    splash.show();
-  a.processEvents();
-   a.thread()->sleep(3);
-
+   a.processEvents();
+   a.thread()->sleep(5);
 
     QTranslator t;
     t.load(":/usr/share/elroke/file/languages/elroke_id.qm");
@@ -53,14 +50,13 @@ QApplication::setStyle("plastique");
             qDebug()<<"SQLITE is not installed";
 
     //create  database connection
-   QSqlDatabase A=  QSqlDatabase::addDatabase("QSQLITE","elroke_show");
-    QSqlDatabase B = QSqlDatabase::addDatabase("QSQLITE","elroke_add");
-    QSqlDatabase C = QSqlDatabase::addDatabase("QSQLITE", "elroke_edit");
+    QSqlDatabase::addDatabase("QSQLITE","elroke_show");
+    QSqlDatabase::addDatabase("QSQLITE","elroke_add");
+    QSqlDatabase::addDatabase("QSQLITE", "elroke_edit");
 
     mainWindow w;
     w.showFullScreen();
     splash.finish(&w);
-
 
     return a.exec();
 }

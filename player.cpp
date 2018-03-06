@@ -1,6 +1,5 @@
 #include "player.h"
 #include<QDebug>
-//#include "opening.h"
 
 Player::Player(QWidget *parent) : QWidget(parent)
 
@@ -31,19 +30,13 @@ Player::Player(QWidget *parent) : QWidget(parent)
    setWindowState(Qt::WindowFullScreen);
     poller->start(1000);
 
-
 }
 
-
-
 void Player::setFile(QString file){
-
     filename = file;
-
 }
 
 QString Player::getFile(){
-
     return filename;
 }
 
@@ -53,8 +46,6 @@ void Player::play(){
         qDebug()<<"file may not be empty";
         return;
     }
-
-//       show();
 
     if(!_isPausing){
     _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
@@ -85,18 +76,13 @@ void Player::pause(){
 }
 
 void Player::stop(){
-
-     _isplaying=false;
+    _isplaying=false;
     libvlc_media_player_stop(_mp);
-
     poller->stop();
-
 }
 
 void Player::setVolume(int newVolume){
-
     libvlc_audio_set_volume(_mp, newVolume);
-
 }
 
 void Player::changePosition(int newPosition){
@@ -129,7 +115,6 @@ void Player::signalAlmostEnd(){
 
           if(time==limit ){
              emit almostEnded();
-              qDebug()<<"almostend emitted";
            }
 
 }
@@ -225,15 +210,6 @@ bool Player::isMute(){
 
 }
 
-
-//void Player::setMeta(QString title, QString singer){
-
-//      _title = title;
-//      _singer=singer;
-
-
-//}
-
 Player::~Player()
 {
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerEndReached,callback,this);
@@ -241,7 +217,7 @@ Player::~Player()
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerStopped,callback,this);
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerPositionChanged,callback,this);
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerEncounteredError,callback, this);
-     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerPlaying,callback, this);
+    libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerPlaying,callback, this);
 
     libvlc_media_player_stop(_mp);
     libvlc_media_player_release(_mp);

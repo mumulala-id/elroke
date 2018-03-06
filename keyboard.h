@@ -2,9 +2,6 @@
 #define KEYBOARD_H
 
 #include <QWidget>
-#include <QString>
-#include <QPushButton>
-
 #include <QPushButton>
 
 class Keyboard : public QWidget

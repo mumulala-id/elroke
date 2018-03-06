@@ -23,20 +23,18 @@ public:
 
 
 public slots:
-    void search(QString);
-    void search(QVariantList);
+  void search(QString);
+  void search(QVariantList);
   void setAlignment(unsigned int, Qt::Alignment);
   void reset();
 
 private slots:
   void clearAlign();
-  //void setAlignment(unsigned int, Qt::ItemFlags);
 
 private:
     QString text_search;
- int colom=0;
-
- mode md;
+    int colom=0;
+    mode md;
 };
 
 #endif // PROXYMODEL_H

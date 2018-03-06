@@ -17,8 +17,8 @@
 */
 #include "keyboard.h"
 #include <clineedit.h>
-#include <QCoreApplication>
-#include <QGuiApplication>
+
+#include <QApplication>
 #include <QGridLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -40,18 +40,15 @@ Keyboard::Keyboard(QWidget *parent) :
         main_layout->addWidget(keyButton[i], row, column);
     }
 
-
-    QPushButton *space = new QPushButton("\u2423", this);
+    auto *space = new QPushButton("\u2423", this);
     space->setFocusPolicy(Qt::NoFocus);
     space->setObjectName("space");
-//    space->setMaximumSize(QSize(48,48));
     space->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     connect(space,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
     auto *backspace = new QPushButton("\u232B", this);
     backspace->setObjectName("backspace");
     backspace->setFocusPolicy(Qt::NoFocus);
-//    backspace->setMaximumSize(QSize(48,48));
     backspace->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     backspace->setAutoRepeat(true);
     backspace->setAutoRepeatInterval(30);
@@ -62,7 +59,7 @@ Keyboard::Keyboard(QWidget *parent) :
     main_layout->setVerticalSpacing(0);
     main_layout->addWidget(space,1,16,1,2);
     main_layout->addWidget(backspace,1,18,1,2);
-        main_layout->setSpacing(0);
+    main_layout->setSpacing(0);
     main_layout->setMargin(0);
     main_layout->setSizeConstraint( QLayout::SetFixedSize );
 
@@ -70,9 +67,6 @@ Keyboard::Keyboard(QWidget *parent) :
     setAutoFillBackground(true);
     setWindowFlags(Qt::FramelessWindowHint );
     setMinimumSize(960,96);
-
-
-
 
 }
 
@@ -88,14 +82,14 @@ QPushButton *Keyboard::createButton( const QString &text){
     button->setFont(font);
     button->setFocusPolicy(Qt::NoFocus);
     button->setObjectName(text);
-        connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
     return button;
 }
 
 void Keyboard::onButtonClicked(){
-//qDebug()
- QObject*receiver = qobject_cast<QObject*>(QGuiApplication::focusObject());
+
+ QObject*receiver = qobject_cast<QObject*>(QApplication::focusObject());
 
          if(!receiver)
              return;
@@ -105,27 +99,25 @@ void Keyboard::onButtonClicked(){
             QChar text = objeck_name.at(0);
 
             Qt::Key key;
-if(objeck_name.size()>1){
+    if(objeck_name.size()>1){
 
         if(objeck_name=="space"){
             key = Qt::Key_Space;
             QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier," ");
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
 
-            QCoreApplication::sendEvent(receiver, &pressEvent);
-            QCoreApplication::sendEvent(receiver,&releaseEvent);
-
+            QApplication::sendEvent(receiver, &pressEvent);
+            QApplication::sendEvent(receiver,&releaseEvent);
         }
+
         if(objeck_name=="backspace"){
             key = Qt::Key_Backspace;
             QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, 0,0 );
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
 
-            QCoreApplication::sendEvent(receiver, &pressEvent);
-            QCoreApplication::sendEvent(receiver,&releaseEvent);
-
+            QApplication::sendEvent(receiver, &pressEvent);
+            QApplication::sendEvent(receiver,&releaseEvent);
         }
-
 }
 
 else{
@@ -240,30 +232,21 @@ else{
         break;
        }
 
-
-
-
     QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier,QKeySequence(key).toString());
     QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
 
-    QCoreApplication::sendEvent(receiver, &pressEvent);
-    QCoreApplication::sendEvent(receiver,&releaseEvent);
+    QApplication::sendEvent(receiver, &pressEvent);
+    QApplication::sendEvent(receiver,&releaseEvent);
 
+    }
 }
-
-}
-
-
-
 
 void Keyboard::showKeyboard(QPoint p){
 
     move(p);
     show();
 
-
 }
-
 
 Keyboard::~Keyboard()
 {

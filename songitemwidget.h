@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QLabel>
 #include <song.h>
-#include <QPushButton>
 
 class songitemwidget : public QWidget
 {
@@ -16,14 +15,12 @@ private :
     Song *song_;
     QLabel *label_title;
     QLabel *label_singer;
-    QPushButton *drag_icon;
 
 signals:
 
 public slots:
     void setSong(Song *);
     Song *song();
-    QPushButton *dragButton();
 };
 
 #endif // SONGITEMWIDGET_H

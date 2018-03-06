@@ -17,9 +17,6 @@
 */
 #include "opening.h"
 
-//#include <QLabel>
-#include <QPainter>
-#include <QPropertyAnimation>
 #include <QDebug>
 #include <QTimer>
 

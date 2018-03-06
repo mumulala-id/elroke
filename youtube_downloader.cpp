@@ -38,7 +38,9 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     connect(view,SIGNAL(linkClicked(QUrl)),this,SLOT(on_searchWebView_linkClicked(QUrl)));
 
     searchNam = new QNetworkAccessManager();
-    searchReply = NULL;
+
+     searchReply = searchNam->get(QNetworkRequest(QUrl("https://www.youtube.com/")));
+     connect(searchReply, SIGNAL(finished()), this, SLOT(processSearchReply()));
 
     layout_browser->addLayout(layout_edit);
     layout_browser->addWidget(view);
@@ -64,6 +66,17 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     layout_output_path->addWidget(dir_edit);
     layout_output_path->addWidget(button_get_path);
 
+    QHBoxLayout *layout_button_addition = new QHBoxLayout;
+
+    auto *button_add = new QPushButton(QIcon(":/usr/share/elroke/file/icon/plus.png"), "", this);
+    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/minus.png"), "", this);
+
+    layout_button_addition->addWidget(button_add);
+    layout_button_addition->addWidget(button_delete);
+    layout_button_addition->addStretch();
+    layout_button_addition->setMargin(0);
+    layout_button_addition->setSpacing(0);
+
    //table
     tview = new QTableView(this);
     tview->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -74,6 +87,10 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     model = new QStandardItemModel(0, 3, tview);
     model->setHorizontalHeaderLabels(QStringList()<<tr("Title")<<tr("Link")<<tr("Status"));
     tview->setModel(model);
+
+    connect(button_delete,&QPushButton::pressed,[this](){
+       model->removeRow(tview->currentIndex().row());
+    });
 
     process  = new QProcess(this);
     process->setProcessChannelMode(QProcess::MergedChannels);
@@ -111,11 +128,14 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     layout_button->addWidget(button_download);
 
     layout_control->addLayout(layout_output_path);
+    layout_control->addLayout(layout_button_addition);
     layout_control->addWidget(tview);
     layout_control->addLayout(layout_button);
+    layout_control->setSpacing(0);
 
     main_layout->addLayout(layout_browser);
     main_layout->addLayout(layout_control);
+
 
     setLayout(main_layout);
 

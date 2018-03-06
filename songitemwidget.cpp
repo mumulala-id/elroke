@@ -1,5 +1,6 @@
 #include "songitemwidget.h"
 #include <QVBoxLayout>
+#include <QDebug>
 
 songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
@@ -11,7 +12,6 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 
     label_title = new QLabel(this);
 
-//    label_title->sete
     QFont font_small;
     font_small.setPointSize(10);
 
@@ -23,15 +23,13 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     sub_main_layout->addWidget(label_title,1,Qt::AlignLeft);
     sub_main_layout->addWidget(label_singer,1,Qt::AlignRight);
 
-    drag_icon = new QPushButton(QIcon(":/usr/share/elroke/file/icon/drag.png"),"",this);
-    drag_icon->setFlat(1);
-    drag_icon->setFocusPolicy(Qt::NoFocus);
-    drag_icon->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+    QLabel *label_drag = new QLabel(this);
+    label_drag->setPixmap(QPixmap(":/usr/share/elroke/file/icon/drag.png"));
+    label_drag->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
     main_layout->addLayout(sub_main_layout);
-    main_layout->addWidget(drag_icon,0);
-    main_layout->setSpacing(0);
-//    main_layout->setMargin(0);
+    main_layout->addWidget(label_drag,0);
+    main_layout->setSpacing(4);
 
     QPalette pal;
     pal.setColor(QPalette::Window, Qt::green);
@@ -56,7 +54,7 @@ Song *songitemwidget::song(){
 
 }
 
-QPushButton * songitemwidget::dragButton(){
+//QPushButton * songitemwidget::dragButton(){
 
-    return drag_icon;
-}
+//    return drag_icon;
+//}

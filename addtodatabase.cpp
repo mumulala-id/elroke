@@ -38,20 +38,16 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     QTabBar *tabbar = new QTabBar(this);
-    tabbar->addTab("Local File");
-    tabbar->addTab("Network");
+    tabbar->addTab(tr("Local"));
+    tabbar->addTab(tr("Network"));
 
     QHBoxLayout *layout_top = new QHBoxLayout;
     QVBoxLayout *layout_top_left = new QVBoxLayout;
 
     combo_mounted = new QComboBox(this);
 
-    combo_mounted->addItem(QDir::homePath());
-
-//get mounted drive
+   //get mounted drive
     getDrive();
-
-    connect(combo_mounted, SIGNAL(activated(QString)), this, SLOT(setDrive(QString)));
 
     QPushButton *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
@@ -69,7 +65,13 @@ addtodatabase::addtodatabase(QWidget *parent) :
      tv_folder->hideColumn(2);
      tv_folder->hideColumn(3);
      tv_folder->header()->hide();
+
      connect(tv_folder, SIGNAL(clicked(QModelIndex)), this,SLOT(onTreeviewClicked(QModelIndex)));
+//     connect(tv_folder,SIGNAL())
+
+     connect(combo_mounted, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive){
+        tv_folder->setRootIndex(dir_model->index(drive));
+     });
 
      file_model = new QFileSystemModel(this);
      file_model->setFilter(QDir::Files | QDir::NoDotAndDotDot);
@@ -81,7 +83,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
      //list for show files
      lw_list = new QListWidget(this);
      lw_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
-     connect(lw_list,SIGNAL(itemSelectionChanged()),this,SLOT(enableStartButton()));
+     connect(lw_list,&QListWidget::itemSelectionChanged,[this](){
+         QListWidgetItem *current= lw_list->currentItem();
+     if(current){
+             button_start->setEnabled(1);
+     }
+     else{
+          button_start->setEnabled(1);
+     }
+     });
 
      QHBoxLayout *layout_drive = new QHBoxLayout;
      layout_drive->addWidget(combo_mounted);
@@ -180,8 +190,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_bottom->addWidget(gr_addcat);
    layout_bottom->addWidget(gr_audio_channel);
 
-
-
    QWidget *widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
    QSizePolicy spTop(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -200,16 +208,31 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_local->addWidget(widget_bottom);
    local_widget->setLayout(layout_local);
 
-
-
 //network widget
    ydownloader = new YoutubeDownloader(this);
+
 
    QStackedLayout *stack = new QStackedLayout;
    stack->addWidget(local_widget);
    stack->addWidget(ydownloader);
 
    connect(tabbar,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
+   connect(ydownloader,&YoutubeDownloader::finished,[this,stack](){
+       stack->setCurrentIndex(0);
+       dir_model->setRootPath(ydownloader->getPath());
+       tv_folder->setRootIndex(dir_model->index(ydownloader->getPath()));
+       lw_list->clear();
+
+//       working_path = dir_model->fileInfo(index).absoluteFilePath();
+
+       QDirIterator it(ydownloader->getPath(),QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
+
+             while (it.hasNext()) {
+                   it.next();
+                   lw_list->addItem(it.fileName());
+
+             }
+   });
 
    layout_main->addWidget(tabbar);
    layout_main->addLayout(stack);
@@ -228,12 +251,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
     setWindowFlags(Qt::FramelessWindowHint );
     setWindowState(Qt::WindowFullScreen);
-}
-
-void addtodatabase::setDrive(const QString &drive){
-
-   tv_folder->setRootIndex(dir_model->index(drive));
-
 }
 
 void addtodatabase::onTreeviewClicked(const QModelIndex &index){
@@ -368,10 +385,10 @@ void addtodatabase::saveToDatabase(){
     qSort(list_language.begin(), list_language.end());
     qSort(list_genre.begin(), list_genre.end());
 
-    writeTextStream(QDir::homePath()+"/.elroke/meta/singer", list_singer);
-    writeTextStream(QDir::homePath()+"/.elroke/meta/language", list_language);
-    writeTextStream(QDir::homePath()+"/.elroke/meta/category", list_genre);
-    writeTextStream(QDir::homePath()+"/.elroke/meta/path", list_path);
+    writeTextStream(data_dir+"/meta/singer", list_singer);
+    writeTextStream(data_dir+"/meta/language", list_language);
+    writeTextStream(data_dir+"meta/category", list_genre);
+    writeTextStream(data_dir+"/meta/path", list_path);
 
      setCursor(Qt::ArrowCursor);
 
@@ -436,7 +453,7 @@ void addtodatabase::setTitleFirst(bool j){
 void addtodatabase::getDrive(){
 
         combo_mounted->clear();
-
+        combo_mounted->addItem(QDir::homePath() );
     //get mounted drive just support ntfs
         foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
                   if (storage.fileSystemType()=="ntfs-3g" || storage.fileSystemType()=="fuseblk") {
@@ -448,15 +465,14 @@ void addtodatabase::getDrive(){
 }
 
 void addtodatabase::setToAuto(bool a){
-    qDebug()<<"a"<<a;
+
     if(a){
         automatic=true;
         manual=false;
         cb_splitby->setChecked(false);
     }
     else{
-          qDebug()<<"a"<<a;
-        automatic=false;
+          automatic=false;
         manual=true;
         cb_splitby->setChecked(true);
     }
@@ -479,18 +495,9 @@ void addtodatabase::setToManual(bool m){
 
 }
 
-//void addtodatabase::paintEvent(QPaintEvent *){
-
-//    QColor backgroundColor = palette().dark().color();
-//    QPainter customPainter(this);
-//    customPainter.fillRect(rect(), backgroundColor);
-
-//}
-
 QString addtodatabase::getSplitter(const QString &filename){
     QStringList old_splitter;
     QStringList new_splitter;
-   // QString text= "judul##artis##kategori#b,ahasa##saluran.mp4";
 
 //identify splitter
     QRegularExpression exp("[^a-zA-Z0-9]+");
@@ -527,12 +534,8 @@ QString addtodatabase::getSplitter(const QString &filename){
     
     return splitter;
     
-    
-    
 }
 
 void addtodatabase::enableStartButton(){
-    QList<QListWidgetItem*> list = lw_list->selectedItems();
-    if(!list.isEmpty())
-        button_start->setEnabled(1);
+
 }
