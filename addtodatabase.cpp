@@ -106,7 +106,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      //right
      QVBoxLayout *layout_list = new QVBoxLayout;
      layout_list->addWidget(lw_list);
-     layout_list->addWidget(button_select_all);
+     layout_list->addWidget(button_select_all,0);
 
      layout_top->addLayout(layout_list);
 

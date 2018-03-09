@@ -1,3 +1,12 @@
+/*
+ *
+ * this code adapted from ClipGrap project
+ * ClipGrab³
+    Copyright (C) Philipp Schmieder
+    http://clipgrab.de
+    feedback [at] clipgrab [dot] de
+ */
+
 #include "youtube_downloader.h"
 #include <QVBoxLayout>
 #include <QDomDocument>

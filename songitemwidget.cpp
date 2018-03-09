@@ -5,7 +5,6 @@
 songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
 
-
     QHBoxLayout *main_layout = new QHBoxLayout;
     QVBoxLayout *sub_main_layout = new QVBoxLayout;
     setAutoFillBackground(1);
@@ -18,7 +17,6 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     label_singer = new QLabel(this);
     label_singer->setFont(font_small);
     song_ = new Song(this);
-
 
     sub_main_layout->addWidget(label_title,1,Qt::AlignLeft);
     sub_main_layout->addWidget(label_singer,1,Qt::AlignRight);
@@ -34,7 +32,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     QPalette pal;
     pal.setColor(QPalette::Window, Qt::green);
     pal.setColor(QPalette::WindowText,Qt::yellow);
-setPalette(pal);
+    setPalette(pal);
     setLayout(main_layout);
 
 }
@@ -49,12 +47,5 @@ void songitemwidget::setSong(Song * _song){
 }
 
 Song *songitemwidget::song(){
-
     return song_;
-
 }
-
-//QPushButton * songitemwidget::dragButton(){
-
-//    return drag_icon;
-//}

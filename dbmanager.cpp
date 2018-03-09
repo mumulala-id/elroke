@@ -194,7 +194,7 @@ Song* dbmanager::getSong(int id){
 //}
     
     Song *the_song  = new Song;
-
+    the_song->setId(rec.value(0).toInt());
     the_song->setTitle(rec.value(1).toString());
     the_song->setSinger(rec.value(2).toString());
     the_song->setLanguage(rec.value(3).toString());

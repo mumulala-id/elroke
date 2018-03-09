@@ -5,44 +5,31 @@ Song::Song(QObject *parent) : QObject(parent)
 
 }
 
-
-void Song::setTitle(QString _title){
-    
+void Song::setTitle(QString _title){ 
     titile = _title;
-    
 }
 
-void Song::setId(int _id){
-    
+void Song::setId(int _id){    
     id = _id;
-    
 }
 
 void Song::setSinger(QString _singer){
-    
     singer = _singer;
-    
 }
 
-void Song::setLanguage(QString _language){
-    
+void Song::setLanguage(QString _language){  
     language = _language;
 }
 
 void Song::setCategory(QString _category){
-    
-    category = _category;
-    
+    category = _category;    
 }
 
 void Song::setPath(QString _path){
-    
-    path =_path;
-    
+    path =_path;    
 }
 
 void Song::setAudioChannel(audioChannel _audioChannel){
-
     audio_channel = _audioChannel;
 }
 
@@ -67,7 +54,6 @@ QString Song::getgetCategory(){
 }
 
 QString Song::getPath(){
-    
     return path;
 }
 
@@ -76,6 +62,5 @@ Song::audioChannel Song::getAudioChannel(){
 }
 
 void Song::setPlaytimes(int _playtimes){
-
     playtimes = _playtimes;
 }

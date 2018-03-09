@@ -1,4 +1,5 @@
 /*
+ *
     ElRoke
     Copyright (C) Muhammad Mukharom
 
@@ -118,11 +119,9 @@ about::about(QWidget *parent) :
     setLayout(lo_main);
 
     setMinimumSize(800,600);
-    setWindowTitle(tr("About")+ " ELroke");
+    setWindowTitle(tr("About")+ " Elroke");
     setAutoFillBackground(1);
-    setWindowFlags(Qt::FramelessWindowHint);
     setPalette(palet);
-
 
 }
 

@@ -462,6 +462,7 @@ void mainWindow::addToPlaylist(){
 
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
     int id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toInt();
+    qDebug()<<"id"<<id;
 
    Song *song =   db->getSong(id);
 
@@ -530,7 +531,6 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
 void mainWindow::dialogAbout(){
 
     about About(this);
-//    About.setAutoFillBackground(1);
     About.exec();
 
 }
@@ -847,7 +847,7 @@ void mainWindow::dialogAddToDatabase(){
 void mainWindow::dialogSavePlaylist(){
 
     QDialog *dialog_save_playlist = new QDialog;
-dialog_save_playlist->setParent(this);
+    dialog_save_playlist->setParent(this);
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
@@ -866,8 +866,7 @@ dialog_save_playlist->setParent(this);
 
     QPushButton *btn_save = new QPushButton("Save", dialog_save_playlist);
     connect(btn_save,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(accept()));
-//    Keyboard *key = new Keyboard(dialog_save_playlist);
-//    layout_main->addWidget(key);
+
     keyboard->move(QPoint(0,0));
 
     layout_btn->addWidget(btn_close);
@@ -883,21 +882,21 @@ dialog_save_playlist->setParent(this);
    le_playlist_name->setFocus();
    dialog_save_playlist->adjustSize();
    dialog_save_playlist->setAutoFillBackground(1);
-   qDebug()<<mapToGlobal(dialog_save_playlist->pos());
+//   qDebug()<<dialog_save_playlist->pos();
 
-   if(dialog_save_playlist->exec()==QDialog::Accepted){
-
+   connect(dialog_save_playlist,&QDialog::accepted,[this,le_playlist_name](){
        writePlaylist(le_playlist_name->text());
 
-   }
-
+   });
+   dialog_save_playlist->show();
    }
 
 void mainWindow::dialogLoadPlaylist(){
 
-    auto *dialog_load_playlist = new QDialog(this);
+    auto *dialog_load_playlist = new QDialog;
+        dialog_load_playlist->setParent(this);
 
-    QDirIterator it(QDir::homePath()+"/.elroke/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
+    QDirIterator it(app_dir+"/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
 
     QList<QString> list_play;
 
@@ -943,10 +942,11 @@ void mainWindow::dialogLoadPlaylist(){
     dialog_load_playlist->setMinimumSize(300,200);
 
 
-    if(dialog_load_playlist->exec()==QDialog::Accepted){
+    connect(dialog_load_playlist,&QDialog::accepted,[this,_list](){
+         loadPlaylist(_list->currentItem()->text());
+    });
 
-        loadPlaylist(_list->currentItem()->text());
-    }
+    dialog_load_playlist->show();
 }
 void mainWindow::writePlaylist(){
 
@@ -956,10 +956,11 @@ void mainWindow::writePlaylist(){
 
 void mainWindow::writePlaylist(const QString &playlistname){
 
+    qDebug()<<"masuk";
     if(playlistname==NULL)
         return;
 
-    QString dir_playlist = QDir::homePath()+"/.elroke/playlist";
+    QString dir_playlist =app_dir+"/playlist";
 
     if(!QDir(dir_playlist).exists())
         QDir().mkpath(dir_playlist);
@@ -973,15 +974,12 @@ void mainWindow::writePlaylist(const QString &playlistname){
 
      stream << "[elroke playlist]\n";
 
-//     for(int i=0; i<model_playlist->rowCount(); i++){
-//            for (int x=0; x<5; x++){
-//                stream<<model_playlist->item(i,x)->text();
-//                if(x<=3)
-//                    stream<<'\t';
+     for(int i =0;i<playlist_widget->count();i++){
+       songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->item(i)));
+       stream<<QString::number(item_widget->song()->getId())<<"\n";
+     }
 
-//            }
-//            stream<<'\n';
-//     }
+
 
      file.close();
 
@@ -995,64 +993,46 @@ void mainWindow::loadPlaylist(){
 
 void mainWindow::loadPlaylist(const QString &s){
 
-////    /*model_playlist->setRowCount(0);
+    playlist_widget->clear();
+    QFile file(app_dir+"/playlist/"+s+".elp");
+    if(!file.exists())
+        return;
 
 
-//    QFile file(QDir::homePath()+"/.elroke/playlist/"+s+".elp");
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug() << "cant read playlist" << s;
+    return;
+    }
 
-//    if(!file.exists())
-//        return;
+    QTextStream stream(&file);
 
-//    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-//        qDebug() << "cant read playlist" << s;
+    QString stuff= stream.readLine();
+    //validate first line
+    if(stuff!="[elroke playlist]")
+        return;
 
-//    QTextStream stream(&file);
+    stuff= stream.readLine();
 
-//    QString stuff= stream.readLine();
-//    //validate first line
-//    if(stuff!="[elroke playlist]")
-//        return;
+    if(stuff==NULL) return;
 
+    while(stuff!=NULL){
 
-//    stuff= stream.readLine();//move to next line
-//    int line_number=0;
+        int id = stuff.toInt();
 
-//    QStandardItem *item_id, *item_path, *item_title, *item_singer, *item_channel;
+        Song *song =   db->getSong(id);
 
-//    while(stuff!=NULL){
-//        QString id=stuff.split('\t').at(0);
-//        QString path=stuff.split('\t').at(1);
-//        QString title=stuff.split('\t').at(2);
-//        QString singer=stuff.split('\t').at(3);
-//        QString channel=stuff.split('\t').at(4);
-////        model_playlist->setRowCount(line_number+1);
+        songitemwidget *item_song_widget = new songitemwidget;
+        item_song_widget->setSong(song);
 
-//        item_id =  new QStandardItem;
-//        item_id->setText(path);
-//        model_playlist->setItem(line_number,0, item_id);
+        QListWidgetItem *item = new QListWidgetItem;
 
-//        item_path =  new QStandardItem;
-//        item_path->setText(path);
-//        model_playlist->setItem(line_number,1, item_path);
+        playlist_widget->addItem(item);
+        playlist_widget->setItemWidget(item, item_song_widget);
+        //resize itemwidget to songitemwidget
+        item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
 
-//        item_title = new QStandardItem;
-//        item_title->setText(title);
-//        item_title->setTextAlignment(Qt::AlignCenter);
-//        model_playlist->setItem(line_number,2,item_title);
-
-//        item_singer = new QStandardItem;
-//        item_singer->setText(singer);
-//        model_playlist->setItem(line_number,3,item_singer);
-
-//        item_channel = new QStandardItem;
-//        item_channel->setText(channel);
-//        model_playlist->setItem(line_number,4, item_channel);
-
-//         line_number++;
-//         stuff= stream.readLine();
-//    }
-
-//    table_playlist->selectRow(0);*/
+        stuff= stream.readLine();
+    }
 
 }
 

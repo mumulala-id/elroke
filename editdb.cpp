@@ -20,7 +20,6 @@
 #include "liststringfileparser.h"
 #include <QGroupBox>
 #include <QPushButton>
-#include <QFrame>
 #include <QGridLayout>
 #include <QDebug>
 #include <QFile>
@@ -30,9 +29,7 @@
 #include <QSizePolicy>
 #include <QSqlError>
 #include <QMessageBox>
-#include <QtAlgorithms>
-// for qSort()
-
+#include <QtAlgorithms> // for qSort()
 
 managedb::managedb(QWidget *parent) :
     QDialog(parent)
@@ -65,22 +62,21 @@ managedb::managedb(QWidget *parent) :
     grup_language->setLayout(lo_grup_language);
 
      QGroupBox *grup_genre = new QGroupBox(tr("Category"), this);
-   list_genre = new QListWidget(this);
+    list_genre = new QListWidget(this);
     list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
-     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+    connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
 
     QVBoxLayout *lo_grup_genre = new QVBoxLayout;
     lo_grup_genre->addWidget(list_genre);
     grup_genre->setLayout(lo_grup_genre);
 
-     QGroupBox *grup_folder = new QGroupBox(tr("Path"), this);
-   list_folder = new QListWidget(this);
+    QGroupBox *grup_folder = new QGroupBox(tr("Path"), this);
+    list_folder = new QListWidget(this);
     list_folder->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/path"));
-     connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+    connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
-
     lo_grup_folder->addWidget(list_folder);
 
     grup_folder->setLayout(lo_grup_folder);
@@ -91,7 +87,6 @@ managedb::managedb(QWidget *parent) :
     lo_top->addWidget(grup_folder);
     lo_top->setMargin(0);
     lo_top->setSpacing(0);
-
 
     /// bottom area ---------------------------------------------------------------------
 
@@ -104,8 +99,6 @@ managedb::managedb(QWidget *parent) :
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sql_model->select();
 
-
-
     proxy_model = new ProxyModel(ProxyModel::column, this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(6, Qt::AlignCenter);
@@ -117,77 +110,74 @@ managedb::managedb(QWidget *parent) :
 
     QGridLayout *glo_button = new QGridLayout;
 
-    QPushButton *button_title_singer = new QPushButton(tr("Title <--> Singer"), this);
+    auto *button_title_singer = new QPushButton(tr("Title <--> Singer"), this);
     connect(button_title_singer, &QPushButton::clicked, this, &managedb::swapTitleSinger);
 
-    QPushButton *button_singer_language = new QPushButton(tr("Singer <--> Language"), this);
+    auto *button_singer_language = new QPushButton(tr("Singer <--> Language"), this);
     connect(button_singer_language,&QPushButton::clicked,this,&managedb::swapSingerLanguage);
 
-    QPushButton *button_title_language = new QPushButton(tr("Title <--> Language"), this);
+    auto *button_title_language = new QPushButton(tr("Title <--> Language"), this);
     connect(button_title_language, &QPushButton::clicked,this,&managedb::swapTitleLanguage);
 
-    QPushButton *button_singer_category = new QPushButton(tr("Singer <--> Category"),this);
+    auto *button_singer_category = new QPushButton(tr("Singer <--> Category"),this);
     connect(button_singer_category,&QPushButton::clicked,this,&managedb::swapSingerCategory);
 
-    QPushButton *button_title_category = new QPushButton(tr("Title <--> Category"), this);
+    auto *button_title_category = new QPushButton(tr("Title <--> Category"), this);
     connect(button_title_category,&QPushButton::clicked,this,&managedb::swapTitleCategory);
 
-    QPushButton *button_language_category = new QPushButton(tr("Language <--> Category"), this);
+    auto *button_language_category = new QPushButton(tr("Language <--> Category"), this);
     connect(button_language_category,&QPushButton::clicked,this,&managedb::swapLanguageCategory);
 
-    QPushButton *button_set_title = new QPushButton(tr("Set Title"), this);
+    auto *button_set_title = new QPushButton(tr("Set Title"), this);
     connect(button_set_title,&QPushButton::clicked,this,&managedb::setTitle);
 
     le_set_title = new CLineEdit(this);
     le_set_title->setPlaceholderText(tr("Title"));
 
-
-    QPushButton *button_set_singer = new QPushButton(tr("Set Singer"), this);
+    auto *button_set_singer = new QPushButton(tr("Set Singer"), this);
     connect(button_set_singer,&QPushButton::clicked,this,&managedb::setSinger);
 
     le_set_singer = new CLineEdit(this);
     le_set_singer->setPlaceholderText(tr("Singer"));
 
-
-    QPushButton *button_set_language = new QPushButton(tr("Set Language"), this);
+    auto *button_set_language = new QPushButton(tr("Set Language"), this);
     connect(button_set_language,&QPushButton::clicked,this,&managedb::setLanguage);
 
     le_set_language = new CLineEdit(this);
     le_set_language->setPlaceholderText(tr("Language"));
 
-    QPushButton *button_set_category = new QPushButton(tr("Set Category"), this);
+    auto *button_set_category = new QPushButton(tr("Set Category"), this);
     connect(button_set_category,&QPushButton::clicked,this,&managedb::setCategory);
 
     le_set_category = new CLineEdit(this);
     le_set_category->setPlaceholderText(tr("Category"));
-
 
     combo_audio_channel = new QComboBox(this);
     combo_audio_channel->addItem("LEFT");
     combo_audio_channel->addItem("RIGHT");
     combo_audio_channel->addItem("STEREO");
 
-    QPushButton *button_set_audio_channel = new QPushButton(tr("Set Audio Channel"));
+    auto *button_set_audio_channel = new QPushButton(tr("Set Audio Channel"));
     connect(button_set_audio_channel,&QPushButton::clicked,this,&managedb::setAudioChannel);
 
     table = new QTableView(this);
 
-    QPushButton *button_selectall = new QPushButton(tr("Select All"), this);
+    auto *button_selectall = new QPushButton(tr("Select All"), this);
     connect(button_selectall,&QPushButton::clicked,table,&QTableView::selectAll);
 
-    QPushButton *button_unselect = new QPushButton(tr("Unselect"), this);
+    auto *button_unselect = new QPushButton(tr("Unselect"), this);
     connect(button_unselect,&QPushButton::clicked,table,&QTableView::clearSelection);
 
-    QPushButton *button_delete_selected = new QPushButton(tr("Delete Selected"), this);
+    auto *button_delete_selected = new QPushButton(tr("Delete Selected"), this);
     connect(button_delete_selected,&QPushButton::clicked,this,&managedb::deleteItem);
 
-    QPushButton *button_save = new QPushButton(tr("SAVE"), this);
+    auto *button_save = new QPushButton(tr("SAVE"), this);
     connect(button_save, &QPushButton::clicked, this, &managedb::save);
 
-    QPushButton *button_undo = new QPushButton(tr("UNDO"), this);
+    auto *button_undo = new QPushButton(tr("UNDO"), this);
     connect(button_undo, &QPushButton::clicked, this, &managedb::undo);
 
-    QPushButton *button_close = new QPushButton(tr("CLOSE"), this);
+    auto *button_close = new QPushButton(tr("CLOSE"), this);
     connect(button_close,SIGNAL(pressed()),this,SLOT(dclose()));
 
     glo_button->addWidget( button_title_singer,0,0);
@@ -238,16 +228,14 @@ managedb::managedb(QWidget *parent) :
     le_jump->setValidator(new QIntValidator(this));
     connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
 
-auto *scroll_top = new QPushButton(tr("Top"), this);
-connect(scroll_top,SIGNAL(pressed()),table,SLOT(scrollToTop()));
+    auto *scroll_top = new QPushButton(tr("Top"), this);
+    connect(scroll_top,SIGNAL(pressed()),table,SLOT(scrollToTop()));
 
-auto *scroll_bottom = new QPushButton(tr("Bottom"), this);
-connect(scroll_bottom,SIGNAL(pressed()),table,SLOT(scrollToBottom()));
+    auto *scroll_bottom = new QPushButton(tr("Bottom"), this);
+    connect(scroll_bottom,SIGNAL(pressed()),table,SLOT(scrollToBottom()));
 
-
-auto *reset = new QPushButton(tr("Show All"), this);
-connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
-
+    auto *reset = new QPushButton(tr("Show All"), this);
+    connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
     lo_search->addWidget(combo_search);
     lo_search->addWidget(le_search);
@@ -258,7 +246,6 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     lo_search->addWidget(reset);
     lo_search->addStretch();
 
-
     table->setModel(proxy_model);
 //    table->verticalHeader()->hide();
     table->resizeColumnsToContents();
@@ -267,9 +254,6 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
     connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
-
-
-
 
     QVBoxLayout *lo_bottom_right = new QVBoxLayout;
 
@@ -297,11 +281,10 @@ connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
     widget_bottom_right->setLayout(lo_bottom_right);
     widget_bottom_right->setSizePolicy(spRight);
 
-
     lo_bottom->addWidget(widget_bottom_right);
     lo_bottom->setMargin(0);
 
-    QFrame *top = new QFrame(this);
+    QWidget *top = new QWidget(this);
     QSizePolicy spTop (QSizePolicy::Preferred,QSizePolicy::Preferred);
     spTop.setVerticalStretch(1);
     top->setSizePolicy(spTop);
@@ -337,11 +320,9 @@ void managedb::swapTitleSinger(){
 
     swapItem(1,2);
     anyChange=true;
-
 }
 
 void managedb::swapItem(int column1, int column2){
-
 
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
 
@@ -378,7 +359,7 @@ void managedb::swapSingerCategory(){
 
 void managedb::swapTitleCategory(){
     swapItem(1,4);
-  anyChange=true;
+    anyChange=true;
 }
 
 void managedb::swapLanguageCategory(){
@@ -390,7 +371,7 @@ void managedb::swapLanguageCategory(){
 void managedb::setitem(QString text, int column){
 
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
-int r=0;
+    int r=0;
 
     foreach (QModelIndex indexes, list_selected) {
         r =  proxy_model->mapToSource( indexes).row();
@@ -439,7 +420,8 @@ void managedb::setAudioChannel(){
 
 
 void managedb::deleteItem(){
-setCursor(Qt::WaitCursor);
+
+    setCursor(Qt::WaitCursor);
 
     QModelIndexList listInd =  table->selectionModel()->selectedRows();
     if(listInd.size()==sql_model->rowCount()){
@@ -452,8 +434,6 @@ setCursor(Qt::WaitCursor);
                 table->hideRow(proxy_model->mapToSource(ind).row());
                 sql_model->removeRow(proxy_model->mapToSource(ind).row());
             }
-
-
         }
         else
         {
@@ -466,7 +446,7 @@ setCursor(Qt::WaitCursor);
     foreach (QModelIndex ind, listInd) {
         int visible_row = ind.row();//visble row on table
         int row = proxy_model->mapToSource(ind).row();//real row
-//        qDebug()<<"row"<<row;
+
         table->hideRow(visible_row);// need to hiding row first, deleted row will disappear after submit.
         sql_model->removeRow(row);
     }
@@ -569,13 +549,11 @@ void managedb::updateList(){
     list_folder->clear();
     list_folder->addItems(path);
 
-
     setCursor(Qt::ArrowCursor);
 
 }
 
 managedb::~managedb(){
-
 //update latest change
     QSet<QString>set_singer;
     QSet<QString>set_language;
@@ -603,12 +581,10 @@ managedb::~managedb(){
     qSort(cat.begin(),cat.end());
     qSort(path.begin(), path.end());
 
-    writeTextStream(QDir::homePath()+"/.elroke/meta/singer", singer);
-     writeTextStream(QDir::homePath()+"/.elroke/meta/language", lang);
-      writeTextStream(QDir::homePath()+"/.elroke/meta/category", cat);
-       writeTextStream(QDir::homePath()+"/.elroke/meta/path", path);
-
-
+    writeTextStream(app_dir+"/meta/singer", singer);
+     writeTextStream (app_dir+"/meta/language", lang);
+      writeTextStream(app_dir+"/meta/category", cat);
+       writeTextStream(app_dir+"/meta/path", path);
 }
 
 void managedb::writeTextStream(const QString &file, QList<QString>set){
@@ -630,8 +606,6 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
           }
     }
          f.close();
-
-
 }
 
 void managedb::selectedCount(){
@@ -650,9 +624,7 @@ void managedb::dclose(){
     }
 
     close();
-
 }
-
 
 void managedb::comboSearchChange(int i){
     QVariantList list;
@@ -667,6 +639,7 @@ void managedb::comboSearchChange(int i){
 }
 
 void managedb::receiverSearch(QString s){
+
     QVariantList list;
     list.append(combo_search->currentIndex());
     list.append(s);
@@ -683,7 +656,6 @@ void managedb::jumpTo(QString t){
 
 void managedb::undo(){
 
-
     sql_model->revertAll();
 
     //unhide row
@@ -691,9 +663,5 @@ void managedb::undo(){
 
         table->setRowHidden(i,0);
 
-
     }
-
-
-
 }

@@ -7,6 +7,7 @@
 
 #include <QDialog>
 #include <QListWidget>
+#include <QStandardPaths>
 //#include <QLineEdit>
 #include <QTableView>
 #include <QLabel>
@@ -32,6 +33,7 @@ private :
     QComboBox *combo_audio_channel;
     QComboBox *combo_search;
     CLineEdit *le_search;
+    QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     bool anyChange=false;
 
 private slots:
