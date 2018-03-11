@@ -12,7 +12,7 @@ public :
     ListWidget(QWidget *parent =0);
 
 public slots:
- void dragWithButton();
+// void dragWithButton();
 
 protected:
     void startDrag(Qt::DropActions supportedActions){

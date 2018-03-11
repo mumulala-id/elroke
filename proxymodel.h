@@ -35,6 +35,10 @@ private:
     QString text_search;
     int colom=0;
     mode md;
+
+protected :
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+
 };
 
 #endif // PROXYMODEL_H

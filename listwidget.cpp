@@ -5,13 +5,13 @@ ListWidget::ListWidget(QWidget *parent) :
 
 }
 
-void ListWidget::dragWithButton(){
-    QListWidgetItem *item = currentItem();
+//void ListWidget::dragWithButton(){
+//    QListWidgetItem *item = currentItem();
 
-    if(item){
-       QDrag *drag = new QDrag(this);
+//    if(item){
+//       QDrag *drag = new QDrag(this);
 
-    drag->exec((Qt::MoveAction));
-    }
+//    drag->exec((Qt::MoveAction));
+//    }
 
-}
+//}

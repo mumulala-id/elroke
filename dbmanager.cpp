@@ -177,21 +177,6 @@ Song* dbmanager::getSong(int id){
                 
             }
     }
-
-////            for(int i=0; rec.count();i++){
-////            qDebug()<<rec.value(i).toString();
-//////            qDebug()<<rec.value(1).toString();
-////            }
-            
-            
-            
-//}
-
-////    qDebug()<<rec.count();
-//    for(int i=0; i<rec.count();i++){
-//               qDebug()<<i<<rec.value(i).toString();
-////               qDebug()<<rec.value(1).toString();
-//}
     
     Song *the_song  = new Song;
     the_song->setId(rec.value(0).toInt());
@@ -201,7 +186,7 @@ Song* dbmanager::getSong(int id){
     the_song->setCategory(rec.value(4).toString());
     the_song->setPlaytimes(rec.value(6).toInt());
     the_song->setPath(rec.value(7).toString());
-QString channel = rec.value(5).toString();
+    QString channel = rec.value(5).toString();
 
 if(QString::compare(channel, "LEFT", Qt::CaseInsensitive)==0){
 
@@ -217,7 +202,6 @@ else if(QString::compare(channel, "RIGHT", Qt::CaseInsensitive)==0){
 }
 
     return the_song;
-    
     
     
 }

@@ -31,6 +31,7 @@
 #include <QtAlgorithms>//qSort
 #include <QTabBar>
 #include <QStackedLayout>
+#include <QHeaderView>
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
@@ -44,69 +45,96 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QHBoxLayout *layout_top = new QHBoxLayout;
     QVBoxLayout *layout_top_left = new QVBoxLayout;
 
-    combo_mounted = new QComboBox(this);
+    combo_drive = new QComboBox(this);
 
    //get mounted drive
     getDrive();
 
-    QPushButton *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
+    auto *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
     connect(button_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
 
      dir_model = new QFileSystemModel(this);
      dir_model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-     dir_ = combo_mounted->itemText(0);
-     dir_model->setRootPath(pakDir());
+     currentDrive = combo_drive->itemText(0);
+     dir_model->setRootPath(getCurrentDrive());
 
-     tv_folder = new QTreeView(this);
-     tv_folder->setModel(dir_model);
-     tv_folder->setRootIndex(dir_model->index(pakDir()));
-     tv_folder->hideColumn(1);
-     tv_folder->hideColumn(2);
-     tv_folder->hideColumn(3);
-     tv_folder->header()->hide();
+     treeview = new QTreeView(this);
+     treeview->setModel(dir_model);
+     treeview->setRootIndex(dir_model->index(getCurrentDrive()));
+     treeview->hideColumn(1);
+     treeview->hideColumn(2);
+     treeview->hideColumn(3);
+     treeview->header()->hide();
 
-     connect(tv_folder, SIGNAL(clicked(QModelIndex)), this,SLOT(onTreeviewClicked(QModelIndex)));
-//     connect(tv_folder,SIGNAL())
+     connect(treeview,static_cast<void(QTreeView::*)(const QModelIndex &)>(&QTreeView::clicked),[this](const QModelIndex &index)
+     {
+         current_dir = dir_model->fileInfo(index).absoluteFilePath();
+         label_current_dir->setText(current_dir);
+         getItem();
+     });
 
-     connect(combo_mounted, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive){
-        tv_folder->setRootIndex(dir_model->index(drive));
+     connect(combo_drive, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive){
+        treeview->setRootIndex(dir_model->index(drive));
      });
 
      file_model = new QFileSystemModel(this);
      file_model->setFilter(QDir::Files | QDir::NoDotAndDotDot);
-     file_model->setNameFilters(QStringList()<<"*.mp4"<<"*.mkv"<<"*.mpg"<<"*.dat"<<"*.avi"<<"*.mov"<<"*.webm");
+     file_model->setNameFilters(supported_video);
      file_model->setNameFilterDisables(false);
 
-     file_model->setRootPath(pakDir());
+     file_model->setRootPath(getCurrentDrive());
 
-     //list for show files
-     lw_list = new QListWidget(this);
-     lw_list->setSelectionMode(QAbstractItemView::ExtendedSelection);
-     connect(lw_list,&QListWidget::itemSelectionChanged,[this](){
-         QListWidgetItem *current= lw_list->currentItem();
-     if(current){
-             button_start->setEnabled(1);
-     }
-     else{
-          button_start->setEnabled(1);
-     }
-     });
+     label_current_dir = new QLabel(this);
+
+     view = new QTableView(this);
+     view->setEditTriggers(QTableView::NoEditTriggers);
+     view->setSelectionBehavior(QAbstractItemView::SelectRows);
+     view->setSelectionMode(QAbstractItemView::SingleSelection);
+     view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+     model = new QStandardItemModel(view);
+     model->setColumnCount(2);
+     view->setModel(model);
+     view->setColumnHidden(1,1);
 
      QHBoxLayout *layout_drive = new QHBoxLayout;
-     layout_drive->addWidget(combo_mounted);
+     layout_drive->addWidget(combo_drive);
      layout_drive->addWidget(button_refresh);
+     layout_drive->addStretch();
+
      layout_top_left->addLayout(layout_drive);
-     layout_top_left->addWidget(tv_folder);
+     layout_top_left->addWidget(treeview);
      layout_top ->addLayout(layout_top_left);
 
+     auto *check_subfolder = new QCheckBox("include sub folder",this);
+     connect(check_subfolder,&QCheckBox::toggled,[this](bool checked){
+        if(checked)
+        {
+            subdir_flag = QDirIterator::Subdirectories;
+            getItem();
+        }
+        else
+        {
+            subdir_flag = QDirIterator::NoIteratorFlags;
+            getItem();
+        }
+     });
 
-     QPushButton *button_select_all = new QPushButton(tr("Select All"), this);
-     connect(button_select_all,SIGNAL(pressed()),lw_list,SLOT(selectAll()));
+     auto *button_select_all = new QPushButton(tr("Select All"), this);
+
+     //this not work
+     connect(button_select_all,SIGNAL(pressed()),view,SLOT(selectAll()));
+
+     QHBoxLayout *layout_below_view = new QHBoxLayout;
+     layout_below_view->addWidget(check_subfolder);
+     layout_below_view->addStretch();
+     layout_below_view->addWidget(button_select_all);
      //right
      QVBoxLayout *layout_list = new QVBoxLayout;
-     layout_list->addWidget(lw_list);
-     layout_list->addWidget(button_select_all,0);
+     layout_list->addWidget(label_current_dir);
+     layout_list->addWidget(view);
+     layout_list->addLayout(layout_below_view);
 
      layout_top->addLayout(layout_list);
 
@@ -157,16 +185,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    QLineEdit *le_singer = new QLineEdit(this);
    QLineEdit *le_language = new QLineEdit(this);
-   QLineEdit *le_category = new QLineEdit(this);
+   QLineEdit *le_genre = new QLineEdit(this);
 
    layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
    layout_additional_item->addWidget(le_singer,0,1);
    layout_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
    layout_additional_item->addWidget(le_language,1,1);
-   layout_additional_item->addWidget(new QLabel(tr("Category"), this),2,0);
-   layout_additional_item->addWidget(le_category,2,1);
+   layout_additional_item->addWidget(new QLabel(tr("Genre"), this),2,0);
+   layout_additional_item->addWidget(le_genre,2,1);
    layout_additional_item->setVerticalSpacing(0);
-
 
    QGroupBox *gr_addcat = new QGroupBox(tr("Add metadata if not available"));
    gr_addcat->setLayout(layout_additional_item);
@@ -192,12 +219,14 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    QWidget *widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
+
    QSizePolicy spTop(QSizePolicy::Preferred, QSizePolicy::Preferred);
    spTop.setVerticalStretch(2);
    widget_top->setSizePolicy(spTop);
 
    QWidget *widget_bottom = new QWidget(this);
    widget_bottom->setLayout(layout_bottom);
+
    QSizePolicy spBottom(QSizePolicy::Preferred, QSizePolicy::Preferred);
    spBottom.setVerticalStretch(1);
    widget_bottom->setSizePolicy(spBottom);
@@ -208,37 +237,28 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_local->addWidget(widget_bottom);
    local_widget->setLayout(layout_local);
 
-//network widget
+//########################network widget############################
    ydownloader = new YoutubeDownloader(this);
-
 
    QStackedLayout *stack = new QStackedLayout;
    stack->addWidget(local_widget);
    stack->addWidget(ydownloader);
 
    connect(tabbar,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
-   connect(ydownloader,&YoutubeDownloader::finished,[this,stack](){
-       stack->setCurrentIndex(0);
-       dir_model->setRootPath(ydownloader->getPath());
-       tv_folder->setRootIndex(dir_model->index(ydownloader->getPath()));
-       lw_list->clear();
+   connect(ydownloader,&YoutubeDownloader::finished,
+           [this,stack](){
+                                   stack->setCurrentIndex(0);
+                                   current_dir = ydownloader->getPath();
+                                   label_current_dir->setText(current_dir);
+                                   getItem();
 
-//       working_path = dir_model->fileInfo(index).absoluteFilePath();
-
-       QDirIterator it(ydownloader->getPath(),QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
-
-             while (it.hasNext()) {
-                   it.next();
-                   lw_list->addItem(it.fileName());
-
-             }
-   });
+             });
 
    layout_main->addWidget(tabbar);
    layout_main->addLayout(stack);
-//   layout_main->addLayout(layout_btn);
 
     setLayout(layout_main);
+
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
     palet.setColor(QPalette::Window, Qt::black);
@@ -248,51 +268,117 @@ addtodatabase::addtodatabase(QWidget *parent) :
     setPalette(palet);
 
     setAutoFillBackground(1);
-
     setWindowFlags(Qt::FramelessWindowHint );
     setWindowState(Qt::WindowFullScreen);
 }
 
-void addtodatabase::onTreeviewClicked(const QModelIndex &index){
+void addtodatabase::getItem(){
 
     setCursor(Qt::BusyCursor);
-    lw_list->clear();
 
-    working_path = dir_model->fileInfo(index).absoluteFilePath();
+    model->clear();
 
-    QDirIterator it(working_path,QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
+    int row = 0;
+
+    QDirIterator it(current_dir,supported_video, QDir::Files,getSubDirFlag());
 
           while (it.hasNext()) {
-                it.next();
-                lw_list->addItem(it.fileName());
+              model->setRowCount(model->rowCount()+1);
+               QString filename = it.next();
+               QFileInfo info;
+               info.setFile(filename);
 
+               QString path = info.absoluteFilePath();
+               QString name = info.fileName();
+
+               QStandardItem *item_name = new QStandardItem;
+               item_name->setText(name);
+               model->setItem(row,0,item_name);
+
+               QStandardItem *item_path = new QStandardItem;
+               item_path->setText(path);
+               model->setItem(row,1,item_path);
+
+               row++;
           }
 
+    view->setColumnHidden(1,1);
     setCursor(Qt::ArrowCursor);
-
 }
 
-void addtodatabase::splitterChange(QString split){
-
+void addtodatabase::splitterChange(QString split)
+{
     if(split==NULL)
         return;
     cmb_titlefirst->setText(tr("Title")+split+tr("Singer"));
     cmb_singerfirst->setText(tr("Singer")+split+tr("Title"));
-
 }
 
-void addtodatabase::saveToDatabase(){
-
+void addtodatabase::saveToDatabase()
+{
     setCursor(Qt::BusyCursor);
     button_start->setEnabled(0);
     splitter = le_splitter->text();
 
-    QDirIterator it(working_path,QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov", QDir::Files,QDirIterator::Subdirectories);
+//    QList<QListWidgetItem*> selected =  lw_list->
+ QModelIndexList list =  view->selectionModel()->selectedRows();
 
-    QStringList filename;
-     QString title, singer, language, category, a_channel, path,folder;
-     QFileInfo info;
-     QString namefile;
+   QStringList splitted;
+    QString title, singer, language, genre, a_channel, path,folder;
+    QString filename;
+
+    if(!automatic)
+    {
+        foreach (QModelIndex index, list)
+        {
+            filename = model->data(model->index(index.row(), 0)).toString();
+            path = model->data(model->index(index.row(),1)).toString();
+        }
+    }
+
+//    if(!automatic)//splitter is defined
+//    {
+//        foreach (QModelIndex index, list)
+//        {
+//           filename =  item->text();
+//           folder = current_dir;
+//           path = folder+"/"+filename;
+
+//           if(filename.contains(splitter))
+//           {
+//               splitted = filename.split(splitter);
+
+//               switch(splitted.count())
+//               {
+//                           case 2:
+//                               title = splitted.at(0);
+//                               singer = splitted.at(1);
+//                               break;
+//                           case 3:
+//                               title = splitted.at(0);
+//                               singer = splitted.at(1);
+//                               a_channel =splitted.last();
+//                               break;
+//                           case 4:
+//                               title = splitted.at(0);
+//                               singer = splitted.at(1);
+//                               language = splitted.at(2);
+//                               a_channel =splitted.last();
+//                               break;
+//                           case 5 :
+//                               title = splitted.at(0);
+//                               singer = splitted.at(1);
+//                               language = splitted.at(2);
+//                               genre = splitted.at(3);
+//                               a_channel =splitted.last();
+//                               break;
+//                           default:
+//                               break;
+//               }
+//           }
+
+//        }
+//    }
 
      dbmanager *db = new dbmanager(dbmanager::add, this);
      db->connectToDB();
@@ -300,76 +386,75 @@ void addtodatabase::saveToDatabase(){
 
      bool sql_ok=true;
 
-
     QVariantList data;
     QSet<QString>set_singer;
     QSet<QString>set_language;
-    QSet<QString>set_category;
+    QSet<QString>set_genre;
     QSet<QString>set_folder;
 
-
-    while(it.hasNext()){
-        info.setFile(it.next());
-        namefile= info.completeBaseName();
-        path = info.absoluteFilePath();
-        folder= info.absolutePath();
-
-
-        if(namefile.contains(splitter)){
-             filename = namefile.split(splitter);
-                switch(filename.count()){
-                            case 2:
-                                title = filename.at(0);
-                                singer = filename.at(1);
-                                break;
-                            case 3:
-                                title = filename.at(0);
-                                singer = filename.at(1);
-                                a_channel =filename.last();
-                                break;
-                            case 4:
-                                title = filename.at(0);
-                                singer = filename.at(1);
-                                language = filename.at(2);
-                                a_channel =filename.last();
-                                break;
-                            case 5 :
-                                title = filename.at(0);
-                                singer = filename.at(1);
-                                language = filename.at(2);
-                                category = filename.at(3);
-                                a_channel =filename.last();
-                                break;
-                            default:
-                                break;
-                            }
-        }
-        else {//usually name is title - singer or singer - title
-            if(namefile.contains("-")){
-               filename = namefile.split("-");
-               title = filename.at(0);
-               singer = filename.at(1);
-
-            }
-        }
+//    while(it.hasNext()){
+//        info.setFile(it.next());
+//        namefile= info.completeBaseName();
+//        path = info.absoluteFilePath();
+//        folder= info.absolutePath();
 
 
-        set_singer.insert(singer.toUpper());
-        set_language.insert(language.toUpper());
-        set_category.insert(category.toUpper());
-        set_folder.insert(folder);
+//        if(namefile.contains(splitter)){
+//             filename = namefile.split(splitter);
+//                switch(filename.count()){
+//                            case 2:
+//                                title = filename.at(0);
+//                                singer = filename.at(1);
+//                                break;
+//                            case 3:
+//                                title = filename.at(0);
+//                                singer = filename.at(1);
+//                                a_channel =filename.last();
+//                                break;
+//                            case 4:
+//                                title = filename.at(0);
+//                                singer = filename.at(1);
+//                                language = filename.at(2);
+//                                a_channel =filename.last();
+//                                break;
+//                            case 5 :
+//                                title = filename.at(0);
+//                                singer = filename.at(1);
+//                                language = filename.at(2);
+//                                genre = filename.at(3);
+//                                a_channel =filename.last();
+//                                break;
+//                            default:
+//                                break;
+//                            }
+//        }
+//        else
+//        {//usually name is title - singer or singer - title
+//            if(namefile.contains("-"))
+//            {
+//               filename = namefile.split("-");
+//               title = filename.at(0);
+//               singer = filename.at(1);
+//            }
+//        }
 
-          data.append(title);
-          data.append(singer);
-          data.append(language);
-          data.append(category);
-          data.append(a_channel);
-          data.append(path);
 
-        sql_ok =  db->insertIntoTable(data);
-        data.clear();
+//        set_singer.insert(singer.toUpper());
+//        set_language.insert(language.toUpper());
+//        set_genre.insert(genre.toUpper());
+//        set_folder.insert(folder);
 
-    }
+//          data.append(title);
+//          data.append(singer);
+//          data.append(language);
+//          data.append(genre);
+//          data.append(a_channel);
+//          data.append(path);
+
+//        sql_ok =  db->insertIntoTable(data);
+//        data.clear();
+
+//    }
     if(sql_ok)
                          db->submit();
     else
@@ -378,7 +463,7 @@ void addtodatabase::saveToDatabase(){
 
     QList<QString>list_singer=set_singer.toList();
     QList<QString>list_language= set_language.toList();
-    QList<QString>list_genre=set_category.toList();
+    QList<QString>list_genre=set_genre.toList();
     QList<QString>list_path = set_folder.toList();
 
     qSort(list_singer.begin(), list_singer.end());
@@ -387,7 +472,7 @@ void addtodatabase::saveToDatabase(){
 
     writeTextStream(data_dir+"/meta/singer", list_singer);
     writeTextStream(data_dir+"/meta/language", list_language);
-    writeTextStream(data_dir+"meta/category", list_genre);
+    writeTextStream(data_dir+"meta/genre", list_genre);
     writeTextStream(data_dir+"/meta/path", list_path);
 
      setCursor(Qt::ArrowCursor);
@@ -396,69 +481,75 @@ void addtodatabase::saveToDatabase(){
 
  }
 
-void addtodatabase::writeTextStream(const QString &file, QList<QString>set){
+void addtodatabase::writeTextStream(const QString &file, QList<QString>set)
+{
     QFileInfo info;
     info.setFile(file);
+
     if(!info.dir().exists())
         QDir().mkdir(info.path());
 
     QFile f(file);
         
-    if(!f.open(QIODevice::WriteOnly | QIODevice::Text)){
+    if(!f.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
          qDebug()<<"cannot write stream";
     }
-    else{
+    else
+    {
           QTextStream stream(&f);
         
-          for(int i=0; i<set.size(); i++){
+          for(int i=0; i<set.size(); i++)
+          {
                 stream << set.at(i)<<'\n';
           }
     }
          f.close();
-
          
 }
 
-void addtodatabase::setSingerFirst(bool p){
-
-    if(p){
+void addtodatabase::setSingerFirst(bool p)
+{
+    if(p)
+    {
         singer_first=1;
         cmb_titlefirst->setChecked(0);
         title_first=0;
     }
-    else{
+    else
+    {
         singer_first=0;
         title_first=1;
         cmb_singerfirst->setChecked(1);
     }
-
 }
 
-void addtodatabase::setTitleFirst(bool j){
-
-    if(j){
+void addtodatabase::setTitleFirst(bool j)
+{
+    if(j)
+    {
         title_first=1;
         singer_first=0;
         cmb_singerfirst->setChecked(0);
         //button_start->setEnabled(1);
     }
-    else{
+    else
+    {
         title_first=0;
         singer_first=1;
-      cmb_titlefirst->setChecked(1);
+        cmb_titlefirst->setChecked(1);
     }
-
 }
 
-void addtodatabase::getDrive(){
-
-        combo_mounted->clear();
-        combo_mounted->addItem(QDir::homePath() );
+void addtodatabase::getDrive()
+{
+        combo_drive->clear();
+        combo_drive->addItem(QDir::homePath() );
     //get mounted drive just support ntfs
         foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
                   if (storage.fileSystemType()=="ntfs-3g" || storage.fileSystemType()=="fuseblk") {
 
-                          combo_mounted->addItem(storage.rootPath());
+                          combo_drive->addItem(storage.rootPath());
 
                      }
               }
@@ -466,32 +557,32 @@ void addtodatabase::getDrive(){
 
 void addtodatabase::setToAuto(bool a){
 
-    if(a){
-        automatic=true;
-        manual=false;
-        cb_splitby->setChecked(false);
-    }
-    else{
-          automatic=false;
-        manual=true;
-        cb_splitby->setChecked(true);
-    }
+//    if(a){
+//        automatic=true;
+//        manual=false;
+//        cb_splitby->setChecked(false);
+//    }
+//    else{
+//          automatic=false;
+//        manual=true;
+//        cb_splitby->setChecked(true);
+//    }
 
 }
 
 void addtodatabase::setToManual(bool m){
 
-    if(m){
-        automatic=false;
-        manual=true;
-        cb_auto->setChecked(false);
-    }
-    else{
+//    if(m){
+//        automatic=false;
+//        manual=true;
+//        cb_auto->setChecked(false);
+//    }
+//    else{
 
-        automatic=true;
-        manual=false;
-        cb_auto->setChecked(true);
-    }
+//        automatic=true;
+//        manual=false;
+//        cb_auto->setChecked(true);
+//    }
 
 }
 
@@ -535,6 +626,7 @@ QString addtodatabase::getSplitter(const QString &filename){
     return splitter;
     
 }
+
 
 void addtodatabase::enableStartButton(){
 

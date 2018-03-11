@@ -1,6 +1,6 @@
 #include "proxymodel.h"
 #include <QDebug>
-
+#include <QVariant>
 
 ProxyModel::ProxyModel(QObject *parent): QSortFilterProxyModel(parent),
     text_search("")
@@ -116,6 +116,28 @@ void ProxyModel::clearAlign(){
 
 }
 
+bool ProxyModel::lessThan(const QModelIndex &left,
+                                      const QModelIndex &right) const
+{
+    QVariant leftData = sourceModel()->data(left);
+    QVariant rightData = sourceModel()->data(right);
+
+    if (leftData.type() == QVariant::Int) {
+           return leftData.toInt() < rightData.toInt();
+
+    }
+    else{
+        QString leftString = leftData.toString();
+//               if(left.column() == 1 && emailPattern.indexIn(leftString) != -1)
+//                   leftString = emailPattern.cap(1);
+
+               QString rightString = rightData.toString();
+//               if(right.column() == 1 && emailPattern.indexIn(rightString) != -1)
+//                   rightString = emailPattern.cap(1);
+
+               return leftString < rightString;
+    }
+}
 void ProxyModel::reset(){
     colom =  0;
     text_search ="";

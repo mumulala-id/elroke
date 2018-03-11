@@ -82,8 +82,8 @@ private :
     int desktop_width = desktop->width();
     int desktop_height = desktop->height();
     QString channel;
-    QPushButton *button_lock_playlist;
-
+//    QPushButton *button_lock_playlist;
+    bool lock_playlist;
     delay * m_worker;
     bool on_delay=false;
     Keyboard *keyboard;
@@ -154,7 +154,6 @@ private slots:
     void videoInstance();
     void keyBoardInstance();
     void fontSetup();
-    void updateLockButton(bool);
     void videoEnds();
     int getRandomNumber();
     void showHits();

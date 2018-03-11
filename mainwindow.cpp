@@ -166,7 +166,7 @@ void mainWindow::createWidgets(){
 
     table = new QTableView(this);
     table->setModel(proxy_model);
-//    table->setSortingEnabled(0);
+//    table->setSortingEnabled(1);
     tableRule();
 
     QPalette header_palette = table->horizontalHeader()->palette();
@@ -211,6 +211,7 @@ void mainWindow::createWidgets(){
     auto *layout_button_playlist = new QHBoxLayout;
 
     auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
+    button_menu->setFlat(1);
 
     auto *menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
@@ -236,18 +237,23 @@ void mainWindow::createWidgets(){
        button_menu->setFocusPolicy(Qt::NoFocus);
 
     auto *button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/file/icon/top.png"),"", this);
+    button_move_to_top->setFocusPolicy(Qt::NoFocus);
+    button_move_to_top->setFlat(1);
 
     connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
 
     auto *button_moveTo_bottom = new QPushButton(QIcon(":/usr/share/elroke/file/icon/bottom.png"),"", this);
-
+    button_moveTo_bottom->setFlat(1);
+    button_moveTo_bottom->setFocusPolicy(Qt::NoFocus);
 
     auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
     button_delete->setFocusPolicy(Qt::NoFocus);
+    button_delete->setFlat(1);
     connect(button_delete,SIGNAL(pressed()),this,SLOT(deleteItemPlaylist()));
 
     auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/clear.png"),"", this);
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
+    button_clear_playlist->setFlat(1);
     connect(button_clear_playlist,SIGNAL(pressed()),this,SLOT(clearPlaylist()));
 
 //    auto *button_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/up.png"),"", this);
@@ -258,10 +264,19 @@ void mainWindow::createWidgets(){
 //    button_down->setFocusPolicy(Qt::NoFocus);
 //    connect(button_down,SIGNAL(pressed()),this,SLOT(moveItemDown()));
 
-    button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
+    QPushButton *button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
     button_lock_playlist->setCheckable(true);
-    connect(button_lock_playlist,&QPushButton::clicked,this,&mainWindow::updateLockButton);
+    button_lock_playlist->setFlat(1);
+//    connect(button_lock_playlist,&QPushButton::clicked,this,&mainWindow::updateLockButton);
+    connect(button_lock_playlist,static_cast<void(QPushButton::*)(bool)>(&QPushButton::clicked),[this, button_lock_playlist](bool lock)
+    {
+        lock_playlist = lock;
+        if(lock)
+            button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
+        else
+             button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
+    });
 //    button_lock_playlist->setCentang(1);
 
     layout_button_playlist->addWidget(button_menu);
@@ -381,8 +396,8 @@ void mainWindow::createWidgets(){
      layout_player_control->addStretch();
      layout_player_control->addWidget(button_audio_mute);
      layout_player_control->setMargin(0);
-     QWidget *widget_bottom = new QWidget(this);
 
+     QWidget *widget_bottom = new QWidget(this);
      widget_bottom->setAutoFillBackground(1);
      widget_bottom->setPalette(transparent_palette);
      widget_bottom->setLayout(layout_player_control);
@@ -390,26 +405,25 @@ void mainWindow::createWidgets(){
     layout_main->addWidget(widget_top);
     layout_main->addWidget(all_table);
 
-    //spacer willbe mask when video playing, keep lyric vicible
+    //spacer sholud be mask when video playing, keep lyric visible
     spacer = new QWidget(this);
     spacer->adjustSize();
     QSizePolicy spSpacer (QSizePolicy::Expanding,QSizePolicy::Expanding);
     spSpacer.setVerticalStretch(1);
-
 
     spacer->setSizePolicy(spSpacer);
     layout_main->addWidget(spacer);
 
     layout_main->addWidget(widget_bottom);
     layout_main->setMargin(0);
+    layout_main->setSpacing(0);
     setLayout(layout_main);
-
 
 }
 
 void mainWindow::createShortcut(){
 
-    QShortcut *sc_quit =new QShortcut(QKeySequence("Esc"),this);
+    QShortcut *sc_quit = new QShortcut(QKeySequence("Esc"),this);
     connect(sc_quit,SIGNAL(activated()),qApp,SLOT(quit()));
 
 }
@@ -462,11 +476,8 @@ void mainWindow::addToPlaylist(){
 
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
     int id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toInt();
-    qDebug()<<"id"<<id;
 
    Song *song =   db->getSong(id);
-
-
 
    songitemwidget *item_song_widget = new songitemwidget;
    item_song_widget->setSong(song);
@@ -475,7 +486,6 @@ void mainWindow::addToPlaylist(){
 
    playlist_widget->addItem(item);
    playlist_widget->setItemWidget(item, item_song_widget);
-
 
 //resize itemwidget to songitemwidget
    item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
@@ -501,22 +511,17 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
             }
         }
 
-
-
         //move focus widget from table to playlist with right key
-        else if(event->key()==Qt::Key_Right && qApp->focusWidget()==table){
-
+        else if(event->key()==Qt::Key_Right && qApp->focusWidget()==table)
+        {
             playlist_widget->setFocus();
         }
 
         //move focus widget from playlist to table with left key
-        else if(event->key()==Qt::Key_Left && qApp->focusWidget()==playlist_widget){
+        else if(event->key()==Qt::Key_Left && qApp->focusWidget()==playlist_widget)
+        {
             table->setFocus();
-
         }
-
-
-
 
         if(event->key()==Qt::Key_Backspace){
             if(le_search->text().isEmpty())
@@ -649,7 +654,7 @@ void mainWindow::deleteItemPlaylist(){
 }
 
 void mainWindow::playPlayer(){
-    qDebug()<<"enter pla player";
+//    qDebug()<<"enter pla player";
 
     if(playlist_widget->count()==0){
         video->close();
@@ -664,7 +669,7 @@ void mainWindow::playPlayer(){
                 video->stop();
             }
            songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
-qDebug()<<"setelah item eidget";
+//qDebug()<<"setelah item eidget";
             int id = item_widget->song()->getId();
             QString file= item_widget->song()->getPath();
             QString title = item_widget->song()->getTitle();
@@ -688,15 +693,15 @@ qDebug()<<"setelah item eidget";
            video->setFile(file);
 
     cover->setData(title, singer);
-    qDebug()<<"setealah setdata";
+//    qDebug()<<"setealah setdata";
 //    cover->raise();
     cover->start();
-qDebug()<<cover->isVisible();
+//qDebug()<<cover->isVisible();
            db->updatePlayedTime(id);
            sql_model->select();
 ////tableRule();
 
-            if(button_lock_playlist->isChecked()){
+            if(lock_playlist){
 //                //move to last
 //                QList<QStandardItem *> item_list = model_playlist->takeRow(cur);
 //                model_playlist->insertRow(model_playlist->rowCount(), item_list);
@@ -956,7 +961,6 @@ void mainWindow::writePlaylist(){
 
 void mainWindow::writePlaylist(const QString &playlistname){
 
-    qDebug()<<"masuk";
     if(playlistname==NULL)
         return;
 
@@ -1047,7 +1051,6 @@ QRegion mainWindow::getMaska(){
 
 }
 
-
 void mainWindow::dialogEditDatabase(){
 
     //sql_model must be inActive before editing
@@ -1058,7 +1061,6 @@ void mainWindow::dialogEditDatabase(){
     md.exec();
 
 }
-
 
 void mainWindow::setAudioChannelManual(){
 
@@ -1181,13 +1183,13 @@ void mainWindow::fontSetup(){
 
 }
 
-void mainWindow::updateLockButton(bool lock){
+//void mainWindow::updateLockButton(bool lock){
 
-    if(lock)
-        button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
-    else
-         button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
-}
+//    if(lock)
+//        button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
+//    else
+//         button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
+//}
 
 void mainWindow::dialogAdmin(){
 
@@ -1415,7 +1417,7 @@ void mainWindow::showHits(){
 
 //    proxy_model->sort(7, ProxyModel::sortRole, Qt::AscendingOrder);
 //proxy_model->setSortRole(ProxyModel::sortRole);
-proxy_model->sort(6, Qt::DescendingOrder);
+proxy_model->sort(6,Qt::AscendingOrder);
 
 
 
