@@ -11,6 +11,7 @@ public:
     explicit preferences(QWidget *parent = nullptr);
 private :
     QStackedLayout *stack;
+    QString selected_font;
 
 signals:
 

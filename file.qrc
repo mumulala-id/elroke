@@ -1,13 +1,12 @@
 <RCC>
     <qresource prefix="/usr/share/elroke">
-        <file>file/font/Xolonium.ttf</file>
         <file>file/background/background.jpg</file>
         <file>file/background/backgroundTrans.png</file>
         <file>file/background/splash.png</file>
         <file>file/icon/next.png</file>
         <file>file/icon/left.png</file>
         <file>file/icon/play.png</file>
-         <file>file/icon/drag.png</file>
+        <file>file/icon/drag.png</file>
         <file>file/icon/clear.png</file>
         <file>file/icon/backspace.png</file>
         <file>file/icon/mute.png</file>
@@ -27,22 +26,19 @@
         <file>file/icon/bottom.png</file>
         <file>file/icon/top.png</file>
         <file>file/icon/logo.png</file>
-          <file>file/icon/paypal_donate.png</file>
+        <file>file/icon/paypal_donate.png</file>
         <file>file/soundfx/applause.mp3</file>
         <file>file/languages/elroke_id.qm</file>
         <file>file/LICENSE</file>
-        <file>file/font/Roboto/Roboto-Black.ttf</file>
-        <file>file/font/Roboto/Roboto-LightItalic.ttf</file>
-        <file>file/font/Roboto/Roboto-Medium.ttf</file>
-        <file>file/font/Roboto/Roboto-Thin.ttf</file>
-        <file>file/font/Roboto/Roboto-ThinItalic.ttf</file>
-        <file>file/font/Roboto/Roboto-Black.ttf</file>
-        <file>file/font/Roboto/Roboto-BlackItalic.ttf</file>
-        <file>file/font/Roboto/Roboto-Bold.ttf</file>
-        <file>file/font/Roboto/Roboto-BoldItalic.ttf</file>
-        <file>file/font/Roboto/Roboto-Italic.ttf</file>
-        <file>file/font/Roboto/Roboto-Light.ttf</file>
-        <file>file/font/Roboto/Roboto-MediumItalic.ttf</file>
-        <file>file/font/Roboto/Roboto-Regular.ttf</file>
+<!--        <file>file/background/butterfly.jpeg</file>
+        <file>file/background/autumn.jpg</file>
+        <file>file/background/flower.jpeg</file>
+        <file>file/background/freshapple.jpeg</file>
+        <file>file/background/greeneye.jpeg</file>
+        <file>file/background/interstellar.jpg</file>
+        <file>file/background/lake.jpeg</file>
+        <file>file/background/redlove.jpeg</file>
+        <file>file/background/view.jpeg</file>
+        <file>file/background/waterflow.jpeg</file>-->
     </qresource>
 </RCC>
