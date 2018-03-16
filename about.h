@@ -13,9 +13,6 @@ public:
 private :
     QStackedLayout *stack;
 
-private slots:
-    void donate();
-
 };
 
 #endif // ABOUT_H

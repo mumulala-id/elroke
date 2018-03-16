@@ -29,7 +29,8 @@ HEADERS  += mainwindow.h \
     songitemwidget.h\
     ProgressCircle.h \
     listwidget.h \
-    youtube_downloader.h
+    youtube_downloader.h \
+    preferences.h
 
 
 SOURCES += main.cpp\
@@ -48,7 +49,8 @@ SOURCES += main.cpp\
     songitemwidget.cpp \
     ProgressCircle.cpp \
     listwidget.cpp \
-    youtube_downloader.cpp
+    youtube_downloader.cpp \
+    preferences.cpp
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

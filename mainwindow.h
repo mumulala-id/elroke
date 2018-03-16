@@ -59,7 +59,6 @@ private :
 
     CLineEdit *le_search;
 
-//   QRoundProgressBar *circle_bar;
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
     Player *video;
@@ -68,7 +67,6 @@ private :
     ListWidget *playlist_widget;
     ProgressCircle *circle;
 
-//    QStringList category;
     QString  app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 
     QString category1;
@@ -82,7 +80,6 @@ private :
     int desktop_width = desktop->width();
     int desktop_height = desktop->height();
     QString channel;
-//    QPushButton *button_lock_playlist;
     bool lock_playlist;
     delay * m_worker;
     bool on_delay=false;
@@ -102,12 +99,12 @@ private :
     CLineEdit * le_userName;
     CLineEdit * le_password;
     CLineEdit *le_password_confirm;
+    QPointer <QDialog> dialog_admin=NULL;
 
 
 
 private slots:
     void dialogAdmin();
-    void dialogAddToDatabase();
     void checkAdmin();
     void createAdminAccount();
     void dialogCreateAdmin();
@@ -120,25 +117,18 @@ private slots:
     void errorHandling();
     void setBackground();
     void updateInterface();
-    void moveItemUp();
-    void moveItemDown();
     void moveItemToTop();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
-    void dialogEditDatabase();
-    void setVolStepDown();
-    void setVolStepUp();
+//    void setVolStepDown();
+//    void setVolStepUp();
     void setMute();
     void audioEffectInstance();
     void randomNumberInstance();
     void setaudiochannelAuto();
     void setAudioChannelManual();
-    void showClock();
     void addToPlaylist();
-    void deleteItemPlaylist();
     void playPlayer();
-    void clearPlaylist();
-    void dialogAbout();
     void getCategory();
     void dialogSavePlaylist();
      void writePlaylist();

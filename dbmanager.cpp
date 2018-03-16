@@ -164,17 +164,18 @@ void dbmanager::updatePlayedTime(int id){
 
 }
 
-Song* dbmanager::getSong(int id){
-    qDebug()<<"id"<<id;
+Song* dbmanager::getSong(int id)
+{
     QSqlQuery query(db);
     
     QSqlRecord rec;
     query.prepare("SELECT * FROM ELROKE123 WHERE ID="+QString::number(id));
     
-    if(query.exec()){
-            while(query.next()){
-                rec = query.record();
-                
+    if(query.exec())
+    {
+            while(query.next())
+            {
+                rec = query.record();         
             }
     }
     

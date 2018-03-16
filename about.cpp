@@ -110,7 +110,10 @@ about::about(QWidget *parent) :
     QPushButton *support =new QPushButton(this);
     support->setIcon(QIcon(":/usr/share/elroke/file/icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
-    connect(support,SIGNAL(pressed()),this,SLOT(donate()));
+    connect(support,&QPushButton::pressed,[this]()
+    {
+        QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
+    });
 
     lo_main->addWidget(tab,0,Qt::AlignCenter);
     lo_main->addLayout(stack);
@@ -122,11 +125,4 @@ about::about(QWidget *parent) :
     setWindowTitle(tr("About")+ " Elroke");
     setAutoFillBackground(1);
     setPalette(palet);
-
-}
-
-void about::donate(){
-
-    QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
-
 }
