@@ -22,8 +22,7 @@
 
 opening::opening( QWidget *parent) : QWidget(parent)
 {
-
-  resize(QSize(desktop_width,desktop_height));
+    resize(QSize(desktop_width,desktop_height));
 
     QFont fontTitle;
     fontTitle.setPointSize(32);
@@ -52,11 +51,7 @@ opening::opening( QWidget *parent) : QWidget(parent)
     setWindowState(Qt::WindowFullScreen);
 //    setAutoFillBackground(1);
     hide();
-
-
 }
-
-
 void opening::setData(QString title, QString singer){
       label_title->setText(title);
        label_title->adjustSize();
@@ -64,16 +59,12 @@ void opening::setData(QString title, QString singer){
          label_singer->adjustSize();
 
 }
-
-
 void opening::start(){
 
     show();
     raise();
     singer_animation->setStartValue(QRect(0,0, width(),height()-label_singer->height()));
     singer_animation->setEndValue(QRect((width()-label_singer->width())/2 ,0, width(), height()-label_singer->height()));
-
-
     title_animaton->setStartValue(QRect(width(), 80, width(), height()));
     title_animaton->setEndValue(QRect((width()-label_title->width())/2, 80, width(), height()));
 
@@ -84,9 +75,6 @@ void opening::start(){
 }
 
 void opening::finish(){
-
     hide();
     emit passed();
-
-
 }

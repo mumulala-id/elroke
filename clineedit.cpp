@@ -5,23 +5,20 @@ CLineEdit::CLineEdit(QWidget *parent) :
 
 }
 
-CLineEdit::~CLineEdit(){}
+CLineEdit::~CLineEdit(){
 
+}
 
-void CLineEdit::focusInEvent(QFocusEvent *e){
-
-
+void CLineEdit::focusInEvent(QFocusEvent *e)
+{
     QLineEdit::focusInEvent(e);
     setReadOnly(false);
     emit(focussed(true));
 }
 
-void CLineEdit::focusOutEvent(QFocusEvent *e){
-
-
+void CLineEdit::focusOutEvent(QFocusEvent *e)
+{
     QLineEdit::focusInEvent(e);
     setReadOnly(true);
     emit(focussed(false));
 }
-
-

@@ -32,7 +32,6 @@
 about::about(QWidget *parent) :
     QDialog(parent)
 {
-
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
     palet.setColor(QPalette::Window, Qt::black);
@@ -73,8 +72,11 @@ about::about(QWidget *parent) :
     file.open(QFile::ReadOnly | QFile::Text);
 
     QTextStream readfile(&file);
+QFont font_license;
+font_license.setPointSize(12);
 
     license_txt->setText(readfile.readAll());
+    license_txt->setFont(font_license);
     license_txt->setReadOnly(1);
 
     //Credit
@@ -107,6 +109,11 @@ about::about(QWidget *parent) :
 
     connect(tab,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
 
+
+
+    auto *button_close = new QPushButton(tr("Close"), this);
+    connect(button_close,SIGNAL(pressed()),this,SLOT(close()));
+
     QPushButton *support =new QPushButton(this);
     support->setIcon(QIcon(":/usr/share/elroke/file/icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
@@ -114,15 +121,19 @@ about::about(QWidget *parent) :
     {
         QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
     });
+    QHBoxLayout *layout_button = new QHBoxLayout;
+    layout_button->addWidget(button_close,0,Qt::AlignLeft);
+    layout_button->addWidget(support,0,Qt::AlignRight);
 
     lo_main->addWidget(tab,0,Qt::AlignCenter);
     lo_main->addLayout(stack);
-    lo_main->addWidget(support,1,Qt::AlignRight);
+    lo_main->addLayout(layout_button);
 
     setLayout(lo_main);
 
     setMinimumSize(800,600);
     setWindowTitle(tr("About")+ " Elroke");
     setAutoFillBackground(1);
+    setWindowFlags(Qt::FramelessWindowHint);
     setPalette(palet);
 }

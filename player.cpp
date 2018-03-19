@@ -2,9 +2,7 @@
 #include<QDebug>
 
 Player::Player(QWidget *parent) : QWidget(parent)
-
 {
-
     const char * const vlc_args[] = {
      //   "--verbose=2",
     };
@@ -21,58 +19,57 @@ Player::Player(QWidget *parent) : QWidget(parent)
     m_eventMgr = libvlc_media_player_event_manager(_mp);
     registerEvents();
 
-    QPalette pal;
-    pal.setColor(QPalette::Background,Qt::black);
-    pal.setColor(QPalette::Foreground,Qt::white);
-    setPalette(pal);
+   QPalette pal;
+   pal.setColor(QPalette::Background,Qt::black);
+   pal.setColor(QPalette::Foreground,Qt::white);
+   setPalette(pal);
 
    setWindowFlags( Qt::FramelessWindowHint);
    setWindowState(Qt::WindowFullScreen);
-    poller->start(1000);
-
+   poller->start(1000);
 }
 
-void Player::setFile(QString file){
+void Player::setFile(QString file)
+{
     filename = file;
 }
 
-QString Player::getFile(){
+QString Player::getFile()
+{
     return filename;
 }
 
-void Player::play(){
-
-    if(getFile()==NULL){
+void Player::play()
+{
+    if(getFile()==NULL)
+    {
         qDebug()<<"file may not be empty";
         return;
     }
 
-    if(!_isPausing){
-    _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
-
-    libvlc_media_player_set_media(_mp, _m);
-
-    int winid = this->winId();
-            libvlc_media_player_set_xwindow(_mp, winid );
-            libvlc_media_player_play(_mp);
-            _isplaying=1;
-             _isPausing=0;
+    if(!_isPausing)
+    {
+        _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
+        libvlc_media_player_set_media(_mp, _m);
+        int winid = this->winId();
+        libvlc_media_player_set_xwindow(_mp, winid );
+        libvlc_media_player_play(_mp);
+        _isplaying=1;
+        _isPausing=0;
     }
-
-            else{
-            libvlc_media_player_play(_mp);
-            _isplaying=1;
-            _isPausing=0;
-            }
-
+    else
+    {
+        libvlc_media_player_play(_mp);
+        _isplaying=1;
+        _isPausing=0;
+    }
 }
 
-void Player::pause(){
-
+void Player::pause()
+{
     libvlc_media_player_pause(_mp);
     _isplaying=false;
     _isPausing=true;
-
 }
 
 void Player::stop(){
@@ -81,25 +78,24 @@ void Player::stop(){
     poller->stop();
 }
 
-void Player::setVolume(int newVolume){
+void Player::setVolume(int newVolume)
+{
     libvlc_audio_set_volume(_mp, newVolume);
 }
 
-void Player::changePosition(int newPosition){
-
+void Player::changePosition(int newPosition)
+{
     libvlc_media_t *curMedia = libvlc_media_player_get_media(_mp);
 
     if(curMedia == NULL)
         return;
 
     float pos = (float)(newPosition)/(float)POSITION_RESOLUTION;
-
     libvlc_media_player_set_position(_mp,pos);
 }
 
-
-void Player::signalAlmostEnd(){
-
+void Player::signalAlmostEnd()
+{
     if(!_isplaying)
         return;
 
@@ -112,21 +108,22 @@ void Player::signalAlmostEnd(){
     auto limit= (int)(duration/1000)-10;
 
     auto time =(int) libvlc_media_player_get_time(_mp)/1000;
-
-          if(time==limit ){
+          if(time==limit )
+          {
              emit almostEnded();
-           }
-
+          }
 }
 
-void Player::setAudioChannelStereo(){
+void Player::setAudioChannelStereo()
+{
     if(!_isplaying)
         return;
 
       libvlc_audio_set_channel(_mp, 1);
 }
 
-void Player::setAudioChannelLeft(){
+void Player::setAudioChannelLeft()
+{
     if(!_isplaying)
         return;
 
@@ -134,34 +131,33 @@ void Player::setAudioChannelLeft(){
 }
 
 void Player::setAudioChannelRight(){
-    if(!_isplaying)
+  if(!_isplaying)
         return;
 
   libvlc_audio_set_channel(_mp, 4);
 
 }
 
-void Player::setMute(bool mute){
-
+void Player::setMute(bool mute)
+{
     if(!_isplaying)
         return;
 
     libvlc_audio_set_mute(_mp, mute);
 }
 
-void Player::registerEvents(){
-
+void Player::registerEvents()
+{
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerEndReached,callback,this);
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerPaused,callback,this);
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerStopped,callback,this);
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerPositionChanged,callback,this);
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerEncounteredError,callback, this);
     libvlc_event_attach(m_eventMgr,libvlc_MediaPlayerPlaying,callback, this);
-
 }
 
-void Player::callback(const libvlc_event_t *event, void *ptr){
-
+void Player::callback(const libvlc_event_t *event, void *ptr)
+{
     Player * self = reinterpret_cast<Player*>(ptr);
 
     switch (event->type)
@@ -187,27 +183,25 @@ void Player::callback(const libvlc_event_t *event, void *ptr){
     }
 }
 
-int Player::volume(){
-    int vol = libvlc_audio_get_volume(_mp);
-    return vol;
+int Player::volume()
+{
+    return   libvlc_audio_get_volume(_mp);
 }
 
-int Player::position(){
-
+int Player::position()
+{
        float pos = libvlc_media_player_get_position(_mp);
-
         return (int)(pos * (float)(100));
 }
 
-int Player::getAudioChannel(){
-
+int Player::getAudioChannel()
+{
     return libvlc_audio_get_channel(_mp);
 }
 
-bool Player::isMute(){
-
+bool Player::isMute()
+{
     return libvlc_audio_get_mute(_mp);
-
 }
 
 Player::~Player()

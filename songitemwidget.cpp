@@ -4,7 +4,6 @@
 
 songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
-
     QHBoxLayout *main_layout = new QHBoxLayout;
     QVBoxLayout *sub_main_layout = new QVBoxLayout;
     setAutoFillBackground(1);
@@ -12,7 +11,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     label_title = new QLabel(this);
 
     QFont font_small;
-    font_small.setPointSize(10);
+    font_small.setPointSize(12);
 
     label_singer = new QLabel(this);
     label_singer->setFont(font_small);
@@ -34,18 +33,16 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     pal.setColor(QPalette::WindowText,Qt::yellow);
     setPalette(pal);
     setLayout(main_layout);
-
 }
 
-void songitemwidget::setSong(Song * _song){
-
+void songitemwidget::setSong(Song * _song)
+{
     song_ = _song;
-
     label_title->setText(song_->getTitle());
     label_singer->setText(song_->getSinger());
-
 }
 
-Song *songitemwidget::song(){
+Song *songitemwidget::song()
+{
     return song_;
 }

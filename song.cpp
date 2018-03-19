@@ -5,62 +5,82 @@ Song::Song(QObject *parent) : QObject(parent)
 
 }
 
-void Song::setTitle(QString _title){ 
+void Song::setTitle(QString _title)
+{
     titile = _title;
 }
 
-void Song::setId(int _id){    
+void Song::setId(int _id)
+{
     id = _id;
 }
 
-void Song::setSinger(QString _singer){
+void Song::setSinger(QString _singer)
+{
     singer = _singer;
 }
 
-void Song::setLanguage(QString _language){  
+void Song::setLanguage(QString _language)
+{
     language = _language;
 }
 
-void Song::setCategory(QString _category){
+void Song::setCategory(QString _category)
+{
     category = _category;    
 }
 
-void Song::setPath(QString _path){
+void Song::setPath(QString _path)
+{
     path =_path;    
 }
 
-void Song::setAudioChannel(audioChannel _audioChannel){
+void Song::setAudioChannel(QString _audioChannel)
+{
     audio_channel = _audioChannel;
 }
 
-int Song::getId(){
+int Song::getId()
+{
     return id;
 }
 
-QString Song::getTitle(){
+QString Song::getTitle()
+{
     return titile;
 }
 
-QString Song::getSinger(){
+QString Song::getSinger()
+{
     return singer;
 }
 
-QString Song::getLanguage(){
+QString Song::getLanguage()
+{
     return language;
 }
 
-QString Song::getgetCategory(){
+QString Song::getgetCategory()
+{
     return category;
 }
 
-QString Song::getPath(){
+QString Song::getPath()
+{
     return path;
 }
 
-Song::audioChannel Song::getAudioChannel(){
+QString Song::getAudioChannel()
+{
     return audio_channel;
 }
 
-void Song::setPlaytimes(int _playtimes){
+void Song::setPlaytimes(int _playtimes)
+{
     playtimes = _playtimes;
+}
+
+int Song::getPlayTimes()
+{
+    return playtimes;
 }

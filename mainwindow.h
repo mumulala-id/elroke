@@ -46,9 +46,7 @@
 class mainWindow : public QDialog
 {
     Q_OBJECT
-
 public:
-
     mainWindow(QWidget *parent = 0);
     ~mainWindow();
 
@@ -56,31 +54,26 @@ private :
     QComboBox *combo_cat;
     QTableView *table;
     ProxyModel *proxy_model;
-
     CLineEdit *le_search;
-
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
     Player *video;
     QSqlTableModel *sql_model;
-
     ListWidget *playlist_widget;
     ProgressCircle *circle;
-
     QString  app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-
     QString category1;
     QString category2;
     QString category3;
     QString category4;
     QString category5;
-    QLabel* clock;
-    QString background=":/usr/share/elroke/file/background/background.jpg";
+   // QLabel* clock;
+    QString background;
     QDesktopWidget *desktop = QApplication::desktop();
     int desktop_width = desktop->width();
     int desktop_height = desktop->height();
     QString channel;
-    bool lock_playlist;
+    bool lock_playlist=false;
     delay * m_worker;
     bool on_delay=false;
     Keyboard *keyboard;
@@ -88,9 +81,7 @@ private :
     QString userID;
     QString password;
     QString group_auth = "Authentication";
-
     Player *effect_player;
-
     opening *cover;
     QWidget *spacer;
     QPushButton *button_audio_channel;
@@ -100,8 +91,8 @@ private :
     CLineEdit * le_password;
     CLineEdit *le_password_confirm;
     QPointer <QDialog> dialog_admin=NULL;
-
-
+    QString c_font;
+    int font_size;
 
 private slots:
     void dialogAdmin();
@@ -114,29 +105,25 @@ private slots:
     void dialogNextSong();
     void createShortcut();
     void createWidgets();
-    void errorHandling();
     void setBackground();
-    void updateInterface();
     void moveItemToTop();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
-//    void setVolStepDown();
-//    void setVolStepUp();
     void setMute();
     void audioEffectInstance();
     void randomNumberInstance();
-    void setaudiochannelAuto();
     void setAudioChannelManual();
+    void setAudioChannelAuto();
     void addToPlaylist();
     void playPlayer();
     void getCategory();
     void dialogSavePlaylist();
-     void writePlaylist();
+    void writePlaylist();
     void writePlaylist(const QString &);//write func
     void dialogLoadPlaylist();
     void loadPlaylist();//DEFAULT
     void loadPlaylist(const QString &);
-     void delayHideWindow();
+    void delayHideWindow();
     void delayEvent();
     void tableRule();
     bool isKeyValid(int);
@@ -148,8 +135,8 @@ private slots:
     int getRandomNumber();
     void showHits();
     void moveItemToBottom();
-    Song *extractSong();
-
+    void updateInterface();
+    void readSettings();
 
 protected :
     void keyPressEvent(QKeyEvent *event);

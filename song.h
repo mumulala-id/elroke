@@ -19,7 +19,7 @@ private :
     QString path;
     QString language;
     QString category;
-    audioChannel audio_channel;
+    QString audio_channel;
     
     
 public slots:
@@ -31,14 +31,15 @@ public slots:
     void setCategory(QString);
     void setPath(QString);
     void setPlaytimes(int);
-    void setAudioChannel(audioChannel);
+    void setAudioChannel(QString);
     int getId();
     QString getTitle();
     QString getSinger();
     QString getLanguage();
     QString getgetCategory();
     QString getPath();
-    audioChannel getAudioChannel();
+    QString getAudioChannel();
+    int getPlayTimes();
     
     
 

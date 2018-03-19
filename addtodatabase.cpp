@@ -279,10 +279,10 @@ void addtodatabase::getItem(){
     model->clear();
 
     int row = 0;
-
     QDirIterator it(current_dir,supported_video, QDir::Files,getSubDirFlag());
 
-          while (it.hasNext()) {
+          while (it.hasNext())
+          {
               model->setRowCount(model->rowCount()+1);
                QString filename = it.next();
                QFileInfo info;

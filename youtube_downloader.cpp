@@ -65,6 +65,7 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
 
     QPushButton *button_get_path = new QPushButton(tr("Browse"));
     connect(button_get_path,&QPushButton::pressed,[this](){
+
         Dir = QFileDialog::getExistingDirectory(this, tr("Choose working directory"), QDir::homePath(), QFileDialog::ShowDirsOnly);
         if(!Dir.isEmpty()){
         dir_edit->setText(Dir);

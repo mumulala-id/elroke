@@ -8,7 +8,6 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
 {
     Q_UNUSED(parent)
 
-
     switch (contype) {
     case show:
         conname = "elroke_show";
@@ -20,70 +19,57 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
         conname = "elroke_add";
         break;
 
-
     }
 
     dbdir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    qDebug()<<dbdir;
     dbname = dbdir+"/elroke.db";
 
     db = QSqlDatabase::database(conname);
-//    QSqlQuery query(db);
     db.setDatabaseName(dbname);
-
 }
 
 void dbmanager::connectToDB(){
 
-    if(!QFile(dbname).exists()){
-
+    if(!QFile(dbname).exists())
+    {
         restoreDB();
-
     }
-    else{
-
+    else
+    {
         openDB();
     }
-
 }
 
-bool dbmanager::restoreDB(){
-
+bool dbmanager::restoreDB()
+{
     if(!QDir(dbdir).exists())
         QDir().mkpath(dbdir);
 
-    if(openDB()){
-
-        if(!createTable()){
+    if(openDB())
+    {
+        if(!createTable())
+        {
             qDebug()<<"cant create table"<<db.lastError();
             return false;
         }
         return true;
-
     }
-
         return false;
-
 }
 
 bool dbmanager::openDB(){
 
-  if(!db.open()){
+  if(!db.open())
+  {
       qDebug()<<"Database not open"<<db.lastError();
       return false;
   }
-
   return true;
-
 }
 
-
-bool dbmanager::createTable(){
-
-QSqlQuery query(db);
-
-//create playlist table
-
+bool dbmanager::createTable()
+{
+    QSqlQuery query(db);
     query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT)");
 
     if(query.exec()){
@@ -92,39 +78,36 @@ QSqlQuery query(db);
     }
     qDebug()<<"table not created";
     return false;
-
-
 }
 
-void dbmanager::closeDB(){
-
+void dbmanager::closeDB()
+{
     db.close();
 }
-void dbmanager::prepare(){
-
+void dbmanager::prepare()
+{
     db.transaction();
 }
 
-
-void dbmanager::submit(){
+void dbmanager::submit()
+{
     db.commit();
 }
 
-
-QString dbmanager::dbName(){
+QString dbmanager::dbName()
+{
     return dbname;
-
 }
 
-void dbmanager::rollBack(){
+void dbmanager::rollBack()
+{
     db.rollback();
 }
 
-bool dbmanager::insertIntoTable(const QVariantList &data){
-
+bool dbmanager::insertIntoTable(const QVariantList &data)
+{
     QSqlQuery  query(db);
-
-   query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path , :Date)");
+    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path , :Date)");
 
      query.bindValue(":Title", data[0].toString());
      query.bindValue(":Singer", data[1].toString());
@@ -138,22 +121,21 @@ bool dbmanager::insertIntoTable(const QVariantList &data){
      if(!query.exec())
          return false;
      return true;
-
 }
 
-void dbmanager::updatePlayedTime(int id){
-
+void dbmanager::updatePlayedTime(int id)
+{
     QSqlQuery query(db);
-  int value=0;
+    int value=0;
     query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+QString::number(id));
 
-    if(query.exec()){
+    if(query.exec())
+    {
         query.first();
-          value = query.value(0).toInt()+1;
+        value = query.value(0).toInt()+1;
     }
     query.clear();
-    prepare();
-
+    this->prepare();
     query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+QString::number(id));
     if(!query.exec())
         qDebug()<<"cant update played time";
@@ -161,13 +143,11 @@ void dbmanager::updatePlayedTime(int id){
         submit();
 
     query.clear();
-
 }
 
 Song* dbmanager::getSong(int id)
 {
-    QSqlQuery query(db);
-    
+    QSqlQuery query(db); 
     QSqlRecord rec;
     query.prepare("SELECT * FROM ELROKE123 WHERE ID="+QString::number(id));
     
@@ -187,22 +167,7 @@ Song* dbmanager::getSong(int id)
     the_song->setCategory(rec.value(4).toString());
     the_song->setPlaytimes(rec.value(6).toInt());
     the_song->setPath(rec.value(7).toString());
-    QString channel = rec.value(5).toString();
-
-if(QString::compare(channel, "LEFT", Qt::CaseInsensitive)==0){
-
-    the_song->setAudioChannel(Song::audioChannel::left);
-
-}
-else if(QString::compare(channel, "RIGHT", Qt::CaseInsensitive)==0){
- the_song->setAudioChannel(Song::audioChannel::right);
-}
- else{
-     the_song->setAudioChannel(Song::audioChannel::stereo);
-
-}
+    the_song->setAudioChannel(rec.value(5).toString());
 
     return the_song;
-    
-    
 }
