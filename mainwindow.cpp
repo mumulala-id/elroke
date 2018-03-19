@@ -185,9 +185,6 @@ void mainWindow::createWidgets(){
     table->horizontalHeader()->setPalette(header_palette);
     table->setPalette(table_palette);
 
-//    QHeaderView *horizontal = table->horizontalHeader();
-//    horizontal->set
-
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
     vertical->setDefaultSectionSize(vertical->fontMetrics().height()+10);
