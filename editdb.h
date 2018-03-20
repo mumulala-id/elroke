@@ -8,12 +8,10 @@
 #include <QDialog>
 #include <QListWidget>
 #include <QStandardPaths>
-//#include <QLineEdit>
 #include <QTableView>
 #include <QLabel>
 #include <QSqlTableModel>
 #include <QComboBox>
-
 
 class managedb : public QDialog
 {

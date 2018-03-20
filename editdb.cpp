@@ -39,7 +39,7 @@ managedb::managedb(QWidget *parent) :
 
     QHBoxLayout *lo_top = new QHBoxLayout;
 
-    QGroupBox *grup_singer = new QGroupBox(tr("Singer"), this);
+   auto *grup_singer = new QGroupBox(tr("Singer"), this);
 
    list_singer = new QListWidget(this);
     list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
@@ -51,7 +51,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_singer->addWidget(list_singer);
     grup_singer->setLayout(lo_grup_singer);
 
-    QGroupBox *grup_language = new QGroupBox(tr("Language"), this);
+   auto *grup_language = new QGroupBox(tr("Language"), this);
 
     list_language = new QListWidget(this);
     list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
@@ -61,7 +61,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_language->addWidget(list_language);
     grup_language->setLayout(lo_grup_language);
 
-     QGroupBox *grup_genre = new QGroupBox(tr("Category"), this);
+    auto *grup_genre = new QGroupBox(tr("Category"), this);
     list_genre = new QListWidget(this);
     list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
@@ -71,7 +71,7 @@ managedb::managedb(QWidget *parent) :
     lo_grup_genre->addWidget(list_genre);
     grup_genre->setLayout(lo_grup_genre);
 
-    QGroupBox *grup_folder = new QGroupBox(tr("Path"), this);
+   auto *grup_folder = new QGroupBox(tr("Path"), this);
     list_folder = new QListWidget(this);
     list_folder->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/path"));
     connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
@@ -213,7 +213,7 @@ managedb::managedb(QWidget *parent) :
 
 //right bottom
     QHBoxLayout *lo_search = new QHBoxLayout;
-   combo_search = new QComboBox(this);
+    combo_search = new QComboBox(this);
     combo_search->addItem(tr("Title"));
     combo_search->addItem(tr("Singer"));
     connect(combo_search,SIGNAL(activated(int)),this,SLOT(comboSearchChange(int)));
@@ -316,67 +316,63 @@ managedb::managedb(QWidget *parent) :
 
 }
 
-void managedb::swapTitleSinger(){
-
+void managedb::swapTitleSinger()
+{
     swapItem(1,2);
     anyChange=true;
 }
 
-void managedb::swapItem(int column1, int column2){
-
+void managedb::swapItem(int column1, int column2)
+{
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
 
-    foreach (QModelIndex indexes, list_selected) {
+    foreach (QModelIndex indexes, list_selected)
+    {
         int r =  proxy_model->mapToSource( indexes).row();
-
         QString data1 = sql_model->index(r,column1).data().toString();
         QString data2 = sql_model->index(r,column2).data().toString();
         sql_model->setData(sql_model->index(r, column1), data2);
         sql_model->setData(sql_model->index(r, column2), data1);
-
     }
-
 }
 
-void managedb::swapSingerLanguage(){
-
+void managedb::swapSingerLanguage()
+{
     swapItem(2,3);
     anyChange=true;
 }
 
-void managedb::swapTitleLanguage(){
-
+void managedb::swapTitleLanguage()
+{
    swapItem(1,3);
    anyChange=true;
-
 }
-void managedb::swapSingerCategory(){
-
+void managedb::swapSingerCategory()
+{
    swapItem(2,4);
    anyChange=true;
-
 }
 
-void managedb::swapTitleCategory(){
+void managedb::swapTitleCategory()
+{
     swapItem(1,4);
     anyChange=true;
 }
 
-void managedb::swapLanguageCategory(){
-
+void managedb::swapLanguageCategory()
+{
     swapItem(3,4);
     anyChange=true;
 }
 
-void managedb::setitem(QString text, int column){
-
+void managedb::setitem(QString text, int column)
+{
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
-    int r=0;
-
-    foreach (QModelIndex indexes, list_selected) {
+    unsigned short  int r=0;
+    foreach (QModelIndex indexes, list_selected)
+    {
         r =  proxy_model->mapToSource( indexes).row();
         sql_model->setData(sql_model->index(r, column), text);
-
     }
 
    QModelIndex index = table->indexAt(QPoint(0,0));
@@ -384,21 +380,22 @@ void managedb::setitem(QString text, int column){
        proxy_model->reset();
 }
 
-void managedb::setTitle(){
-
+void managedb::setTitle()
+{
     if(!le_set_title->text().isEmpty())
     setitem(le_set_title->text(), 1);
     anyChange=true;
-
 }
-void managedb::setSinger(){
 
+void managedb::setSinger()
+{
     if(!le_set_singer->text().isEmpty())
     setitem(le_set_singer->text(), 2);
     anyChange=true;
 }
-void managedb::setLanguage(){
 
+void managedb::setLanguage()
+{
     if(!le_set_language->text().isEmpty())
     setitem(le_set_language->text(), 3);
     anyChange=true;
@@ -411,26 +408,26 @@ void managedb::setCategory(){
 
 }
 
-void managedb::setAudioChannel(){
-
+void managedb::setAudioChannel()
+{
     setitem(combo_audio_channel->currentText(),5);
     anyChange=true;
-
 }
 
-
-void managedb::deleteItem(){
-
+void managedb::deleteItem()
+{
     setCursor(Qt::WaitCursor);
 
     QModelIndexList listInd =  table->selectionModel()->selectedRows();
-    if(listInd.size()==sql_model->rowCount()){
-
+    if(listInd.size()==sql_model->rowCount())
+    {
         QMessageBox::StandardButton warning;
         warning = QMessageBox::question(this, "Warning!", "Are you sure want to delete all item?",
                                         QMessageBox::Yes | QMessageBox::No);
-        if(warning==QMessageBox::Yes){
-            foreach (QModelIndex ind, listInd) {
+        if(warning==QMessageBox::Yes)
+        {
+            foreach (QModelIndex ind, listInd)
+            {
                 table->hideRow(proxy_model->mapToSource(ind).row());
                 sql_model->removeRow(proxy_model->mapToSource(ind).row());
             }
@@ -438,30 +435,29 @@ void managedb::deleteItem(){
         else
         {
             setCursor(Qt::ArrowCursor);
-        return;
+            return;
         }
     }
-    else{
-
-    foreach (QModelIndex ind, listInd) {
-        int visible_row = ind.row();//visble row on table
-        int row = proxy_model->mapToSource(ind).row();//real row
-
-        table->hideRow(visible_row);// need to hiding row first, deleted row will disappear after submit.
-        sql_model->removeRow(row);
-    }
-}
+    else
+    {
+        foreach (QModelIndex ind, listInd)
+        {
+            int visible_row = ind.row();//visble row on table
+            int row = proxy_model->mapToSource(ind).row();//real row
+            table->hideRow(visible_row);// need to hiding row first, deleted row will disappear after submit.
+            sql_model->removeRow(row);
+        }
+      }
     QModelIndex index = table->indexAt(QPoint(0,0));
     if(!index.isValid())
         proxy_model->reset();
+
     anyChange=true;
     setCursor(Qt::ArrowCursor);
 }
 
-
-
-void managedb::save(){
-
+void managedb::save()
+{
     if(!anyChange)
         return;
 
@@ -474,18 +470,14 @@ void managedb::save(){
     updateList();
 }
 
-
-void managedb::onListWidgetClicked(QListWidgetItem *item){
-
+void managedb::onListWidgetClicked(QListWidgetItem *item)
+{
     setCursor(Qt::WaitCursor);
-
     table->clearSelection();
-
     QObject *obj = sender();
     QString text=item->text();
 
     int column=0;
-
     if (obj==list_singer)
         column=1;
     else if(obj==list_language)
@@ -506,8 +498,8 @@ void managedb::onListWidgetClicked(QListWidgetItem *item){
 
 }
 
-void managedb::updateList(){
-
+void managedb::updateList()
+{
     setCursor(Qt::WaitCursor);
 
     //QSET FOR REMOVE DUPPLICATE
@@ -516,23 +508,20 @@ void managedb::updateList(){
     QSet<QString>set_category;
     QSet<QString>set_folder;
 
-    for(int i=0; i<sql_model->rowCount(); i++){
-
+    for(int i=0; i<sql_model->rowCount(); i++)
+    {
         set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString().toUpper());
-         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
-          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
-          QFileInfo info;
-          info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
-           set_folder.insert(info.path());
-
-
+        set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
+        set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
+        QFileInfo info;
+        info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
+        set_folder.insert(info.path());
     }
 
     QList<QString>singer= set_singer.toList();
     QList<QString>lang = set_language.toList();
     QList<QString>cat = set_category.toList();
     QList<QString>path= set_folder.toList();
-
 
     //SORT LIST
     qSort(singer.begin(), singer.end());
@@ -550,7 +539,6 @@ void managedb::updateList(){
     list_folder->addItems(path);
 
     setCursor(Qt::ArrowCursor);
-
 }
 
 managedb::~managedb(){
@@ -560,15 +548,14 @@ managedb::~managedb(){
     QSet<QString>set_category;
     QSet<QString>set_folder;
 
-    for(int i=0; i<sql_model->rowCount(); i++){
-
+    for(int i=0; i<sql_model->rowCount(); i++)
+    {
         set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString().toUpper());
-         set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
-          set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
-          QFileInfo info;
-          info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
-           set_folder.insert(info.path());
-
+        set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
+        set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
+        QFileInfo info;
+        info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
+        set_folder.insert(info.path());
     }
 
     QList<QString>singer= set_singer.toList();
@@ -582,9 +569,9 @@ managedb::~managedb(){
     qSort(path.begin(), path.end());
 
     writeTextStream(app_dir+"/meta/singer", singer);
-     writeTextStream (app_dir+"/meta/language", lang);
-      writeTextStream(app_dir+"/meta/category", cat);
-       writeTextStream(app_dir+"/meta/path", path);
+    writeTextStream (app_dir+"/meta/language", lang);
+    writeTextStream(app_dir+"/meta/category", cat);
+    writeTextStream(app_dir+"/meta/path", path);
 }
 
 void managedb::writeTextStream(const QString &file, QList<QString>set){
@@ -608,19 +595,22 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
          f.close();
 }
 
-void managedb::selectedCount(){
+void managedb::selectedCount()
+{
     QModelIndexList list = table->selectionModel()->selectedRows();
     selected_count_label->setText(QString::number(list.count()));
 }
 
-void managedb::dclose(){
-
-    if(anyChange){
-    QMessageBox::StandardButton warning;
-    warning = QMessageBox::question(this,tr( "Warning"),tr("Change not save yet. Save?"), QMessageBox::Yes | QMessageBox::No);
-    if(warning==QMessageBox::Yes){
-      sql_model->submitAll();
-    }
+void managedb::dclose()
+{
+    if(anyChange)
+    {
+        QMessageBox::StandardButton warning;
+        warning = QMessageBox::question(this,tr( "Warning"),tr("Change not save yet. Save?"), QMessageBox::Yes | QMessageBox::No);
+        if(warning==QMessageBox::Yes)
+        {
+          sql_model->submitAll();
+        }
     }
 
     close();

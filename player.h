@@ -2,37 +2,39 @@
 #define PLAYER_H
 
 #include "vlc/vlc.h"
+#include <QObject>
 #include <QWidget>
 #include <QTimer>
 #include <QEvent>
 #define POSITION_RESOLUTION 10000
 
-class Player : public QWidget
+class Player : public QObject
 {
     Q_OBJECT
 
     QString filename;
     QTimer *poller;
-    bool _isplaying;
-    bool _isPausing;
+
     libvlc_instance_t *_vlcinstance;
     libvlc_media_player_t *_mp;
     libvlc_media_t *_m;
     bool replay=false;
+    bool _isplaying=false;
+    bool _isPausing=false;
     libvlc_event_manager_t *m_eventMgr;
 
 public:
-    Player(QWidget *parent = 0);
+    Player(QObject *parent = 0);
     ~Player();
 
 public slots:
     void setFile(QString file);
+    QString getFile();
     void play();
     void pause();
     void stop();
     void setMute(bool mute);
-    bool isMute();
-    QString getFile();
+    bool isMute();    
     void signalAlmostEnd();
     void setVolume(int newVolume);
     void changePosition(int newPosition);
@@ -44,13 +46,11 @@ public slots:
     int getAudioChannel();
     bool isPlaying(){return _isplaying;}
     bool isPausing(){return _isPausing;}
-
+    void setWinId(WId _wid);
     //event manager
     void registerEvents();
-
     //event handler callback
     static void callback(const libvlc_event_t* event, void *ptr);
-
 
 signals:
     void reachEnded();

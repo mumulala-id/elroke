@@ -30,7 +30,8 @@ HEADERS  += mainwindow.h \
     ProgressCircle.h \
     listwidget.h \
     youtube_downloader.h \
-    preferences.h
+    preferences.h \
+    videowidget.h
 
 
 SOURCES += main.cpp\
@@ -50,7 +51,8 @@ SOURCES += main.cpp\
     ProgressCircle.cpp \
     listwidget.cpp \
     youtube_downloader.cpp \
-    preferences.cpp
+    preferences.cpp \
+    videowidget.cpp
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

@@ -8,18 +8,11 @@ class Song : public QObject
     Q_OBJECT
     
 public:
-    enum audioChannel{left,right,stereo};
-
     explicit Song(QObject *parent = nullptr);
 
 private :
-    int id;
-    QString titile,singer;
-    int playtimes;
-    QString path;
-    QString language;
-    QString category;
-    QString audio_channel;
+    unsigned int id, playtimes;
+    QString titile,singer, path,language, category, audio_channel;
     
     
 public slots:
@@ -32,14 +25,14 @@ public slots:
     void setPath(QString);
     void setPlaytimes(int);
     void setAudioChannel(QString);
-    int getId();
+   unsigned int getId();
     QString getTitle();
     QString getSinger();
     QString getLanguage();
     QString getgetCategory();
     QString getPath();
     QString getAudioChannel();
-    int getPlayTimes();
+   unsigned int getPlayTimes();
     
     
 

@@ -7,24 +7,18 @@
 class Keyboard : public QWidget
 {
     Q_OBJECT
-
 public:
     explicit Keyboard(QWidget *parent = 0);
     ~Keyboard();
     void showKeyboard(QPoint);
 
-
 private:
-
-         QPushButton *keyButton[36];
-         bool lowerCase=0;
+     QPushButton *keyButton[36];
+     bool lowerCase=0;
 
 private slots:
     QPushButton *createButton(const QString &);
     void onButtonClicked();
-
-
-
 };
 
 #endif // WIDGET_H

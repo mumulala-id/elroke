@@ -1,7 +1,7 @@
 #include "player.h"
 #include<QDebug>
 
-Player::Player(QWidget *parent) : QWidget(parent)
+Player::Player(QObject *parent) : QObject(parent)
 {
     const char * const vlc_args[] = {
      //   "--verbose=2",
@@ -19,13 +19,6 @@ Player::Player(QWidget *parent) : QWidget(parent)
     m_eventMgr = libvlc_media_player_event_manager(_mp);
     registerEvents();
 
-   QPalette pal;
-   pal.setColor(QPalette::Background,Qt::black);
-   pal.setColor(QPalette::Foreground,Qt::white);
-   setPalette(pal);
-
-   setWindowFlags( Qt::FramelessWindowHint);
-   setWindowState(Qt::WindowFullScreen);
    poller->start(1000);
 }
 
@@ -51,8 +44,6 @@ void Player::play()
     {
         _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
         libvlc_media_player_set_media(_mp, _m);
-        int winid = this->winId();
-        libvlc_media_player_set_xwindow(_mp, winid );
         libvlc_media_player_play(_mp);
         _isplaying=1;
         _isPausing=0;
@@ -72,7 +63,8 @@ void Player::pause()
     _isPausing=true;
 }
 
-void Player::stop(){
+void Player::stop()
+{
     _isplaying=false;
     libvlc_media_player_stop(_mp);
     poller->stop();
@@ -124,25 +116,19 @@ void Player::setAudioChannelStereo()
 
 void Player::setAudioChannelLeft()
 {
-    if(!_isplaying)
-        return;
-
+    if(!_isplaying)        return;
     libvlc_audio_set_channel(_mp, 3);
 }
 
-void Player::setAudioChannelRight(){
-  if(!_isplaying)
-        return;
-
-  libvlc_audio_set_channel(_mp, 4);
-
+void Player::setAudioChannelRight()
+{
+    if(!_isplaying)        return;
+    libvlc_audio_set_channel(_mp, 4);
 }
 
 void Player::setMute(bool mute)
 {
-    if(!_isplaying)
-        return;
-
+    if(!_isplaying)        return;
     libvlc_audio_set_mute(_mp, mute);
 }
 
@@ -217,4 +203,9 @@ Player::~Player()
     libvlc_media_player_release(_mp);
     libvlc_release(_vlcinstance);
 
+}
+
+void Player::setWinId(WId _wid)
+{
+    libvlc_media_player_set_xwindow(_mp, _wid );
 }

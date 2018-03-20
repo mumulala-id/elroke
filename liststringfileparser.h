@@ -21,7 +21,8 @@ public:
             return list;
         }
 
-        if(!f.open(QIODevice::ReadOnly | QIODevice::Text)){
+        if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
+        {
             qDebug()<<"cant read singer";
         }
 
@@ -37,7 +38,6 @@ public:
         qSort(list.begin(), list.end());
             return list;
     }
-
 };
 
 #endif // LISTFILEPARSER_H

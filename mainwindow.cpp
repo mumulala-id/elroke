@@ -59,11 +59,7 @@ mainWindow::mainWindow(QWidget *parent)
 
 
     getCategory();
-//dialogNextSong();
     setWindowFlags(Qt::FramelessWindowHint);
-  // setAttribute( Qt::AA_EnableHighDpiScaling);
-
-
 }
 
 void mainWindow::createWidgets(){
@@ -365,10 +361,10 @@ void mainWindow::createWidgets(){
      button_vol_down->setIconSize(QSize(24,24));
      connect(button_vol_down,&QPushButton::pressed,[this]()
      {
-         if(video->volume()<5)
-              video->setVolume(0);
+         if(video->player()->volume()<5)
+              video->player()->setVolume(0);
          else
-         video->setVolume(video->volume()-5);
+         video->player()->setVolume(video->player()->volume()-5);
      });
 
      slider_vol = new QSlider(Qt::Horizontal, this);
@@ -382,10 +378,10 @@ void mainWindow::createWidgets(){
      button_vol_up->setFlat(1);
      connect(button_vol_up,&QPushButton::pressed,[this]()
      {
-         if(video->volume()>95)
-             video->setVolume(100);
+         if(video->player()-> volume()>95)
+             video->player()->setVolume(100);
          else
-          video->setVolume(video->volume()+5);
+          video->player()->setVolume(video->player()->volume()+5);
      });
 
      button_audio_mute = new QPushButton(QIcon(":/usr/share/elroke/file/icon/unmute.png"),"", this);
@@ -394,17 +390,17 @@ void mainWindow::createWidgets(){
      button_audio_mute->setFlat(1);
      connect(button_audio_mute,&QPushButton::pressed,[this]()
      {
-         if(!video->isPlaying())
+         if(!video->player()->isPlaying())
              return;
 
-         if(video->isMute())
+         if(video->player()->isMute())
          {
-             video->setMute(0);
+             video->player()->setMute(0);
              button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/unmute.png"));
          }
          else
          {
-             video->setMute(1);
+             video->player()->setMute(1);
              button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/mute.png"));
          }
      });
@@ -445,7 +441,6 @@ void mainWindow::createWidgets(){
     layout_main->setMargin(0);
     layout_main->setSpacing(0);
     setLayout(layout_main);
-
 }
 
 void mainWindow::createShortcut(){
@@ -456,22 +451,6 @@ void mainWindow::createShortcut(){
 }
 void mainWindow::getCategory(){
 //QList <QString> s = listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category");
-}
-
-void mainWindow::setMute()
-{
-    if(!video->isPlaying())
-        return;
-
-    if(video->isMute()){
-        video->setMute(0);
-        button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/unmute.png"));
-    }
-
-    else{
-        video->setMute(1);
-         button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/mute.png"));
-    }
 }
 
 void mainWindow::addToPlaylist()
@@ -496,21 +475,25 @@ void mainWindow::addToPlaylist()
 void mainWindow::keyPressEvent(QKeyEvent *event){
 
   //IF USER TYPE USER TYPE NUMBER OR ALPHABET DIRECT TO LINEEDIT SEARCH
-    if(isKeyValid(event->key())){
+    if(isKeyValid(event->key()))
+    {
         le_search->setFocus();
         le_search->setText(event->text());
     }
 
-        if(event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return){
-            //send item to playlist with enter key
-            if(focusWidget()==table){
-                addToPlaylist();
-            }
-            //play item with enter key
-            else if(focusWidget()==playlist_widget){
-                playPlayer();
-            }
+    if(event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return)
+    {
+        //send item to playlist with enter key
+        if(focusWidget()==table)
+        {
+            addToPlaylist();
         }
+        //play item with enter key
+         else if(focusWidget()==playlist_widget)
+        {
+            playPlayer();
+        }
+    }
 
         //move focus widget from table to playlist with right key
         else if(event->key()==Qt::Key_Right && qApp->focusWidget()==table)
@@ -524,10 +507,12 @@ void mainWindow::keyPressEvent(QKeyEvent *event){
             table->setFocus();
         }
 
-        if(event->key()==Qt::Key_Backspace){
+        if(event->key()==Qt::Key_Backspace)
+        {
             if(le_search->text().isEmpty())
                 return;
-            else{
+            else
+            {
                 le_search->setFocus();
                 le_search->backspace();
             }
@@ -592,9 +577,9 @@ void mainWindow::playPlayer()
     }
 
 ////STOP IF PLAYING
-            if(video->isPlaying())
+            if(video->player()->isPlaying())
             {
-                video->stop();
+                video->player()->stop();
             }
            songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 //qDebug()<<"setelah item eidget";
@@ -614,31 +599,29 @@ void mainWindow::playPlayer()
                message.setStandardButtons(QMessageBox::Close);
                message.setAutoFillBackground(1);
                message.exec();
-
                return;
            }
 
-    video->setFile(file);
+    video->player()->setFile(file);
     cover->setData(title, singer);
     cover->start();
 
     db->updatePlayedTime(id);
     sql_model->select();
 
-            if(lock_playlist)
-            {
-               moveItemToBottom();
-            }
-            else
-            {
-                qDeleteAll(playlist_widget->selectedItems());
-            }
+    if(lock_playlist)
+    {
+       moveItemToBottom();
+    }
+    else
+    {
+        qDeleteAll(playlist_widget->selectedItems());
+    }
 
-            if(playlist_widget->count()>1)
-            {
-                playlist_widget->setCurrentRow(0);
-            }
-
+    if(playlist_widget->count()>1)
+    {
+        playlist_widget->setCurrentRow(0);
+    }
 }
 
 void mainWindow::dialogNextSong()
@@ -669,11 +652,11 @@ void mainWindow::dialogNextSong()
     notif->setWindowFlags(Qt::FramelessWindowHint);
     notif->setPalette(let);
     notif->setFont(f);
+    notif->layout()->setMargin(6);
     notif->adjustSize();
     notif->move((desktop_width-notif->width())/2,0);
     notif->setAttribute(Qt::WA_DeleteOnClose);
     QTimer::singleShot(5000, notif, SLOT(close()));
-//    setParent(QApplication::activeWindow());
     notif->show();
 }
 
@@ -776,14 +759,11 @@ void mainWindow::dialogSavePlaylist()
 void mainWindow::dialogLoadPlaylist(){
 
     auto *dialog_load_playlist = new QDialog;
-        dialog_load_playlist->setParent(this);
+    dialog_load_playlist->setParent(this);
 
     QDirIterator it(app_dir+"/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
-
     QList<QString> list_play;
-
     QFileInfo info;
-
     while(it.hasNext())
     {
         info.setFile(it.next());
@@ -800,7 +780,6 @@ void mainWindow::dialogLoadPlaylist(){
     layout_main->addWidget(new QLabel("Load Playlist :", dialog_load_playlist));
 
     auto *layout_btn = new QHBoxLayout;
-
     auto *btn_cancel = new QPushButton("Cancel", dialog_load_playlist);
     connect(btn_cancel,SIGNAL(clicked(bool)),dialog_load_playlist,SLOT(close()));
 
@@ -819,7 +798,6 @@ void mainWindow::dialogLoadPlaylist(){
     dialog_load_playlist->setWindowFlags(Qt::FramelessWindowHint);
     dialog_load_playlist->setAutoFillBackground(1);
     dialog_load_playlist->setAttribute(Qt::WA_DeleteOnClose);
-
     dialog_load_playlist->setMinimumSize(300,200);
 
     connect(dialog_load_playlist,&QDialog::accepted,[this,_list](){
@@ -914,8 +892,8 @@ void mainWindow::loadPlaylist(const QString &s)
 
 QRegion mainWindow::getMaska()
 {
-    int   free_top_point = spacer->mapToGlobal(spacer->rect().topLeft()).y();
-    int   free_bottom_point = spacer->mapToGlobal( spacer->rect().bottomLeft()).y();
+    unsigned short int   free_top_point = spacer->mapToGlobal(spacer->rect().topLeft()).y();
+    unsigned short int   free_bottom_point = spacer->mapToGlobal( spacer->rect().bottomLeft()).y();
     QRegion r(0,free_top_point,desktop_width,free_bottom_point-free_top_point, QRegion::Rectangle);
     QRegion desk (0,0, desktop_width, desktop_height, QRegion::Rectangle);
     return desk.subtracted(r);
@@ -923,17 +901,17 @@ QRegion mainWindow::getMaska()
 
 void mainWindow::setAudioChannelManual()
 {
-    switch(video->getAudioChannel()){
+    switch(video->player()->getAudioChannel()){
     case 1://stereo
-        video->setAudioChannelRight();
+        video->player()->setAudioChannelRight();
         button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
         break;
     case 3://left
-        video->setAudioChannelStereo();
+        video->player()->setAudioChannelStereo();
         button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/stereo.png"));
         break;
     case 4://right
-        video->setAudioChannelLeft();
+        video->player()->setAudioChannelLeft();
         button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
        break;
     }
@@ -995,23 +973,40 @@ void mainWindow::showKeyboard(bool x)
 
 void mainWindow::videoInstance(){
     //video player
-    video = new Player;
+    video = new VideoWidget;
     video->hide();
     video->installEventFilter(this);
-    connect(video,SIGNAL(positionChanged()),this,SLOT(updateInterface()));
-    connect(video,SIGNAL(reachEnded()),this,SLOT(videoEnds()));
-    connect(video,SIGNAL(almostEnded()),this,SLOT(dialogNextSong()));
-    connect(video,SIGNAL(playing()),this,SLOT(setAudioChannelAuto()));
+    connect(video->player(),SIGNAL(positionChanged()),this,SLOT(updateInterface()));
+    connect(video->player(),SIGNAL(reachEnded()),this,SLOT(videoEnds()));
+    connect(video->player(),SIGNAL(almostEnded()),this,SLOT(dialogNextSong()));
+    connect(video->player(),SIGNAL(playing()),this,SLOT(setAudioChannelAuto()));
+//    connect(video,&Player::playing,[this](){
+//        qDebug()<<"channel";
+//        QTimer::singleShot(1000,[this](){
+//            if(channel.contains("LEFT", Qt::CaseInsensitive))
+//            {
+//                video->setAudioChannelLeft();
+//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
+//                        qDebug()<<"channel1";
+//            }
+//            else if(channel.contains("RIGHT", Qt::CaseInsensitive))
+//            {
+//                video->setAudioChannelRight();
+//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
+//                        qDebug()<<"channel2";
+//            }
+//        });
+//    });
 
-    connect(video,&Player::error,[this]()
+    connect(video->player(),&Player::error,[this]()
     {
         QMessageBox error_message(this);// = new QMessageBox(this);
-        error_message.setInformativeText("Error playing "+video->getFile());
+        error_message.setInformativeText("Error playing "+video->player()->getFile());
         error_message.show();
         QTimer::singleShot(3000,&error_message,SLOT(deleteLater()));
     });
 //    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
-    connect(slider_vol,&QSlider::sliderMoved,video,&Player::setVolume);
+    connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
 }
 
 void mainWindow::keyBoardInstance()
@@ -1174,7 +1169,8 @@ void mainWindow::dialogCreateAdmin()
 
 void mainWindow::dialogLogin()
 {
-    if(dialog_admin!=NULL) {
+    if(dialog_admin!=NULL)
+    {
         return;
     }
 
@@ -1182,7 +1178,6 @@ void mainWindow::dialogLogin()
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     le_userName = new CLineEdit(dialog);
-
     le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
 
@@ -1274,13 +1269,7 @@ void mainWindow::showHits(){
 //proxy_model->setSortRole(ProxyModel::sortRole);
 proxy_model->sort(6,Qt::AscendingOrder);
 }
-mainWindow::~mainWindow()
-{
-    delete video;
-    delete cover;
-    if(autosave_playlist->isChecked())
-        writePlaylist();
-}
+
 
 int mainWindow::getRandomNumber(){
 //    max 100 min 55
@@ -1323,7 +1312,7 @@ void mainWindow::videoEnds(){
 void mainWindow::audioEffectInstance()
 {
     effect_player = new Player(this);
-    effect_player->setVisible(0);
+//    effect_player->setVisible(0);
 }
 
 void mainWindow::randomNumberInstance(){
@@ -1335,7 +1324,7 @@ void mainWindow::openingInstance()
 {
     cover = new opening();
     connect(cover,SIGNAL(passed()),video,SLOT(show()));
-    connect(cover,SIGNAL(passed()),video,SLOT(play()));
+    connect(cover,SIGNAL(passed()),video->player(),SLOT(play()));
 }
 
 void mainWindow::moveItemToBottom()
@@ -1370,21 +1359,23 @@ void mainWindow::moveItemToBottom()
          qDeleteAll(playlist_widget->selectedItems());
          playlist_widget->setCurrentRow(playlist_widget->count()-1);
 }
-void mainWindow::updateInterface(){
-    circle->setValue(video->position());
-    slider_vol->setSliderPosition(video->volume());
+void mainWindow::updateInterface()
+{
+    circle->setValue(video->player()->position());
+    slider_vol->setSliderPosition(video->player()->volume());
 }
 void mainWindow::setAudioChannelAuto()
 {
 //wait video fully load
     this_thread::sleep_for(chrono::milliseconds(500));
 
+
     if(channel.contains("LEFT", Qt::CaseInsensitive)){
-        video->setAudioChannelLeft();
+        video->player()->setAudioChannelLeft();
         button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
     }
     else if(channel.contains("RIGHT", Qt::CaseInsensitive)){
-        video->setAudioChannelRight();
+        video->player()->setAudioChannelRight();
         button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
     }
 }
@@ -1401,4 +1392,12 @@ void mainWindow::readSettings(){
     font_size = setting.value("font_size").toInt();
     if(font_size==0) font_size=16;
     setting.endGroup();
+}
+
+mainWindow::~mainWindow()
+{
+    delete video;
+    delete cover;
+    if(autosave_playlist->isChecked())
+        writePlaylist();
 }

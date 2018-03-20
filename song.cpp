@@ -40,7 +40,7 @@ void Song::setAudioChannel(QString _audioChannel)
     audio_channel = _audioChannel;
 }
 
-int Song::getId()
+unsigned int Song::getId()
 {
     return id;
 }
@@ -80,7 +80,7 @@ void Song::setPlaytimes(int _playtimes)
     playtimes = _playtimes;
 }
 
-int Song::getPlayTimes()
+unsigned int Song::getPlayTimes()
 {
     return playtimes;
 }

@@ -29,6 +29,7 @@
 #include "songitemwidget.h"
 #include "ProgressCircle.h"
 #include "listwidget.h"
+#include "videowidget.h"
 
 #include <QApplication>
 #include <QDialog>
@@ -57,7 +58,7 @@ private :
     CLineEdit *le_search;
     QSlider *slider_vol;
     QPushButton *button_audio_mute;
-    Player *video;
+    VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;
     ProgressCircle *circle;
@@ -67,7 +68,6 @@ private :
     QString category3;
     QString category4;
     QString category5;
-   // QLabel* clock;
     QString background;
     QDesktopWidget *desktop = QApplication::desktop();
     unsigned short int desktop_width = desktop->width();
@@ -78,17 +78,14 @@ private :
     bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;
-    QString userID;
-    QString password;
-//    QString group_auth = "Authentication";
+    QString userID, password;
     Player *effect_player;
     opening *cover;
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
     QAction *autosave_playlist;
-    CLineEdit * le_userName;
-    CLineEdit * le_password;
+    CLineEdit * le_userName, *le_password;
     CLineEdit *le_password_confirm;
     QPointer <QDialog> dialog_admin=NULL;
     QString c_font;
@@ -109,7 +106,7 @@ private slots:
     void moveItemToTop();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
-    void setMute();
+//    void setMute();
     void audioEffectInstance();
     void randomNumberInstance();
     void setAudioChannelManual();
