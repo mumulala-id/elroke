@@ -59,7 +59,7 @@ mainWindow::mainWindow(QWidget *parent)
 
 
     getCategory();
-
+//dialogNextSong();
     setWindowFlags(Qt::FramelessWindowHint);
   // setAttribute( Qt::AA_EnableHighDpiScaling);
 
@@ -661,6 +661,11 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
+    if(this->isActiveWindow())
+        setParent(this);
+    else
+        setParent(video);
+
     notif->setWindowFlags(Qt::FramelessWindowHint);
     notif->setPalette(let);
     notif->setFont(f);
@@ -668,6 +673,7 @@ void mainWindow::dialogNextSong()
     notif->move((desktop_width-notif->width())/2,0);
     notif->setAttribute(Qt::WA_DeleteOnClose);
     QTimer::singleShot(5000, notif, SLOT(close()));
+//    setParent(QApplication::activeWindow());
     notif->show();
 }
 
@@ -1103,7 +1109,7 @@ void mainWindow::checkAdmin()
 {
     QSettings settings("elroke","elroke");
     QString user;
-    settings.beginGroup(group_auth);
+    settings.beginGroup("Authentication");
     user=settings.value("username").toString();
     settings.endGroup();
 
@@ -1223,7 +1229,6 @@ void mainWindow::dialogLogin()
 
 void mainWindow::createAdminAccount(){
 
-    QSettings setting("elroke","elroke");
 
     QString user = le_userName->text();
     QString pass = le_password->text();
@@ -1236,8 +1241,8 @@ void mainWindow::createAdminAccount(){
     if(pass!=pass_confirm){
         return;
     }
-
-        setting.beginGroup(group_auth);
+        QSettings setting("elroke","elroke");
+        setting.beginGroup("Authentication");
         setting.setValue("username", QCryptographicHash::hash(user.toUtf8(), QCryptographicHash::Sha1));
         setting.setValue("password", QCryptographicHash::hash(pass.toUtf8(), QCryptographicHash::Sha1));
         setting.endGroup();
@@ -1249,11 +1254,10 @@ void mainWindow::createAdminAccount(){
 void mainWindow::login(){
 
     QSettings settings("elroke","elroke");
-    QByteArray user;
-    QByteArray password;
-    settings.beginGroup(group_auth);
-    user=settings.value("username").toByteArray();
-    password=settings.value("password").toByteArray();
+    QByteArray user, password;
+    settings.beginGroup("Authentication");
+    user = settings.value("username").toByteArray();
+    password = settings.value("password").toByteArray();
     settings.endGroup();
 
    QByteArray u  = QCryptographicHash::hash(le_userName->text().toUtf8(), QCryptographicHash::Sha1);
@@ -1304,14 +1308,11 @@ void mainWindow::videoEnds(){
     value_label->setFont(font);
 
     QVBoxLayout *layout = new QVBoxLayout;
-
     layout->addWidget(value_label);
-
     dialog_random_number->setLayout(layout);
-
     value_label->setText(QString::number(getRandomNumber()));
-    QPalette pal;
 
+    QPalette pal;
     pal.setColor(QPalette::WindowText,Qt::blue);
     pal.setColor(QPalette::Window,Qt::white);
 

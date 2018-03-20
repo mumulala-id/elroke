@@ -70,8 +70,8 @@ private :
    // QLabel* clock;
     QString background;
     QDesktopWidget *desktop = QApplication::desktop();
-    int desktop_width = desktop->width();
-    int desktop_height = desktop->height();
+    unsigned short int desktop_width = desktop->width();
+    unsigned short  int desktop_height = desktop->height();
     QString channel;
     bool lock_playlist=false;
     delay * m_worker;
@@ -80,7 +80,7 @@ private :
     dbmanager *db;
     QString userID;
     QString password;
-    QString group_auth = "Authentication";
+//    QString group_auth = "Authentication";
     Player *effect_player;
     opening *cover;
     QWidget *spacer;
@@ -92,7 +92,7 @@ private :
     CLineEdit *le_password_confirm;
     QPointer <QDialog> dialog_admin=NULL;
     QString c_font;
-    int font_size;
+   unsigned short  int font_size;
 
 private slots:
     void dialogAdmin();
