@@ -13,14 +13,11 @@ public:
       enum mode{column,smart};
       enum role{sortRole=Qt::UserRole};
 
-    ProxyModel(QObject* parent = 0);
-    ProxyModel(mode, QObject *parent=0);
-    bool filterAcceptsRow(int source_row,
-                          const QModelIndex &source_parent) const;
+    explicit ProxyModel(QObject* parent = 0);
+    explicit ProxyModel(mode, QObject *parent=0);
+    bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
     QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation,
-                        int role) const;
-
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
 
 public slots:
   void search(QString);

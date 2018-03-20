@@ -16,7 +16,7 @@ public:
 private :
     QStackedLayout *stack;
     QString selected_font,selected_background;
-   unsigned short  int font_size;
+    unsigned short  int font_size;
     QCheckBox *check_startapp;
     QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
 

@@ -54,7 +54,6 @@ Keyboard::Keyboard(QWidget *parent) :
     backspace->setAutoRepeatInterval(30);
     connect(backspace,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
 
-
     main_layout->setHorizontalSpacing(0);
     main_layout->setVerticalSpacing(0);
     main_layout->addWidget(space,1,16,1,2);
@@ -67,15 +66,13 @@ Keyboard::Keyboard(QWidget *parent) :
     setAutoFillBackground(true);
     setWindowFlags(Qt::FramelessWindowHint );
     setMinimumSize(960,96);
-
 }
-
 
 QPushButton *Keyboard::createButton( const QString &text){
 
-    QPushButton *button = new QPushButton(text, this);
-
+   auto *button = new QPushButton(text, this);
     button->setMaximumSize(QSize(48,48));
+
     QFont font;
     font.setPointSize(24);
 
@@ -94,14 +91,15 @@ void Keyboard::onButtonClicked(){
          if(!receiver)
              return;
 
-            QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
-            QString objeck_name = clickedButton->objectName();
-            QChar text = objeck_name.at(0);
+    QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
+    QString objeck_name = clickedButton->objectName();
+    QChar text = objeck_name.at(0);
 
-            Qt::Key key;
-    if(objeck_name.size()>1){
-
-        if(objeck_name=="space"){
+    Qt::Key key;
+    if(objeck_name.size()>1)
+    {
+        if(objeck_name=="space")
+        {
             key = Qt::Key_Space;
             QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier," ");
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
@@ -110,7 +108,8 @@ void Keyboard::onButtonClicked(){
             QApplication::sendEvent(receiver,&releaseEvent);
         }
 
-        if(objeck_name=="backspace"){
+        if(objeck_name=="backspace")
+        {
             key = Qt::Key_Backspace;
             QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, 0,0 );
             QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
@@ -118,119 +117,119 @@ void Keyboard::onButtonClicked(){
             QApplication::sendEvent(receiver, &pressEvent);
             QApplication::sendEvent(receiver,&releaseEvent);
         }
-}
+    }
 
-else{
-    switch(text.unicode()){
-    case '0':
-        key = Qt::Key_0;
-        break;
-    case '1':
-        key = Qt::Key_1;
-        break;
-    case '2':
-        key = Qt::Key_2;
-        break;
-    case '3':
-        key = Qt::Key_3;
-        break;
-    case '4':
-        key = Qt::Key_4;
-        break;
-    case '5':
-        key = Qt::Key_5;
-        break;
-    case '6':
-        key = Qt::Key_6;
-        break;
-    case '7' :
-        key = Qt::Key_7;
-        break;
-    case '8':
-        key = Qt::Key_8;
-        break;
-    case '9':
-        key = Qt::Key_9;
-        break;
-    case 'A':
-        key = Qt::Key_A;
-        break;
-    case 'B':
-        key = Qt::Key_B;
-        break;
-    case 'C':
-        key = Qt::Key_C;
-        break;
-    case 'D':
-        key = Qt::Key_D;
-        break;
-    case 'E':
-        key = Qt::Key_E;
-        break;
-    case 'F':
-        key = Qt::Key_F;
-        break;
-    case 'G' :
-        key = Qt::Key_G;
-        break;
-    case 'H':
-        key = Qt::Key_H;
-        break;
-    case 'I':
-        key = Qt::Key_I;
-        break;
-    case 'J':
-        key = Qt::Key_J;
-        break;
-    case 'K':
-        key = Qt::Key_K;
-        break;
-    case 'L':
-        key = Qt::Key_L;
-        break;
-    case 'M':
-        key = Qt::Key_M;
-        break;
-    case 'N':
-        key = Qt::Key_N;
-        break;
-    case 'O':
-        key = Qt::Key_O;
-        break;
-    case 'P' :
-        key = Qt::Key_P;
-        break;
-    case 'Q':
-        key = Qt::Key_Q;
-        break;
-    case 'R':
-        key = Qt::Key_R;
-        break;
-    case 'S':
-        key = Qt::Key_S;
-        break;
-    case 'T':
-        key = Qt::Key_T;
-        break;
-    case 'U':
-        key = Qt::Key_U;
-        break;
-    case 'V':
-        key = Qt::Key_V;
-        break;
-    case 'W':
-        key = Qt::Key_W;
-        break;
-    case 'X' :
-        key = Qt::Key_X;
-        break;
-    case 'Y':
-        key = Qt::Key_Y;
-        break;
-    case 'Z':
-        key = Qt::Key_Z;
-        break;
-       }
+    else{
+        switch(text.unicode()){
+        case '0':
+            key = Qt::Key_0;
+            break;
+        case '1':
+            key = Qt::Key_1;
+            break;
+        case '2':
+            key = Qt::Key_2;
+            break;
+        case '3':
+            key = Qt::Key_3;
+            break;
+        case '4':
+            key = Qt::Key_4;
+            break;
+        case '5':
+            key = Qt::Key_5;
+            break;
+        case '6':
+            key = Qt::Key_6;
+            break;
+        case '7' :
+            key = Qt::Key_7;
+            break;
+        case '8':
+            key = Qt::Key_8;
+            break;
+        case '9':
+            key = Qt::Key_9;
+            break;
+        case 'A':
+            key = Qt::Key_A;
+            break;
+        case 'B':
+            key = Qt::Key_B;
+            break;
+        case 'C':
+            key = Qt::Key_C;
+            break;
+        case 'D':
+            key = Qt::Key_D;
+            break;
+        case 'E':
+            key = Qt::Key_E;
+            break;
+        case 'F':
+            key = Qt::Key_F;
+            break;
+        case 'G' :
+            key = Qt::Key_G;
+            break;
+        case 'H':
+            key = Qt::Key_H;
+            break;
+        case 'I':
+            key = Qt::Key_I;
+            break;
+        case 'J':
+            key = Qt::Key_J;
+            break;
+        case 'K':
+            key = Qt::Key_K;
+            break;
+        case 'L':
+            key = Qt::Key_L;
+            break;
+        case 'M':
+            key = Qt::Key_M;
+            break;
+        case 'N':
+            key = Qt::Key_N;
+            break;
+        case 'O':
+            key = Qt::Key_O;
+            break;
+        case 'P' :
+            key = Qt::Key_P;
+            break;
+        case 'Q':
+            key = Qt::Key_Q;
+            break;
+        case 'R':
+            key = Qt::Key_R;
+            break;
+        case 'S':
+            key = Qt::Key_S;
+            break;
+        case 'T':
+            key = Qt::Key_T;
+            break;
+        case 'U':
+            key = Qt::Key_U;
+            break;
+        case 'V':
+            key = Qt::Key_V;
+            break;
+        case 'W':
+            key = Qt::Key_W;
+            break;
+        case 'X' :
+            key = Qt::Key_X;
+            break;
+        case 'Y':
+            key = Qt::Key_Y;
+            break;
+        case 'Z':
+            key = Qt::Key_Z;
+            break;
+        }
 
     QKeyEvent pressEvent = QKeyEvent(QEvent::KeyPress, key, Qt::NoModifier,QKeySequence(key).toString());
     QKeyEvent releaseEvent = QKeyEvent(QEvent::KeyRelease, key, Qt::NoModifier);
@@ -241,11 +240,10 @@ else{
     }
 }
 
-void Keyboard::showKeyboard(QPoint p){
-
+void Keyboard::showKeyboard(QPoint p)
+{
     move(p);
     show();
-
 }
 
 Keyboard::~Keyboard()

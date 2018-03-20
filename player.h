@@ -12,20 +12,20 @@ class Player : public QObject
 {
     Q_OBJECT
 
+public:
+    explicit Player(QObject *parent = 0);
+    ~Player();
+
+private:
+    libvlc_instance_t *vlc;
+    libvlc_media_player_t *media_player;
+    libvlc_media_t *media;
+    libvlc_event_manager_t *m_eventMgr;
     QString filename;
     QTimer *poller;
-
-    libvlc_instance_t *_vlcinstance;
-    libvlc_media_player_t *_mp;
-    libvlc_media_t *_m;
     bool replay=false;
     bool _isplaying=false;
     bool _isPausing=false;
-    libvlc_event_manager_t *m_eventMgr;
-
-public:
-    Player(QObject *parent = 0);
-    ~Player();
 
 public slots:
     void setFile(QString file);

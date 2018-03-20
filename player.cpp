@@ -4,22 +4,17 @@
 Player::Player(QObject *parent) : QObject(parent)
 {
     const char * const vlc_args[] = {
-     //   "--verbose=2",
+    //   "--verbose=2",
     };
 
-      _isplaying =0;
-    poller = new QTimer(this);
-
-    _vlcinstance = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args );
-
-    _mp = libvlc_media_player_new(_vlcinstance);
-
-    connect(poller,SIGNAL(timeout()), this,SLOT(signalAlmostEnd()));
-
-    m_eventMgr = libvlc_media_player_event_manager(_mp);
+    vlc = libvlc_new(sizeof(vlc_args) / sizeof(vlc_args[0]), vlc_args );
+    media_player = libvlc_media_player_new(vlc);
+    m_eventMgr = libvlc_media_player_event_manager(media_player);
     registerEvents();
 
-   poller->start(1000);
+    poller = new QTimer(this);
+    connect(poller,SIGNAL(timeout()), this,SLOT(signalAlmostEnd()));
+    poller->start(1000);
 }
 
 void Player::setFile(QString file)
@@ -42,15 +37,15 @@ void Player::play()
 
     if(!_isPausing)
     {
-        _m = libvlc_media_new_path(_vlcinstance, getFile().toLatin1());
-        libvlc_media_player_set_media(_mp, _m);
-        libvlc_media_player_play(_mp);
+        media = libvlc_media_new_path(vlc, getFile().toLatin1());
+        libvlc_media_player_set_media(media_player, media);
+        libvlc_media_player_play(media_player);
         _isplaying=1;
         _isPausing=0;
     }
     else
     {
-        libvlc_media_player_play(_mp);
+        libvlc_media_player_play(media_player);
         _isplaying=1;
         _isPausing=0;
     }
@@ -58,7 +53,7 @@ void Player::play()
 
 void Player::pause()
 {
-    libvlc_media_player_pause(_mp);
+    libvlc_media_player_pause(media_player);
     _isplaying=false;
     _isPausing=true;
 }
@@ -66,24 +61,24 @@ void Player::pause()
 void Player::stop()
 {
     _isplaying=false;
-    libvlc_media_player_stop(_mp);
+    libvlc_media_player_stop(media_player);
     poller->stop();
 }
 
 void Player::setVolume(int newVolume)
 {
-    libvlc_audio_set_volume(_mp, newVolume);
+    libvlc_audio_set_volume(media_player, newVolume);
 }
 
 void Player::changePosition(int newPosition)
 {
-    libvlc_media_t *curMedia = libvlc_media_player_get_media(_mp);
+    libvlc_media_t *curMedia = libvlc_media_player_get_media(media_player);
 
     if(curMedia == NULL)
         return;
 
     float pos = (float)(newPosition)/(float)POSITION_RESOLUTION;
-    libvlc_media_player_set_position(_mp,pos);
+    libvlc_media_player_set_position(media_player,pos);
 }
 
 void Player::signalAlmostEnd()
@@ -91,7 +86,7 @@ void Player::signalAlmostEnd()
     if(!_isplaying)
         return;
 
-    auto duration= libvlc_media_player_get_length(_mp);
+    auto duration= libvlc_media_player_get_length(media_player);
 
      if(duration<10000)
      return;
@@ -99,7 +94,7 @@ void Player::signalAlmostEnd()
      //before 10 sec video end signal will be emitted
     auto limit= (int)(duration/1000)-10;
 
-    auto time =(int) libvlc_media_player_get_time(_mp)/1000;
+    auto time =(int) libvlc_media_player_get_time(media_player)/1000;
           if(time==limit )
           {
              emit almostEnded();
@@ -111,25 +106,25 @@ void Player::setAudioChannelStereo()
     if(!_isplaying)
         return;
 
-      libvlc_audio_set_channel(_mp, 1);
+      libvlc_audio_set_channel(media_player, 1);
 }
 
 void Player::setAudioChannelLeft()
 {
     if(!_isplaying)        return;
-    libvlc_audio_set_channel(_mp, 3);
+    libvlc_audio_set_channel(media_player, 3);
 }
 
 void Player::setAudioChannelRight()
 {
     if(!_isplaying)        return;
-    libvlc_audio_set_channel(_mp, 4);
+    libvlc_audio_set_channel(media_player, 4);
 }
 
 void Player::setMute(bool mute)
 {
     if(!_isplaying)        return;
-    libvlc_audio_set_mute(_mp, mute);
+    libvlc_audio_set_mute(media_player, mute);
 }
 
 void Player::registerEvents()
@@ -171,23 +166,23 @@ void Player::callback(const libvlc_event_t *event, void *ptr)
 
 int Player::volume()
 {
-    return   libvlc_audio_get_volume(_mp);
+    return   libvlc_audio_get_volume(media_player);
 }
 
 int Player::position()
 {
-       float pos = libvlc_media_player_get_position(_mp);
+       float pos = libvlc_media_player_get_position(media_player);
         return (int)(pos * (float)(100));
 }
 
 int Player::getAudioChannel()
 {
-    return libvlc_audio_get_channel(_mp);
+    return libvlc_audio_get_channel(media_player);
 }
 
 bool Player::isMute()
 {
-    return libvlc_audio_get_mute(_mp);
+    return libvlc_audio_get_mute(media_player);
 }
 
 Player::~Player()
@@ -199,13 +194,13 @@ Player::~Player()
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerEncounteredError,callback, this);
     libvlc_event_detach(m_eventMgr,libvlc_MediaPlayerPlaying,callback, this);
 
-    libvlc_media_player_stop(_mp);
-    libvlc_media_player_release(_mp);
-    libvlc_release(_vlcinstance);
+    libvlc_media_player_stop(media_player);
+    libvlc_media_player_release(media_player);
+    libvlc_release(vlc);
 
 }
 
 void Player::setWinId(WId _wid)
 {
-    libvlc_media_player_set_xwindow(_mp, _wid );
+    libvlc_media_player_set_xwindow(media_player, _wid );
 }

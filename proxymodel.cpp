@@ -10,9 +10,6 @@ ProxyModel::ProxyModel(QObject *parent): QSortFilterProxyModel(parent),
 ProxyModel::ProxyModel(mode _md, QObject *parent):
 QSortFilterProxyModel(parent),text_search(""),md(_md)
 {
-
-
-
 }
 
 void ProxyModel::search(QString s){
@@ -22,8 +19,8 @@ void ProxyModel::search(QString s){
     invalidateFilter();
 
 }
-void ProxyModel::search(QVariantList var_list){
-
+void ProxyModel::search(QVariantList var_list)
+{
     if(var_list.size()!=2)
         return;
 
@@ -31,28 +28,25 @@ void ProxyModel::search(QVariantList var_list){
     text_search = var_list.at(1).toString();
 
     invalidateFilter();
-
-
 }
 
-bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const{
+bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
+{
 //smart mode will search title and singer
-    if(md==ProxyModel::smart){
+    if(md==ProxyModel::smart)
+    {
     QModelIndex indG = sourceModel()->index(source_row, 1, source_parent);
     QModelIndex indD = sourceModel()->index(source_row, 2, source_parent);
     return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive) ||
             sourceModel()->data(indD).toString().contains(text_search, Qt::CaseInsensitive) ;
     }
 
-    if(md==ProxyModel::column){
+    if(md==ProxyModel::column)
+    {
         QModelIndex indG = sourceModel()->index(source_row, colom+1, source_parent);
          return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive);
-
-
-
     }
     return false;
-
 }
 
 QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -79,15 +73,15 @@ QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant();
 }
 
-QVariant ProxyModel::data(const QModelIndex &index, int role) const{
-
-
-    if(role==Qt::TextAlignmentRole){
-
+QVariant ProxyModel::data(const QModelIndex &index, int role) const
+{
+    if(role==Qt::TextAlignmentRole)
+    {
         if(alignMap.contains(-1))
             return QVariant(alignMap.value(-1));
 
-        if(alignMap.contains(index.column())){
+        if(alignMap.contains(index.column()))
+        {
             return QVariant(alignMap.value(index.column()));
         }
 
@@ -95,25 +89,20 @@ QVariant ProxyModel::data(const QModelIndex &index, int role) const{
     if(role==sortRole)
         return QVariant().toInt();
 
-            return QSortFilterProxyModel::data(index, role);
-
-
+    return QSortFilterProxyModel::data(index, role);
 }
 
-void ProxyModel::setAlignment(unsigned int index, Qt::Alignment flag){
-
+void ProxyModel::setAlignment(unsigned int index, Qt::Alignment flag)
+{
     if(alignMap.contains(-1))
         clearAlign();
 
     alignMap.insert(index, flag);
-
 }
 
-
-void ProxyModel::clearAlign(){
-
+void ProxyModel::clearAlign()
+{
     alignMap.clear();
-
 }
 
 bool ProxyModel::lessThan(const QModelIndex &left,
@@ -122,9 +111,9 @@ bool ProxyModel::lessThan(const QModelIndex &left,
     QVariant leftData = sourceModel()->data(left);
     QVariant rightData = sourceModel()->data(right);
 
-    if (leftData.type() == QVariant::Int) {
+    if (leftData.type() == QVariant::Int)
+    {
            return leftData.toInt() < rightData.toInt();
-
     }
     else{
         QString leftString = leftData.toString();
@@ -142,6 +131,4 @@ void ProxyModel::reset(){
     colom =  0;
     text_search ="";
     invalidateFilter();
-
-
 }

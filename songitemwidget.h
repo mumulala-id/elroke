@@ -13,8 +13,7 @@ public:
 
 private :
     Song *song_;
-    QLabel *label_title;
-    QLabel *label_singer;
+    QLabel *label_title, *label_singer;
 
 signals:
 
