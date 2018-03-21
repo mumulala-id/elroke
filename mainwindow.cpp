@@ -1051,7 +1051,7 @@ void mainWindow::dialogAdmin()
     auto *button_about = new QPushButton(tr("ABOUT"), dialog_admin);
     connect(button_about,&QPushButton::pressed,[this]()
     {
-        about About;
+        about About(this);
         About.exec();
     });
 

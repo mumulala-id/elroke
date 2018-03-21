@@ -47,7 +47,6 @@ about::about(QWidget *parent) :
     tab->addTab(tr("License"));
     tab->addTab(tr("Credit"));
     tab->addTab(tr("Donatur"));
-//    tab->addTab(tr("Close"));
 
     QVBoxLayout *lo_details = new QVBoxLayout;
 
@@ -68,21 +67,20 @@ about::about(QWidget *parent) :
     //license
     QTextEdit *license_txt = new QTextEdit(this);
 
-    QFile file(":/usr/share/elroke/file/LICENSE");
+    QFile file(":/usr/share/doc/elroke/copyright");
     file.open(QFile::ReadOnly | QFile::Text);
 
     QTextStream readfile(&file);
-QFont font_license;
-font_license.setPointSize(12);
+
+    QFont font_license;
+    font_license.setPointSize(12);
 
     license_txt->setText(readfile.readAll());
     license_txt->setFont(font_license);
     license_txt->setReadOnly(1);
 
     //Credit
-
     QTextEdit *credit_text = new QTextEdit(this);
-
     credit_text->setText(tr("Thank to")+" :\n"
                          "Qt\n"
                          "VLC\n"

@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationDomain("");
     QApplication::setApplicationName("ElRoke");
     QApplication::setApplicationVersion("0.0.1");
-    QPixmap pic(":/usr/share/elroke/file/background/splash.png");
+    QPixmap pic(":/usr/share/elroke/file/icon/splash.png");
     QSplashScreen splash(pic);
 
    splash.show();

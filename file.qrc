@@ -29,16 +29,8 @@
         <file>file/icon/paypal_donate.png</file>
         <file>file/soundfx/applause.mp3</file>
         <file>file/languages/elroke_id.qm</file>
-        <file>file/LICENSE</file>
-<!--        <file>file/background/butterfly.jpeg</file>
-        <file>file/background/autumn.jpg</file>
-        <file>file/background/flower.jpeg</file>
-        <file>file/background/freshapple.jpeg</file>
-        <file>file/background/greeneye.jpeg</file>
-        <file>file/background/interstellar.jpg</file>
-        <file>file/background/lake.jpeg</file>
-        <file>file/background/redlove.jpeg</file>
-        <file>file/background/view.jpeg</file>
-        <file>file/background/waterflow.jpeg</file>-->
+    </qresource>
+    <qresource prefix="/usr/share/doc">
+        <file>elroke/copyright</file>
     </qresource>
 </RCC>
