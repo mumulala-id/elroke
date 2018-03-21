@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QListWidgetItem>
 #include <QStandardItemModel>
+#include "resizer.h"
 class preferences : public QDialog
 {
     Q_OBJECT
@@ -24,6 +25,8 @@ private :
     QStringList bg_list ;
     QThread *thread_resizer;
     QStandardItemModel *model ;
+    resizer *img_resizer;
+    bool startup=false;
 
 private slots:
 //    QList<QStandardItem*> getItemList();

@@ -1,9 +1,6 @@
 #include "preferences.h"
-#include "resizer.h"
 #include <QHBoxLayout>
 #include <QPushButton>
-//#include <QListView>
-//#include <QStandardItemModel>
 #include <QFontComboBox>
 #include <QGroupBox>
 #include <QDialogButtonBox>
@@ -13,8 +10,8 @@
 #include <QSettings>
 #include <QDirIterator>
 #include <QFileInfo>
+#include <QTextStream>
 #include "liststringfileparser.h"
-
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
@@ -64,16 +61,17 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
         bg_list<<info.absoluteFilePath();
     }
 
-    resizer *resizer_img = new resizer();
-    resizer_img->setInput(bg_list);
+    img_resizer = new resizer();
+    img_resizer->setInput(bg_list);
 
     thread_resizer = new QThread(this);
 
-    resizer_img->moveToThread(thread_resizer);
+    img_resizer->moveToThread(thread_resizer);
+
     qRegisterMetaType< QList<QImage>>( "QList<QImage>" );
 
-    connect(thread_resizer,SIGNAL(started()),resizer_img,SLOT(start()));
-    connect(resizer_img,SIGNAL(finished(QList<QImage>)),this,SLOT(handleImage(QList<QImage>)));
+    connect(thread_resizer,SIGNAL(started()),img_resizer,SLOT(start()));
+    connect(img_resizer,SIGNAL(finished(QList<QImage>)),this,SLOT(handleImage(QList<QImage>)));
     thread_resizer->start();
 
     QListView *background_view  = new QListView(this);
@@ -82,6 +80,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     model = new QStandardItemModel;
     background_view->setModel(model);
+
+
+   QList<QStandardItem*>l = model->findItems(selected_background);
+    if(!l.isEmpty()){
+        background_view->setCurrentIndex(l.at(0)->index());
+    }
 
     connect(background_view, static_cast< void (QListView::*)(const QModelIndex &)>(&QListView::clicked),[this,background_view](const QModelIndex &index)
    {
@@ -155,25 +159,64 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     list_menu_all->addItems(getLanguageGenre());
 
-        connect(button_right,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
-        {
-           list_menu_selected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
-        });
+    connect(button_right,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
+    {
+       list_menu_selected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
+    });
 
-        connect(button_left,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
-        {
-           list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
-        });
+    connect(button_left,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
+    {
+       list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
+    });
 
     auto *group_system = new QGroupBox(tr("System"),this);
     QVBoxLayout *layout_system = new QVBoxLayout;
 
     check_startapp  = new QCheckBox(tr("Run at startup"), this);
+    check_startapp->setChecked(startup);
     layout_system->addWidget(check_startapp);
+
+    connect(check_startapp,static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),[this](bool d)
+    {
+        startup = d;
+         QDir dir(QDir::homePath()+"/.config/autostart");
+         QFile file(dir.path()+"/elroke.desktop");
+        if(d)
+        {
+            if(file.exists())
+            {
+                return;
+            }
+            if(!dir.exists())
+            {
+                QDir().mkdir(dir.path());
+            }
+
+
+            QTextStream stream(&file);
+            if(!file.open(QIODevice::WriteOnly|QIODevice::Text))
+                qDebug()<<"unable open"+dir.path()+"/.config/autostart/elroke.desktop";
+            stream<<
+                    "[Desktop Entry]\n"
+                    "Version=1.0\n"
+                    "Terminal=false\n"
+                    "Icon=elroke\n"
+                    "Type=Application\n"
+                     "Name=Elroke\n"
+                     "GenericName=Karaoke Entertainment\n"
+                    "Categories=Video\n"
+                    "Exec=elroke";
+        file.close();
+        }
+        else
+        {
+            file.remove();
+        }
+
+    });
+
     layout_system->addStretch();
     group_system->setLayout(layout_system);
-
-
 
     stack->addWidget(group_background);
     stack->addWidget(group_font);
@@ -241,6 +284,7 @@ void preferences::apply()
     setting.setValue("font",selected_font);
     setting.setValue("background", selected_background);
     setting.setValue("font_size", font_size);
+    setting.setValue("startup", startup);
     setting.endGroup();
 }
 void preferences::ok()
@@ -256,6 +300,7 @@ void preferences::readSetting()
     selected_font = setting.value("font").toString();
     selected_background = setting.value("background").toString();
     font_size = setting.value("font_size").toInt();
+    startup = setting.value("startup").toBool();
     setting.endGroup();
 }
 
@@ -263,7 +308,6 @@ void preferences::handleImage(QList<QImage> imglist)
 {
         for(int i =0;i<imglist.count();i++)
         {
-
             QStandardItem *item = new QStandardItem;
             item->setIcon(QPixmap::fromImage(imglist.at(i)));
             item->setData(bg_list.at(i),Qt::UserRole);
@@ -277,4 +321,6 @@ preferences::~preferences()
 {
     thread_resizer->quit();
     thread_resizer->wait();
+//    delete thread_resizer;
+    delete img_resizer;
 }
