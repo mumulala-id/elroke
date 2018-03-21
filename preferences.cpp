@@ -1,8 +1,9 @@
 #include "preferences.h"
+#include "resizer.h"
 #include <QHBoxLayout>
 #include <QPushButton>
-#include <QListView>
-#include <QStandardItemModel>
+//#include <QListView>
+//#include <QStandardItemModel>
 #include <QFontComboBox>
 #include <QGroupBox>
 #include <QDialogButtonBox>
@@ -14,10 +15,11 @@
 #include <QFileInfo>
 #include "liststringfileparser.h"
 
+
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
-    setCursor(Qt::WaitCursor);
     readSetting();
+    setCursor(Qt::WaitCursor);
     QHBoxLayout *main_layout = new QHBoxLayout;
 
     QVBoxLayout *layout_button = new QVBoxLayout;
@@ -52,25 +54,37 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     QVBoxLayout *layout_background = new QVBoxLayout;
 
+    QDirIterator it("/usr/share/elroke/file/background",QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files, QDirIterator::NoIteratorFlags);
+
+    QFileInfo info;
+
+    while(it.hasNext())
+    {
+        info.setFile(it.next());
+        bg_list<<info.absoluteFilePath();
+    }
+
+    resizer *resizer_img = new resizer();
+    resizer_img->setInput(bg_list);
+
+    thread_resizer = new QThread(this);
+
+    resizer_img->moveToThread(thread_resizer);
+    qRegisterMetaType< QList<QImage>>( "QList<QImage>" );
+
+    connect(thread_resizer,SIGNAL(started()),resizer_img,SLOT(start()));
+    connect(resizer_img,SIGNAL(finished(QList<QImage>)),this,SLOT(handleImage(QList<QImage>)));
+    thread_resizer->start();
+
     QListView *background_view  = new QListView(this);
     background_view->setViewMode(QListView::IconMode);
     background_view->setIconSize(QSize(320,180));
 
-
-    QStandardItemModel *model = new QStandardItemModel;
-
-    model->appendColumn(getItemList());
-    setCursor(Qt::ArrowCursor);
-     background_view->setModel(model);
-
-     QList<QStandardItem*> check = model->findItems(selected_background);
-   if(!check.isEmpty())
-   {
-    background_view->setCurrentIndex(check.at(0)->index());
-   }
+    model = new QStandardItemModel;
+    background_view->setModel(model);
 
     connect(background_view, static_cast< void (QListView::*)(const QModelIndex &)>(&QListView::clicked),[this,background_view](const QModelIndex &index)
-    {
+   {
        selected_background = background_view->model()->data(index,Qt::UserRole).toString();
     });
 
@@ -211,31 +225,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 //    });
 
 }
-QList<QStandardItem*> preferences::getItemList()
-{
-    QDirIterator it("/usr/share/elroke/file/background",QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files, QDirIterator::NoIteratorFlags);
-    QStringList list ;
-    QFileInfo info;
-
-    while(it.hasNext())
-    {
-        info.setFile(it.next());
-        list<<info.absoluteFilePath();
-    }
-
-    QList<QStandardItem*> listitem;
-
-    foreach (QString s, list)
-    {
-        QStandardItem *item = new QStandardItem;
-        QImage img(s);
-        img = img.scaled(160,90, Qt::KeepAspectRatio, Qt::FastTransformation);
-        item->setData(s, Qt::UserRole);
-        item->setIcon(QIcon(QPixmap::fromImage(img)));
-        listitem<<item;
-    }
-    return listitem;
-}
 
 QStringList preferences::getLanguageGenre()
 {
@@ -268,4 +257,24 @@ void preferences::readSetting()
     selected_background = setting.value("background").toString();
     font_size = setting.value("font_size").toInt();
     setting.endGroup();
+}
+
+void preferences::handleImage(QList<QImage> imglist)
+{
+        for(int i =0;i<imglist.count();i++)
+        {
+
+            QStandardItem *item = new QStandardItem;
+            item->setIcon(QPixmap::fromImage(imglist.at(i)));
+            item->setData(bg_list.at(i),Qt::UserRole);
+            model->setItem(i,0,item);
+        }
+
+    setCursor(Qt::ArrowCursor);
+}
+
+preferences::~preferences()
+{
+    thread_resizer->quit();
+    thread_resizer->wait();
 }

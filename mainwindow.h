@@ -43,6 +43,7 @@
 #include <QSqlTableModel>
 #include <QPainter>
 #include <QStandardPaths>
+#include <QThread>
 
 class mainWindow : public QDialog
 {

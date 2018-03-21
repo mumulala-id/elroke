@@ -27,7 +27,6 @@
 int main(int argc, char *argv[])
 {
     // turn on the DPI support**
-
     QApplication a(argc, argv);
     QApplication::setStyle("plastique");
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);

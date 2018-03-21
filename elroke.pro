@@ -31,7 +31,8 @@ HEADERS  += mainwindow.h \
     listwidget.h \
     youtube_downloader.h \
     preferences.h \
-    videowidget.h
+    videowidget.h \
+    resizer.h
 
 
 SOURCES += main.cpp\
@@ -52,7 +53,8 @@ SOURCES += main.cpp\
     listwidget.cpp \
     youtube_downloader.cpp \
     preferences.cpp \
-    videowidget.cpp
+    videowidget.cpp \
+    resizer.cpp
 
 TRANSLATIONS = file/languages/elroke_id.ts
 
