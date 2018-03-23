@@ -18,7 +18,6 @@ HEADERS  += mainwindow.h \
     about.h \
     addtodatabase.h \
     proxymodel.h \
-    delay.h \
     keyboard.h \
     editdb.h \
     dbmanager.h \
@@ -41,7 +40,6 @@ SOURCES += main.cpp\
     about.cpp \
     addtodatabase.cpp \
     proxymodel.cpp \
-    delay.cpp \
     keyboard.cpp \
     editdb.cpp \
     dbmanager.cpp \

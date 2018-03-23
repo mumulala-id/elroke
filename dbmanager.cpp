@@ -70,7 +70,7 @@ bool dbmanager::openDB(){
 bool dbmanager::createTable()
 {
     QSqlQuery query(db);
-    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, CATEGORY TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT)");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT)");
 
     if(query.exec()){
         qDebug()<<"table created";
@@ -107,12 +107,12 @@ void dbmanager::rollBack()
 bool dbmanager::insertIntoTable(const QVariantList &data)
 {
     QSqlQuery  query(db);
-    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , CATEGORY, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Category, :Channel, :Playtimes, :Path , :Date)");
+    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , GENRE, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Genre, :Channel, :Playtimes, :Path , :Date)");
 
      query.bindValue(":Title", data[0].toString());
      query.bindValue(":Singer", data[1].toString());
      query.bindValue(":Language", data[2].toString());
-     query.bindValue(":Category", data[3].toString());
+     query.bindValue(":Genre", data[3].toString());
      query.bindValue(":Channel", data[4].toString());
      query.bindValue(":Playtimes", 0);
      query.bindValue(":Path", data[5].toString());
@@ -126,7 +126,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data)
 void dbmanager::updatePlayedTime(int id)
 {
     QSqlQuery query(db);
-    int value=0;
+    unsigned int value=0;
     query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+QString::number(id));
 
     if(query.exec())
@@ -170,4 +170,10 @@ Song* dbmanager::getSong(int id)
     the_song->setAudioChannel(rec.value(5).toString());
 
     return the_song;
+}
+
+dbmanager::~dbmanager()
+{
+    db.close();
+
 }

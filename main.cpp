@@ -22,6 +22,7 @@
 #include <QTranslator>
 #include <QSplashScreen>
 #include <QBitmap>
+#include <QDebug>
 #include <QStyleFactory>
 
 int main(int argc, char *argv[])
@@ -34,7 +35,7 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationDomain("");
     QApplication::setApplicationName("ElRoke");
     QApplication::setApplicationVersion("0.0.1");
-    QPixmap pic(":/usr/share/elroke/file/icon/splash.png");
+    QPixmap pic(":/usr/share/elroke//icon/splash.png");
     QSplashScreen splash(pic);
 
    splash.show();
@@ -42,7 +43,7 @@ int main(int argc, char *argv[])
    a.thread()->sleep(5);
 
     QTranslator t;
-    t.load(":/usr/share/elroke/file/languages/elroke_id.qm");
+    t.load(":/usr/share/elroke//languages/elroke_id.qm");
     a.installTranslator(&t);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))

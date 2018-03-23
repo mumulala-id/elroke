@@ -113,7 +113,7 @@ about::about(QWidget *parent) :
     connect(button_close,SIGNAL(pressed()),this,SLOT(close()));
 
     QPushButton *support =new QPushButton(this);
-    support->setIcon(QIcon(":/usr/share/elroke/file/icon/paypal_donate.png"));
+    support->setIcon(QIcon(":/usr/share/elroke//icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
     connect(support,&QPushButton::pressed,[this]()
     {

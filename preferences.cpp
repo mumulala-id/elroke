@@ -51,7 +51,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     QVBoxLayout *layout_background = new QVBoxLayout;
 
-    QDirIterator it("/usr/share/elroke/file/background",QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files, QDirIterator::NoIteratorFlags);
+    QDirIterator it("/usr/share/elroke//background",QStringList()<<"*.jpg"<<"*.jpeg"<<"*.png",QDir::Files, QDirIterator::NoIteratorFlags);
 
     QFileInfo info;
 

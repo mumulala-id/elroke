@@ -141,13 +141,22 @@ addtodatabase::addtodatabase(QWidget *parent) :
     // ----
 
     QVBoxLayout *layout_splitter = new QVBoxLayout;
-    cb_auto = new QCheckBox(tr("Auto"), this);
+    QCheckBox *cb_auto = new QCheckBox(tr("Auto"), this);
     cb_auto->setChecked(automatic);
-    connect(cb_auto,SIGNAL(toggled(bool)),this,SLOT(setToAuto(bool)));
 
     QHBoxLayout *layout_use_char = new QHBoxLayout;
     QCheckBox *cb_splitby= new QCheckBox(tr("Split by"), this);
-    connect(cb_splitby,SIGNAL(toggled(bool)),this,SLOT(setToManual(bool)));
+
+    connect(cb_auto,static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::toggled),[this,cb_splitby](bool a)
+    {
+        automatic = a;
+        cb_splitby->setChecked(!a);
+    });
+    connect(cb_splitby,static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),[this, cb_auto](bool c)
+    {
+        automatic = !c;
+       cb_auto->setChecked(!c);
+    });
 
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
@@ -157,7 +166,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     layout_use_char->addWidget(le_splitter);
     layout_use_char->addStretch();
     layout_splitter->addWidget(cb_auto);
-    layout_splitter->addLayout(layout_use_char);
+    layout_splitter->addLayout(layout_use_char,0);
     layout_splitter->addStretch();
 
     QGroupBox *grup_splitter = new QGroupBox(tr("Splitter"), this);
@@ -174,8 +183,16 @@ addtodatabase::addtodatabase(QWidget *parent) :
     cmb_singerfirst->setText(tr("Singer")+splitter+tr("Title"));
     connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
 
+    QCheckBox *cb_tsgl = new QCheckBox(this);
+    cb_tsgl->setText("Title"+splitter+"Singer"+splitter+"Genre"+splitter+"Laguage");
+
+    QCheckBox *cb_tslg = new QCheckBox(this);
+    cb_tslg->setText("Title"+splitter+"Singer"+splitter+"Language"+splitter+"Genre");
+
     layout_pattern->addWidget(cmb_titlefirst);
     layout_pattern->addWidget(cmb_singerfirst);
+    layout_pattern->addWidget(cb_tsgl);
+    layout_pattern->addWidget(cb_tslg);
     layout_pattern->addStretch();
 
     QGroupBox *grup_pattern = new QGroupBox(tr("Pattern"), this);
@@ -208,7 +225,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_audio_channel->addStretch();
 
    QGroupBox *gr_audio_channel = new QGroupBox(tr("Audio Channel"), this);
-
    gr_audio_channel->setLayout(layout_audio_channel);
 
    QHBoxLayout *layout_bottom = new QHBoxLayout;
@@ -320,10 +336,9 @@ void addtodatabase::saveToDatabase()
     button_start->setEnabled(0);
     splitter = le_splitter->text();
 
-//    QList<QListWidgetItem*> selected =  lw_list->
- QModelIndexList list =  view->selectionModel()->selectedRows();
+    QModelIndexList list =  view->selectionModel()->selectedRows();
 
-   QStringList splitted;
+    QStringList splitted;
     QString title, singer, language, genre, a_channel, path,folder;
     QString filename;
 
@@ -333,52 +348,45 @@ void addtodatabase::saveToDatabase()
         {
             filename = model->data(model->index(index.row(), 0)).toString();
             path = model->data(model->index(index.row(),1)).toString();
+
+           if(filename.contains(splitter))
+           {
+               splitted = filename.split(splitter);
+
+               switch(splitted.count())
+               {
+                           case 2:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               break;
+                           case 3:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               a_channel =splitted.last();
+                               break;
+                           case 4:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               language = splitted.at(2);
+                               a_channel =splitted.last();
+                               break;
+                           case 5 :
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               language = splitted.at(2);
+                               genre = splitted.at(3);
+                               a_channel =splitted.last();
+                               break;
+                           default:
+                               break;
+               }
+           }
+
         }
     }
+    else{
 
-//    if(!automatic)//splitter is defined
-//    {
-//        foreach (QModelIndex index, list)
-//        {
-//           filename =  item->text();
-//           folder = current_dir;
-//           path = folder+"/"+filename;
-
-//           if(filename.contains(splitter))
-//           {
-//               splitted = filename.split(splitter);
-
-//               switch(splitted.count())
-//               {
-//                           case 2:
-//                               title = splitted.at(0);
-//                               singer = splitted.at(1);
-//                               break;
-//                           case 3:
-//                               title = splitted.at(0);
-//                               singer = splitted.at(1);
-//                               a_channel =splitted.last();
-//                               break;
-//                           case 4:
-//                               title = splitted.at(0);
-//                               singer = splitted.at(1);
-//                               language = splitted.at(2);
-//                               a_channel =splitted.last();
-//                               break;
-//                           case 5 :
-//                               title = splitted.at(0);
-//                               singer = splitted.at(1);
-//                               language = splitted.at(2);
-//                               genre = splitted.at(3);
-//                               a_channel =splitted.last();
-//                               break;
-//                           default:
-//                               break;
-//               }
-//           }
-
-//        }
-//    }
+    }
 
      dbmanager *db = new dbmanager(dbmanager::add, this);
      db->connectToDB();
@@ -553,37 +561,6 @@ void addtodatabase::getDrive()
 
                      }
               }
-}
-
-void addtodatabase::setToAuto(bool a){
-
-//    if(a){
-//        automatic=true;
-//        manual=false;
-//        cb_splitby->setChecked(false);
-//    }
-//    else{
-//          automatic=false;
-//        manual=true;
-//        cb_splitby->setChecked(true);
-//    }
-
-}
-
-void addtodatabase::setToManual(bool m){
-
-//    if(m){
-//        automatic=false;
-//        manual=true;
-//        cb_auto->setChecked(false);
-//    }
-//    else{
-
-//        automatic=true;
-//        manual=false;
-//        cb_auto->setChecked(true);
-//    }
-
 }
 
 QString addtodatabase::getSplitter(const QString &filename){

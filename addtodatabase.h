@@ -39,8 +39,6 @@ private :
     QString splitter{"#"};
     QStringList supported_video = QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov";
     QComboBox *combo_drive;
-    QCheckBox *cb_auto;
-    QCheckBox *cb_splitby;
     QString default_singer;
     QString defafult_language;
     QString default_genre;
@@ -48,7 +46,7 @@ private :
 
      bool title_first=true;
      bool singer_first=false;
-     bool automatic=false;
+     bool automatic=true;
      QDirIterator::IteratorFlag subdir_flag = QDirIterator::NoIteratorFlags;
 
 
@@ -59,10 +57,6 @@ private slots:
      void setSingerFirst(bool);
      void setTitleFirst(bool);
      void getDrive();
-     bool isAutomatic()const{return automatic;}
-//     bool isManual()const{return manual;}
-     void setToAuto(bool);
-     void setToManual(bool);
      QString getSplitter(const QString &);
      void writeTextStream(const QString &file, QList<QString> set);
      void enableStartButton();

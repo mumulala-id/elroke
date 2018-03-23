@@ -21,7 +21,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     sub_main_layout->addWidget(label_singer,1,Qt::AlignRight);
 
     QLabel *label_drag = new QLabel(this);
-    label_drag->setPixmap(QPixmap(":/usr/share/elroke/file/icon/drag.png"));
+    label_drag->setPixmap(QPixmap(":/usr/share/elroke//icon/drag.png"));
     label_drag->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 
     main_layout->addLayout(sub_main_layout);

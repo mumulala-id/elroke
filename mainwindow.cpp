@@ -39,7 +39,7 @@
 #include <QMutex>
 #include <QCryptographicHash>
 #include <QEventLoop>
-
+#include <QSettings>
 using namespace std;
 
 mainWindow::mainWindow(QWidget *parent)
@@ -57,7 +57,6 @@ mainWindow::mainWindow(QWidget *parent)
     createShortcut();
     setBackground();
 
-
     getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
 }
@@ -65,12 +64,10 @@ mainWindow::mainWindow(QWidget *parent)
 void mainWindow::createWidgets(){
 
     resize(desktop_width, desktop_height);
-
     QVBoxLayout *layout_main = new QVBoxLayout;
-
     QHBoxLayout *layout_top = new QHBoxLayout;
 
-    auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"", this);
+    auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke//icon/menu.png"),"", this);
     pb_menu->setFlat(1);
     pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
@@ -135,7 +132,7 @@ void mainWindow::createWidgets(){
     layout_top->setMargin(0);
 
     QWidget *widget_top = new QWidget(this);
-//    QPixmap bg_trans(":/usr/share/elroke/file/background/backgroundTrans.png");
+//    QPixmap bg_trans(":/usr/share/elroke//background/backgroundTrans.png");
     QPalette transparent_palette;
 
 //    bg_trans =   bg_trans.scaled(widget_top->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
@@ -210,7 +207,7 @@ void mainWindow::createWidgets(){
 
     auto *layout_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/file/icon/menu.png"),"",this);
+    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke//icon/menu.png"),"",this);
     button_menu->setFlat(1);
     button_menu->setIconSize(QSize(32,32));
 
@@ -237,19 +234,19 @@ void mainWindow::createWidgets(){
     button_menu->setMenu(menu_playlist);
     button_menu->setFocusPolicy(Qt::NoFocus);
 
-    auto *button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/file/icon/top.png"),"", this);
+    auto *button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke//icon/top.png"),"", this);
     button_move_to_top->setFocusPolicy(Qt::NoFocus);
     button_move_to_top->setFlat(1);
     button_move_to_top->setIconSize(QSize(32,32));
     connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
 
-    auto *button_move_to_bottom = new QPushButton(QIcon(":/usr/share/elroke/file/icon/bottom.png"),"", this);
+    auto *button_move_to_bottom = new QPushButton(QIcon(":/usr/share/elroke//icon/bottom.png"),"", this);
     button_move_to_bottom->setFlat(1);
     button_move_to_bottom->setIconSize(QSize(32,32));
     button_move_to_bottom->setFocusPolicy(Qt::NoFocus);
     connect(button_move_to_bottom,SIGNAL(pressed()),this,SLOT(moveItemToBottom()));
 
-    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/file/icon/delete.png"),"", this);
+    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke//icon/delete.png"),"", this);
     button_delete->setFocusPolicy(Qt::NoFocus);
     button_delete->setFlat(1);
     button_delete->setIconSize(QSize(32,32));
@@ -258,7 +255,7 @@ void mainWindow::createWidgets(){
         qDeleteAll(playlist_widget->selectedItems());
     });
 
-    auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/clear.png"),"", this);
+    auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke//icon/clear.png"),"", this);
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
     button_clear_playlist->setFlat(1);
     button_clear_playlist->setIconSize(QSize(32,32));
@@ -267,7 +264,7 @@ void mainWindow::createWidgets(){
          playlist_widget->clear();
     });
 
-    auto *button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/file/icon/lock.png"),"", this);
+    auto *button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke//icon/lock.png"),"", this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
     button_lock_playlist->setCheckable(true);
     button_lock_playlist->setFlat(1);
@@ -276,9 +273,9 @@ void mainWindow::createWidgets(){
     {
         lock_playlist = lock;
         if(lock)
-            button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/unlock.png"));
+            button_lock_playlist->setIcon(QIcon(":/usr/share/elroke//icon/unlock.png"));
         else
-             button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/file/icon/lock.png"));
+             button_lock_playlist->setIcon(QIcon(":/usr/share/elroke//icon/lock.png"));
     });
 
     layout_button_playlist->addWidget(button_menu);
@@ -324,7 +321,7 @@ void mainWindow::createWidgets(){
     circle->setFixedSize(64,64);
 
      auto *btn_next = new QPushButton(this);
-     btn_next->setIcon(QIcon(":/usr/share/elroke/file/icon/next.png"));
+     btn_next->setIcon(QIcon(":/usr/share/elroke//icon/next.png"));
      btn_next->setFlat(1);
      btn_next->setIconSize(QSize(64,64));
      btn_next->setFocusPolicy(Qt::NoFocus);
@@ -336,26 +333,26 @@ void mainWindow::createWidgets(){
 //     button_stop->setPalette(btn_pal);
 //     connect(button_stop, SIGNAL(pressed()),video,SLOT(stop()));
 
-     auto *button_play_pause = new QPushButton(QIcon(":/usr/share/elroke/file/icon/play.png"), "", this);
+     auto *button_play_pause = new QPushButton(QIcon(":/usr/share/elroke//icon/play.png"), "", this);
      button_play_pause->setFlat(1);
      button_play_pause->setIconSize(QSize(64,64));
      button_play_pause->setFocusPolicy(Qt::NoFocus);
      //connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPausePlayer()));
 
-     auto *button_favorit = new QPushButton(QIcon(":/usr/share/elroke/file/icon/favorit.png"), "", this);
+     auto *button_favorit = new QPushButton(QIcon(":/usr/share/elroke//icon/favorit.png"), "", this);
       button_favorit->setFlat(1);
       button_favorit->setIconSize(QSize(64,64));
       button_favorit->setFocusPolicy(Qt::NoFocus);
       connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
 
     button_audio_channel = new QPushButton(this);
-    button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/stereo.png"));
+    button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/stereo.png"));
     button_audio_channel->setIconSize(QSize(64,64));
     button_audio_channel->setFlat(1);
     button_audio_channel->setFocusPolicy(Qt::NoFocus);
     connect(button_audio_channel,SIGNAL(pressed()),this,SLOT(setAudioChannelManual()));
 
-     auto *button_vol_down = new QPushButton(QIcon(":/usr/share/elroke/file/icon/minus.png"),"", this);
+     auto *button_vol_down = new QPushButton(QIcon(":/usr/share/elroke//icon/minus.png"),"", this);
      button_vol_down->setFocusPolicy(Qt::NoFocus);
      button_vol_down->setFlat(1);
      button_vol_down->setIconSize(QSize(24,24));
@@ -372,7 +369,7 @@ void mainWindow::createWidgets(){
      slider_vol->setFixedWidth(200);
      slider_vol->setFocusPolicy(Qt::NoFocus);
 
-     auto *button_vol_up = new QPushButton(QIcon(":/usr/share/elroke/file/icon/plus.png"),"", this);
+     auto *button_vol_up = new QPushButton(QIcon(":/usr/share/elroke//icon/plus.png"),"", this);
      button_vol_up->setFocusPolicy(Qt::NoFocus);
      button_vol_up->setIconSize(QSize(24,24));
      button_vol_up->setFlat(1);
@@ -384,7 +381,7 @@ void mainWindow::createWidgets(){
           video->player()->setVolume(video->player()->volume()+5);
      });
 
-     button_audio_mute = new QPushButton(QIcon(":/usr/share/elroke/file/icon/unmute.png"),"", this);
+     button_audio_mute = new QPushButton(QIcon(":/usr/share/elroke//icon/unmute.png"),"", this);
      button_audio_mute->setFocusPolicy(Qt::NoFocus);
      button_audio_mute->setIconSize(QSize(64,64));
      button_audio_mute->setFlat(1);
@@ -396,12 +393,12 @@ void mainWindow::createWidgets(){
          if(video->player()->isMute())
          {
              video->player()->setMute(0);
-             button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/unmute.png"));
+             button_audio_mute->setIcon(QIcon(":/usr/share/elroke//icon/unmute.png"));
          }
          else
          {
              video->player()->setMute(1);
-             button_audio_mute->setIcon(QIcon(":/usr/share/elroke/file/icon/mute.png"));
+             button_audio_mute->setIcon(QIcon(":/usr/share/elroke//icon/mute.png"));
          }
      });
 
@@ -697,19 +694,19 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event)
         return QObject::eventFilter(target, event);
 }
 
-void mainWindow::delayHideWindow()
-{
-    qDebug()<<"tred started";
-}
+//void mainWindow::delayHideWindow()
+//{
+//    qDebug()<<"tred started";
+//}
 
-void mainWindow::delayEvent()
-{
-    on_delay=false;
-    qDebug()<<"delay event"<< on_delay;
-    if(on_delay)
-        return;
-    this->hide();
-}
+//void mainWindow::delayEvent()
+//{
+//    on_delay=false;
+//    qDebug()<<"delay event"<< on_delay;
+//    if(on_delay)
+//        return;
+//    this->hide();
+//}
 
 void mainWindow::dialogSavePlaylist()
 {
@@ -719,7 +716,7 @@ void mainWindow::dialogSavePlaylist()
 
     CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
     connect(le_playlist_name,SIGNAL(focussed(bool)),keyboard,SLOT(setVisible(bool)));
-    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/file/icon/backspace.png"), "", this);
+    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke//icon/backspace.png"), "", this);
     le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
     connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
@@ -894,15 +891,15 @@ void mainWindow::setAudioChannelManual()
     switch(video->player()->getAudioChannel()){
     case 1://stereo
         video->player()->setAudioChannelRight();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
+        button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/right.png"));
         break;
     case 3://left
         video->player()->setAudioChannelStereo();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/stereo.png"));
+        button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/stereo.png"));
         break;
     case 4://right
         video->player()->setAudioChannelLeft();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
+        button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/left.png"));
        break;
     }
 }
@@ -976,13 +973,13 @@ void mainWindow::videoInstance(){
 //            if(channel.contains("LEFT", Qt::CaseInsensitive))
 //            {
 //                video->player()->setAudioChannelLeft();
-//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
+//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/left.png"));
 //                        qDebug()<<"channel1";
 //            }
 //            else if(channel.contains("RIGHT", Qt::CaseInsensitive))
 //            {
 //                video->player()->setAudioChannelRight();
-//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
+//                button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/right.png"));
 //                        qDebug()<<"channel2";
 //            }
 //        });
@@ -1360,11 +1357,11 @@ void mainWindow::setAudioChannelAuto()
 
         if(channel.contains("LEFT", Qt::CaseInsensitive)){
             video->player()->setAudioChannelLeft();
-            button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/left.png"));
+            button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/left.png"));
         }
         else if(channel.contains("RIGHT", Qt::CaseInsensitive)){
             video->player()->setAudioChannelRight();
-            button_audio_channel->setIcon(QIcon(":/usr/share/elroke/file/icon/right.png"));
+            button_audio_channel->setIcon(QIcon(":/usr/share/elroke//icon/right.png"));
         }
 }
 
@@ -1375,7 +1372,7 @@ void mainWindow::readSettings()
     c_font = setting.value("font").toString();
     if(c_font==NULL) c_font = "Roboto";
     background = setting.value("background").toString();
-    if(background==NULL) background = ":/usr/share/elroke/file/background/butterfly.jpeg";
+    if(background==NULL) background = ":/usr/share/elroke//background/butterfly.jpeg";
     font_size = setting.value("font_size").toInt();
     if(font_size==0) font_size=16;
     setting.endGroup();

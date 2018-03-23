@@ -21,7 +21,7 @@
 
 #include "player.h"
 #include "proxymodel.h"
-#include "delay.h"
+//#include "delay.h"
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
@@ -44,6 +44,7 @@
 #include <QPainter>
 #include <QStandardPaths>
 #include <QThread>
+#include <QPointer>
 
 class mainWindow : public QDialog
 {
@@ -75,8 +76,8 @@ private :
     unsigned short  int desktop_height = desktop->height();
     QString channel;
     bool lock_playlist=false;
-    delay * m_worker;
-    bool on_delay=false;
+//    delay * m_worker;
+//    bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;
     QString userID, password;
@@ -121,8 +122,6 @@ private slots:
     void dialogLoadPlaylist();
     void loadPlaylist();//DEFAULT
     void loadPlaylist(const QString &);
-    void delayHideWindow();
-    void delayEvent();
     void tableRule();
     bool isKeyValid(int);
     void showKeyboard(bool);
