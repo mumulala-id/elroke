@@ -78,8 +78,8 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
 
     QHBoxLayout *layout_button_addition = new QHBoxLayout;
 
-    auto *button_add = new QPushButton(QIcon(":/usr/share/elroke//icon/plus.png"), "", this);
-    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke//icon/minus.png"), "", this);
+    auto *button_add = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"), "", this);
+    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"), "", this);
 
     layout_button_addition->addWidget(button_add);
     layout_button_addition->addWidget(button_delete);

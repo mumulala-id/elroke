@@ -57,7 +57,6 @@ private slots:
     void receiverSearch(QString);
     void comboSearchChange(int);
     void jumpTo(QString);
-    void dclose();
     void undo();
 signals :
     void toSearch(QVariantList);

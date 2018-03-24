@@ -20,6 +20,7 @@
 
 
 #include "about.h"
+#include <QApplication>
 #include <QLabel>
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -50,15 +51,22 @@ about::about(QWidget *parent) :
 
     QVBoxLayout *lo_details = new QVBoxLayout;
 
-    QLabel *label_name_version = new QLabel(this);
+    QLabel *label_appname = new QLabel(this);
 
-    label_name_version->setText("ELROKE");
-    label_name_version->setAlignment(Qt::AlignCenter);
+    label_appname->setText(QApplication::applicationName());
+    label_appname->setAlignment(Qt::AlignCenter);
+
+    QLabel *label_version = new QLabel(this);
+    label_version->setText(QApplication::applicationVersion());
+    label_version->setAlignment(Qt::AlignCenter);
 
     QLabel *description = new QLabel(this);
     description->setText("\tElroke is free and open source apllication for karaoke entertainment. Feel free to use this app for commercial and home use without any fee. But do not forget to  get part for donation to support us. We do not responsible of the contents you used within app");
     description->setWordWrap(true);
-    lo_details->addWidget(label_name_version);
+
+    lo_details->addWidget(label_appname);
+    lo_details->addWidget(label_version);
+    lo_details->addStretch();
     lo_details->addWidget(description);
 
     QWidget *widget_description = new QWidget(this);
@@ -105,15 +113,13 @@ about::about(QWidget *parent) :
     stack->addWidget(credit_text);
     stack->addWidget(donatur);
 
-    connect(tab,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
-
-
+    connect(tab,&QTabBar::currentChanged,stack,&QStackedLayout::setCurrentIndex);
 
     auto *button_close = new QPushButton(tr("Close"), this);
-    connect(button_close,SIGNAL(pressed()),this,SLOT(close()));
+    connect(button_close,&QPushButton::pressed,this,&about::close);
 
     QPushButton *support =new QPushButton(this);
-    support->setIcon(QIcon(":/usr/share/elroke//icon/paypal_donate.png"));
+    support->setIcon(QIcon(":/usr/share/elroke/icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
     connect(support,&QPushButton::pressed,[this]()
     {

@@ -28,8 +28,8 @@ dbmanager::dbmanager(dbcontype contype, QObject *parent)
     db.setDatabaseName(dbname);
 }
 
-void dbmanager::connectToDB(){
-
+void dbmanager::connectToDB()
+{
     if(!QFile(dbname).exists())
     {
         restoreDB();

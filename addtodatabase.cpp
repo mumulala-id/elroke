@@ -37,7 +37,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
     QVBoxLayout *layout_main = new QVBoxLayout;
-
     QTabBar *tabbar = new QTabBar(this);
     tabbar->addTab(tr("Local"));
     tabbar->addTab(tr("Network"));
@@ -52,7 +51,8 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
     auto *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
-    connect(button_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
+//    connect(button_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
+    connect(button_refresh,&QPushButton::pressed,this,&addtodatabase::getDrive);
 
      dir_model = new QFileSystemModel(this);
      dir_model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -67,14 +67,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
      treeview->hideColumn(3);
      treeview->header()->hide();
 
-     connect(treeview,static_cast<void(QTreeView::*)(const QModelIndex &)>(&QTreeView::clicked),[this](const QModelIndex &index)
+     connect(treeview,&QTreeView::clicked,[this](const QModelIndex &index)
      {
          current_dir = dir_model->fileInfo(index).absoluteFilePath();
          label_current_dir->setText(current_dir);
          getItem();
      });
 
-     connect(combo_drive, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive){
+     connect(combo_drive, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive)
+     {
         treeview->setRootIndex(dir_model->index(drive));
      });
 
@@ -124,7 +125,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      auto *button_select_all = new QPushButton(tr("Select All"), this);
 
      //this not work
-     connect(button_select_all,SIGNAL(pressed()),view,SLOT(selectAll()));
+     connect(button_select_all,&QPushButton::pressed,view,&QTableView::selectAll);
 
      QHBoxLayout *layout_below_view = new QHBoxLayout;
      layout_below_view->addWidget(check_subfolder);
@@ -147,12 +148,12 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QHBoxLayout *layout_use_char = new QHBoxLayout;
     QCheckBox *cb_splitby= new QCheckBox(tr("Split by"), this);
 
-    connect(cb_auto,static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::toggled),[this,cb_splitby](bool a)
+    connect(cb_auto,&QCheckBox::toggled,[this,cb_splitby](bool a)
     {
         automatic = a;
         cb_splitby->setChecked(!a);
     });
-    connect(cb_splitby,static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),[this, cb_auto](bool c)
+    connect(cb_splitby,&QCheckBox::toggled,[this, cb_auto](bool c)
     {
         automatic = !c;
        cb_auto->setChecked(!c);
@@ -161,7 +162,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
     le_splitter->setText(splitter);
-    connect(le_splitter,SIGNAL(textChanged(QString)),this,SLOT(splitterChange(QString)));
+    connect(le_splitter,&QLineEdit::textChanged,this,&addtodatabase::splitterChange);
     layout_use_char->addWidget(cb_splitby);
     layout_use_char->addWidget(le_splitter);
     layout_use_char->addStretch();
@@ -259,9 +260,8 @@ addtodatabase::addtodatabase(QWidget *parent) :
    QStackedLayout *stack = new QStackedLayout;
    stack->addWidget(local_widget);
    stack->addWidget(ydownloader);
-
-   connect(tabbar,SIGNAL(currentChanged(int)),stack,SLOT(setCurrentIndex(int)));
-   connect(ydownloader,&YoutubeDownloader::finished,
+    connect(tabbar,&QTabBar::currentChanged,stack,&QStackedLayout::setCurrentIndex);
+    connect(ydownloader,&YoutubeDownloader::finished,
            [this,stack](){
                                    stack->setCurrentIndex(0);
                                    current_dir = ydownloader->getPath();
@@ -288,35 +288,33 @@ addtodatabase::addtodatabase(QWidget *parent) :
     setWindowState(Qt::WindowFullScreen);
 }
 
-void addtodatabase::getItem(){
-
+void addtodatabase::getItem()
+{
     setCursor(Qt::BusyCursor);
-
     model->clear();
 
     int row = 0;
     QDirIterator it(current_dir,supported_video, QDir::Files,getSubDirFlag());
+      while (it.hasNext())
+      {
+          model->setRowCount(model->rowCount()+1);
+           QString filename = it.next();
+           QFileInfo info;
+           info.setFile(filename);
 
-          while (it.hasNext())
-          {
-              model->setRowCount(model->rowCount()+1);
-               QString filename = it.next();
-               QFileInfo info;
-               info.setFile(filename);
+           QString path = info.absoluteFilePath();
+           QString name = info.fileName();
 
-               QString path = info.absoluteFilePath();
-               QString name = info.fileName();
+           QStandardItem *item_name = new QStandardItem;
+           item_name->setText(name);
+           model->setItem(row,0,item_name);
 
-               QStandardItem *item_name = new QStandardItem;
-               item_name->setText(name);
-               model->setItem(row,0,item_name);
+           QStandardItem *item_path = new QStandardItem;
+           item_path->setText(path);
+           model->setItem(row,1,item_path);
 
-               QStandardItem *item_path = new QStandardItem;
-               item_path->setText(path);
-               model->setItem(row,1,item_path);
-
-               row++;
-          }
+           row++;
+      }
 
     view->setColumnHidden(1,1);
     setCursor(Qt::ArrowCursor);
@@ -463,11 +461,8 @@ void addtodatabase::saveToDatabase()
 //        data.clear();
 
 //    }
-    if(sql_ok)
-                         db->submit();
-    else
-
-                                         qDebug()<<"sql not ok";
+    if(sql_ok)       db->submit();
+    else               qDebug()<<"sql not ok";
 
     QList<QString>list_singer=set_singer.toList();
     QList<QString>list_language= set_language.toList();
@@ -551,25 +546,26 @@ void addtodatabase::setTitleFirst(bool j)
 
 void addtodatabase::getDrive()
 {
-        combo_drive->clear();
-        combo_drive->addItem(QDir::homePath() );
+    combo_drive->clear();
+    combo_drive->addItem(QDir::homePath() );
     //get mounted drive just support ntfs
-        foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
-                  if (storage.fileSystemType()=="ntfs-3g" || storage.fileSystemType()=="fuseblk") {
-
-                          combo_drive->addItem(storage.rootPath());
-
-                     }
-              }
+    foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes())
+    {
+        if (storage.fileSystemType()=="ntfs-3g" || storage.fileSystemType()=="fuseblk")
+        {
+            combo_drive->addItem(storage.rootPath());
+        }
+    }
 }
 
-QString addtodatabase::getSplitter(const QString &filename){
+QString addtodatabase::getSplitter(const QString &filename)
+{
     QStringList old_splitter;
     QStringList new_splitter;
 
 //identify splitter
     QRegularExpression exp("[^a-zA-Z0-9]+");
-    QRegularExpressionMatchIterator i =exp.globalMatch(filename);
+    QRegularExpressionMatchIterator i = exp.globalMatch(filename);
 
     while(i.hasNext()){
         QRegularExpressionMatch match=i.next();
@@ -578,7 +574,8 @@ QString addtodatabase::getSplitter(const QString &filename){
     }
 
     //trim double item
-    for (int i=0;i<old_splitter.size();i++){
+    for (int i=0;i<old_splitter.size();i++)
+    {
         if(!new_splitter.contains(old_splitter.at(i))){
             new_splitter<<old_splitter.at(i);
         }
@@ -588,22 +585,17 @@ QString addtodatabase::getSplitter(const QString &filename){
     QString splitter="";
     
 //get greater count
-    for(int x=0;x<new_splitter.size();x++){
-
-        if(max<old_splitter.count(new_splitter.at(x))){
-
+    for(int x=0;x<new_splitter.size();x++)
+    {
+        if(max<old_splitter.count(new_splitter.at(x)))
+        {
             splitter = new_splitter.at(x);
-
         }
 
         max = old_splitter.count(new_splitter.at(x));
-
     }
-    
     return splitter;
-    
 }
-
 
 void addtodatabase::enableStartButton(){
 

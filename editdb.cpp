@@ -43,8 +43,8 @@ managedb::managedb(QWidget *parent) :
 
    list_singer = new QListWidget(this);
     list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
-
-    connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
+connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+//    connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
     QVBoxLayout *lo_grup_singer = new QVBoxLayout;
 
 
@@ -54,7 +54,7 @@ managedb::managedb(QWidget *parent) :
    auto *grup_language = new QGroupBox(tr("Language"), this);
 
     list_language = new QListWidget(this);
-    list_language->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/language"));
+    list_language->addItems(listStringFileParser::parse(app_dir+"/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_language = new QVBoxLayout;
@@ -63,7 +63,7 @@ managedb::managedb(QWidget *parent) :
 
     auto *grup_genre = new QGroupBox(tr("Category"), this);
     list_genre = new QListWidget(this);
-    list_genre->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category"));
+    list_genre->addItems(listStringFileParser::parse(app_dir+"/meta/category"));
     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
 
@@ -73,7 +73,7 @@ managedb::managedb(QWidget *parent) :
 
    auto *grup_folder = new QGroupBox(tr("Path"), this);
     list_folder = new QListWidget(this);
-    list_folder->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/path"));
+    list_folder->addItems(listStringFileParser::parse(app_dir+"/meta/path"));
     connect(list_folder, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_folder = new QVBoxLayout;
@@ -178,7 +178,20 @@ managedb::managedb(QWidget *parent) :
     connect(button_undo, &QPushButton::clicked, this, &managedb::undo);
 
     auto *button_close = new QPushButton(tr("CLOSE"), this);
-    connect(button_close,SIGNAL(pressed()),this,SLOT(dclose()));
+    connect(button_close,&QPushButton::pressed,[this]()
+    {
+        if(anyChange)
+        {
+            QMessageBox::StandardButton warning;
+            warning = QMessageBox::question(this,tr( "Warning"),tr("Change not save yet. Save?"), QMessageBox::Yes | QMessageBox::No);
+            if(warning==QMessageBox::Yes)
+            {
+              sql_model->submitAll();
+            }
+        }
+
+        close();
+    });
 
     glo_button->addWidget( button_title_singer,0,0);
     glo_button->addWidget( button_singer_language,0,1);
@@ -599,21 +612,6 @@ void managedb::selectedCount()
 {
     QModelIndexList list = table->selectionModel()->selectedRows();
     selected_count_label->setText(QString::number(list.count()));
-}
-
-void managedb::dclose()
-{
-    if(anyChange)
-    {
-        QMessageBox::StandardButton warning;
-        warning = QMessageBox::question(this,tr( "Warning"),tr("Change not save yet. Save?"), QMessageBox::Yes | QMessageBox::No);
-        if(warning==QMessageBox::Yes)
-        {
-          sql_model->submitAll();
-        }
-    }
-
-    close();
 }
 
 void managedb::comboSearchChange(int i){
