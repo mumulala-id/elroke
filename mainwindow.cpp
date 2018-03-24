@@ -1292,8 +1292,8 @@ void mainWindow::randomNumberInstance(){
 void mainWindow::openingInstance()
 {
     cover = new opening();
-    connect(cover,SIGNAL(passed()),video,SLOT(show()));
-    connect(cover,SIGNAL(passed()),video->player(),SLOT(play()));
+    connect(cover,&opening::passed,video,&VideoWidget::show);
+    connect(cover,&opening::passed,video->player(),&Player::play);
 }
 
 void mainWindow::moveItemToBottom()
