@@ -37,11 +37,11 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_button->addStretch();
 
     auto *button_ok = new QPushButton(tr("Ok"), this);
-    connect(button_ok,SIGNAL(pressed()),this,SLOT(ok()));
+    connect(button_ok,&QPushButton::pressed,this,&preferences::ok);
     auto *button_apply = new QPushButton(tr("Apply"), this);
-    connect(button_apply,SIGNAL(pressed()),this,SLOT(apply()));
+    connect(button_apply,&QPushButton::pressed,this,&preferences::apply);
     auto *button_cancel = new QPushButton(tr("Cancel"), this);
-    connect(button_cancel,SIGNAL(pressed()),this,SLOT(close()));
+    connect(button_cancel,&QPushButton::pressed,this,&preferences::close);
 
     layout_button->addWidget(button_ok);
     layout_button->addWidget(button_apply);
@@ -81,13 +81,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     model = new QStandardItemModel;
     background_view->setModel(model);
 
-
    QList<QStandardItem*>l = model->findItems(selected_background);
     if(!l.isEmpty()){
         background_view->setCurrentIndex(l.at(0)->index());
     }
 
-    connect(background_view, static_cast< void (QListView::*)(const QModelIndex &)>(&QListView::clicked),[this,background_view](const QModelIndex &index)
+    connect(background_view,&QListView::clicked,[this,background_view](const QModelIndex &index)
    {
        selected_background = background_view->model()->data(index,Qt::UserRole).toString();
     });
@@ -112,7 +111,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     if(!selected_font.isEmpty())
         combo_font->setCurrentText(selected_font);
-
     connect(combo_font,static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::activated),[this](const QString &s_font)
     {
         selected_font = s_font;
@@ -176,44 +174,31 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     check_startapp->setChecked(startup);
     layout_system->addWidget(check_startapp);
 
-    connect(check_startapp,static_cast<void(QCheckBox::*)(bool)>(&QCheckBox::toggled),[this](bool d)
+    connect(check_startapp,&QCheckBox::toggled,[this](bool d)
     {
         startup = d;
-         QDir dir(QDir::homePath()+"/.config/autostart");
-         QFile file(dir.path()+"/elroke.desktop");
-        if(d)
-        {
-            if(file.exists())
-            {
-                return;
-            }
-            if(!dir.exists())
-            {
-                QDir().mkdir(dir.path());
-            }
-
-
-            QTextStream stream(&file);
-            if(!file.open(QIODevice::WriteOnly|QIODevice::Text))
-                qDebug()<<"unable open"+dir.path()+"/.config/autostart/elroke.desktop";
-            stream<<
-                    "[Desktop Entry]\n"
-                    "Version=1.0\n"
-                    "Terminal=false\n"
-                    "Icon=elroke\n"
-                    "Type=Application\n"
-                     "Name=Elroke\n"
-                     "GenericName=Karaoke Entertainment\n"
-                    "Categories=Video\n"
-                    "Exec=elroke";
-        file.close();
-        }
-        else
-        {
-            file.remove();
-        }
-
     });
+
+    QComboBox *combo_language = new QComboBox(this);
+    combo_language->addItem("English");
+    combo_language->addItem("Bahasa Indonesia");
+    connect(combo_language,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[this](int index)
+    {
+        switch (index) {
+        case 0:
+            language = "english";
+            break;
+        case 1:
+            language = "indonesian";
+        default:
+            break;
+        }
+    });
+
+    QHBoxLayout *layout_language = new QHBoxLayout;
+    layout_language->addWidget(new QLabel(tr("Language"),this));
+    layout_language->addWidget(combo_language);
+    layout_system->addLayout(layout_language);
 
     layout_system->addStretch();
     group_system->setLayout(layout_system);
@@ -279,12 +264,46 @@ QStringList preferences::getLanguageGenre()
 
 void preferences::apply()
 {
+    QDir dir(QDir::homePath()+"/.config/autostart");
+    QFile file(dir.path()+"/elroke.desktop");
+   if(startup)
+   {
+       if(file.exists())
+       {
+           return;
+       }
+       if(!dir.exists())
+       {
+          QDir().mkdir(dir.path());
+       }
+
+       QTextStream stream(&file);
+       if(!file.open(QIODevice::WriteOnly|QIODevice::Text))
+           qDebug()<<"unable open"+dir.path()+"/.config/autostart/elroke.desktop";
+       stream<<
+               "[Desktop Entry]\n"
+               "Version=1.0\n"
+               "Terminal=false\n"
+               "Icon=elroke\n"
+               "Type=Application\n"
+                "Name=Elroke\n"
+                "GenericName=Karaoke Entertainment\n"
+               "Categories=Video\n"
+               "Exec=elroke";
+   file.close();
+   }
+   else
+   {
+       file.remove();
+   }
+
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     setting.setValue("font",selected_font);
     setting.setValue("background", selected_background);
     setting.setValue("font_size", font_size);
     setting.setValue("startup", startup);
+    setting.setValue("language", language);
     setting.endGroup();
 }
 void preferences::ok()
@@ -301,18 +320,19 @@ void preferences::readSetting()
     selected_background = setting.value("background").toString();
     font_size = setting.value("font_size").toInt();
     startup = setting.value("startup").toBool();
+    language = setting.value("language").toString();
     setting.endGroup();
 }
 
 void preferences::handleImage(QList<QImage> imglist)
 {
-        for(int i =0;i<imglist.count();i++)
-        {
-            QStandardItem *item = new QStandardItem;
-            item->setIcon(QPixmap::fromImage(imglist.at(i)));
-            item->setData(bg_list.at(i),Qt::UserRole);
-            model->setItem(i,0,item);
-        }
+    for(int i =0;i<imglist.count();i++)
+    {
+        QStandardItem *item = new QStandardItem;
+        item->setIcon(QPixmap::fromImage(imglist.at(i)));
+        item->setData(bg_list.at(i),Qt::UserRole);
+        model->setItem(i,0,item);
+    }
 
     setCursor(Qt::ArrowCursor);
 }
@@ -321,6 +341,5 @@ preferences::~preferences()
 {
     thread_resizer->quit();
     thread_resizer->wait();
-//    delete thread_resizer;
     delete img_resizer;
 }

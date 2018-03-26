@@ -91,7 +91,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      view = new QTableView(this);
      view->setEditTriggers(QTableView::NoEditTriggers);
      view->setSelectionBehavior(QAbstractItemView::SelectRows);
-     view->setSelectionMode(QAbstractItemView::SingleSelection);
+     view->setSelectionMode(QAbstractItemView::ExtendedSelection);
      view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
      model = new QStandardItemModel(view);
@@ -124,8 +124,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      auto *button_select_all = new QPushButton(tr("Select All"), this);
 
-     //this not work
-     connect(button_select_all,&QPushButton::pressed,view,&QTableView::selectAll);
+     connect(button_select_all,&QPushButton::pressed,[this]()
+     {
+         view->selectAll();
+         button_start->setEnabled(1);
+     });
 
      QHBoxLayout *layout_below_view = new QHBoxLayout;
      layout_below_view->addWidget(check_subfolder);
@@ -273,6 +276,20 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_main->addWidget(tabbar);
    layout_main->addLayout(stack);
 
+   QHBoxLayout *layout_button = new QHBoxLayout;
+
+   auto *button_cancel = new QPushButton(tr("Cancel"), this);
+   connect(button_cancel,&QPushButton::pressed,this,&addtodatabase::close);
+
+  button_start = new QPushButton(tr("Start"), this);
+  button_start->setEnabled(0);
+  connect(button_start,&QPushButton::pressed,this,&addtodatabase::saveToDatabase);
+
+   layout_button->addStretch();
+   layout_button->addWidget(button_cancel);
+   layout_button->addWidget(button_start);
+   layout_main->addLayout(layout_button);
+
     setLayout(layout_main);
 
     QPalette palet;
@@ -381,10 +398,20 @@ void addtodatabase::saveToDatabase()
            }
 
         }
-    }
-    else{
 
     }
+    else//automatic
+    {
+        foreach (QModelIndex index, list)
+        {
+            filename = model->data(model->index(index.row(), 0)).toString();
+            path = model->data(model->index(index.row(),1)).toString();
+
+            getSplitter(filename);
+
+    }
+    }
+
 
      dbmanager *db = new dbmanager(dbmanager::add, this);
      db->connectToDB();
@@ -560,40 +587,54 @@ void addtodatabase::getDrive()
 
 QString addtodatabase::getSplitter(const QString &filename)
 {
-    QStringList old_splitter;
-    QStringList new_splitter;
 
 //identify splitter
-    QRegularExpression exp("[^a-zA-Z0-9]+");
+    qDebug()<<filename;
+    QRegularExpression exp("[^a-zA-Z0-9\\s]+");
     QRegularExpressionMatchIterator i = exp.globalMatch(filename);
-
+QStringList symbol;
     while(i.hasNext()){
         QRegularExpressionMatch match=i.next();
+        symbol<<match.captured();
+    }
+    QSet<QString>s;
+    s=s.fromList(symbol);
 
-       old_splitter<< filename.at(match.capturedEnd()-1);
+    foreach (QString val, s) {
+        qDebug()<<val<<symbol.count(val);
     }
 
-    //trim double item
-    for (int i=0;i<old_splitter.size();i++)
-    {
-        if(!new_splitter.contains(old_splitter.at(i))){
-            new_splitter<<old_splitter.at(i);
-        }
-    }
+//    QSetIterator<QString>it(s);
 
-    int max=0;
-    QString splitter="";
+//    while (it.hasNext()) {
+//        qDebug()<<it.next();
+//    }
+////    qDebug()<<symbol;
+//    foreach (QString x, s) {
+//        qDebug()<<symbol.count(x);
+//    }
+
+//    //trim double item
+//    for (int i=0;i<old_splitter.size();i++)
+//    {
+//        if(!new_splitter.contains(old_splitter.at(i))){
+//            new_splitter<<old_splitter.at(i);
+//        }
+//    }
+
+//    int max=0;
+//    QString splitter="";
     
-//get greater count
-    for(int x=0;x<new_splitter.size();x++)
-    {
-        if(max<old_splitter.count(new_splitter.at(x)))
-        {
-            splitter = new_splitter.at(x);
-        }
+////get greater count
+//    for(int x=0;x<new_splitter.size();x++)
+//    {
+//        if(max<old_splitter.count(new_splitter.at(x)))
+//        {
+//            splitter = new_splitter.at(x);
+//        }
 
-        max = old_splitter.count(new_splitter.at(x));
-    }
+//        max = old_splitter.count(new_splitter.at(x));
+//    }
     return splitter;
 }
 

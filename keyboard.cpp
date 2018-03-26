@@ -44,7 +44,7 @@ Keyboard::Keyboard(QWidget *parent) :
     space->setFocusPolicy(Qt::NoFocus);
     space->setObjectName("space");
     space->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    connect(space,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+    connect(space,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
 
     auto *backspace = new QPushButton("\u232B", this);
     backspace->setObjectName("backspace");
@@ -52,8 +52,7 @@ Keyboard::Keyboard(QWidget *parent) :
     backspace->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     backspace->setAutoRepeat(true);
     backspace->setAutoRepeatInterval(30);
-    connect(backspace,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
-
+    connect(backspace,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
     main_layout->setHorizontalSpacing(0);
     main_layout->setVerticalSpacing(0);
     main_layout->addWidget(space,1,16,1,2);
@@ -79,7 +78,8 @@ QPushButton *Keyboard::createButton( const QString &text){
     button->setFont(font);
     button->setFocusPolicy(Qt::NoFocus);
     button->setObjectName(text);
-    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+//    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
+    connect(button,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
 
     return button;
 }

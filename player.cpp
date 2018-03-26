@@ -13,7 +13,7 @@ Player::Player(QObject *parent) : QObject(parent)
     registerEvents();
 
     poller = new QTimer(this);
-    connect(poller,SIGNAL(timeout()), this,SLOT(signalAlmostEnd()));
+    connect(poller,&QTimer::timeout,this,&Player::signalAlmostEnd);
     poller->start(1000);
 }
 

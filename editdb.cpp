@@ -34,25 +34,19 @@
 managedb::managedb(QWidget *parent) :
     QDialog(parent)
 {
-
     QVBoxLayout *lo_main = new QVBoxLayout;
-
     QHBoxLayout *lo_top = new QHBoxLayout;
 
    auto *grup_singer = new QGroupBox(tr("Singer"), this);
 
    list_singer = new QListWidget(this);
-    list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
-connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
-//    connect(list_singer,SIGNAL(itemClicked(QListWidgetItem*)),this,SLOT(onListWidgetClicked(QListWidgetItem *)));
-    QVBoxLayout *lo_grup_singer = new QVBoxLayout;
-
-
+   list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
+   connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+   QVBoxLayout *lo_grup_singer = new QVBoxLayout;
     lo_grup_singer->addWidget(list_singer);
     grup_singer->setLayout(lo_grup_singer);
 
-   auto *grup_language = new QGroupBox(tr("Language"), this);
-
+    auto *grup_language = new QGroupBox(tr("Language"), this);
     list_language = new QListWidget(this);
     list_language->addItems(listStringFileParser::parse(app_dir+"/meta/language"));
     connect(list_language, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
@@ -65,7 +59,6 @@ connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicke
     list_genre = new QListWidget(this);
     list_genre->addItems(listStringFileParser::parse(app_dir+"/meta/category"));
     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
-
 
     QVBoxLayout *lo_grup_genre = new QVBoxLayout;
     lo_grup_genre->addWidget(list_genre);
@@ -418,7 +411,6 @@ void managedb::setCategory(){
     if(!le_set_category->text().isEmpty())
     setitem(le_set_category->text(), 4);
     anyChange=true;
-
 }
 
 void managedb::setAudioChannel()
@@ -635,21 +627,20 @@ void managedb::receiverSearch(QString s){
     emit toSearch(list);
 }
 
-void managedb::jumpTo(QString t){
-
-    int x = t.toInt();
+void managedb::jumpTo(QString t)
+{   bool a;
+    int x = t.toInt(&a);
+    if(a)
     table->scrollTo( table->model()->index(x-1,0), QAbstractItemView::PositionAtTop);
 
 }
 
-void managedb::undo(){
-
+void managedb::undo()
+{
     sql_model->revertAll();
-
     //unhide row
-    for(int i=0; i<sql_model->rowCount();i++){
-
+    for(int i=0; i<sql_model->rowCount();i++)
+    {
         table->setRowHidden(i,0);
-
     }
 }

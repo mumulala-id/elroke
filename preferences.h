@@ -9,6 +9,7 @@
 #include <QThread>
 #include <QListWidgetItem>
 #include <QStandardItemModel>
+#include <QLabel>
 #include "resizer.h"
 class preferences : public QDialog
 {
@@ -27,9 +28,9 @@ private :
     QStandardItemModel *model ;
     resizer *img_resizer;
     bool startup=false;
+    QString language;
 
 private slots:
-//    QList<QStandardItem*> getItemList();
     QStringList getLanguageGenre();
     void handleImage(QList<QImage> imglist);
     void apply();

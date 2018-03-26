@@ -91,6 +91,7 @@ private :
     CLineEdit *le_password_confirm;
     QPointer <QDialog> dialog_admin=NULL;
     QString c_font;
+    QString language;
    unsigned short  int font_size;
 
 private slots:

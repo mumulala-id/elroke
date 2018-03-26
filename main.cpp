@@ -19,12 +19,13 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QSqlDatabase>
-#include <QTranslator>
 #include <QSplashScreen>
 #include <QBitmap>
 #include <QDebug>
 #include <QStyleFactory>
-
+#include <QLocale>
+#include <QTranslator>
+#include <QSettings>
 int main(int argc, char *argv[])
 {
     // turn on the DPI support**
@@ -33,7 +34,7 @@ int main(int argc, char *argv[])
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setOrganizationName("mumulala");
     QApplication::setOrganizationDomain("");
-    QApplication::setApplicationName("ElRoke");
+    QApplication::setApplicationName("elroke");
     QApplication::setApplicationVersion("0.0.1");
     QPixmap pic(":/usr/share/elroke//icon/splash.png");
     QSplashScreen splash(pic);
@@ -42,9 +43,7 @@ int main(int argc, char *argv[])
    a.processEvents();
    a.thread()->sleep(5);
 
-    QTranslator t;
-    t.load(":/usr/share/elroke//languages/elroke_id.qm");
-    a.installTranslator(&t);
+
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
             qDebug()<<"SQLITE is not installed";
@@ -53,6 +52,20 @@ int main(int argc, char *argv[])
     QSqlDatabase::addDatabase("QSQLITE","elroke_show");
     QSqlDatabase::addDatabase("QSQLITE","elroke_add");
     QSqlDatabase::addDatabase("QSQLITE", "elroke_edit");
+
+    QSettings setting("elroke", "elroke");
+    setting.beginGroup("Preferences");
+    QString language = setting.value("language").toString();
+    setting.endGroup();
+
+//    QString language = QLocale::languageToString(QLocale().system().language());
+    qDebug()<<language;
+    QTranslator t;
+    if(language!="english"&&language!=NULL)
+    {
+        t.load(":/usr/share/elroke/languages/elroke_id.qm");
+        a.installTranslator(&t);
+     }
 
     mainWindow w;
     w.showFullScreen();

@@ -549,54 +549,54 @@ void mainWindow::moveItemToTop()
          playlist_widget->setCurrentRow(0);
 }
 
-void mainWindow::setBackground(){
+void mainWindow::setBackground()
+{
+    QPixmap bg(background);
+    bg=bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
 
-        QPixmap bg(background);
-        bg=bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    QPalette pal;
+    pal.setColor(QPalette::Window,Qt::black);
+    pal.setColor(QPalette::WindowText,Qt::white);
+    pal.setBrush(QPalette::Background, bg);
+    //        pal.setColor(QPalette::Button, Qt::transparent);
 
-        QPalette pal;
-        pal.setColor(QPalette::Window,Qt::black);
-        pal.setColor(QPalette::WindowText,Qt::white);
-        pal.setBrush(QPalette::Background, bg);
-//        pal.setColor(QPalette::Button, Qt::transparent);
-
-        setPalette(pal);
+    setPalette(pal);
 }
 
 void mainWindow::playPlayer()
 {
     if(playlist_widget->count()==0)
     {
-       video->close();
-       clearMask();
-       return;
+    video->close();
+    clearMask();
+    return;
     }
 
-////STOP IF PLAYING
-            if(video->player()->isPlaying())
-            {
-                video->player()->stop();
-            }
-           songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
+    ////STOP IF PLAYING
+    if(video->player()->isPlaying())
+    {
+    video->player()->stop();
+    }
+    songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
-           unsigned int id = item_widget->song()->getId();
-            QString file= item_widget->song()->getPath();
-            QString title = item_widget->song()->getTitle();
-            QString singer = item_widget->song()->getSinger();
-            channel = item_widget->song()->getAudioChannel();
+    unsigned int id = item_widget->song()->getId();
+    QString file= item_widget->song()->getPath();
+    QString title = item_widget->song()->getTitle();
+    QString singer = item_widget->song()->getSinger();
+    channel = item_widget->song()->getAudioChannel();
 
-            //CHECK IF FILE EXIST
-            if (!QFile(file).exists()){
-
-               QMessageBox message(this);
-               message.setIcon(QMessageBox::Information);
-               message.setInformativeText(tr("File is not found."));
-               message.setWindowFlags(Qt::FramelessWindowHint);
-               message.setStandardButtons(QMessageBox::Close);
-               message.setAutoFillBackground(1);
-               message.exec();
-               return;
-           }
+    //CHECK IF FILE EXIST
+    if (!QFile(file).exists())
+    {
+    QMessageBox message(this);
+    message.setIcon(QMessageBox::Information);
+    message.setInformativeText(tr("File is not found."));
+    message.setWindowFlags(Qt::FramelessWindowHint);
+    message.setStandardButtons(QMessageBox::Close);
+    message.setAutoFillBackground(1);
+    message.exec();
+    return;
+    }
 
     video->player()->setFile(file);
     video->activateWindow();
@@ -701,7 +701,6 @@ void mainWindow::dialogSavePlaylist()
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
-//    connect(le_playlist_name,SIGNAL(focussed(bool)),keyboard,SLOT(setVisible(bool)));
     connect(le_playlist_name,&CLineEdit::focussed,keyboard,&Keyboard::setVisible);
     QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", this);
     le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
@@ -714,10 +713,8 @@ void mainWindow::dialogSavePlaylist()
 
     auto *btn_close = new QPushButton("Cancel", dialog_save_playlist);
     connect(btn_close,&QPushButton::pressed,dialog_save_playlist,&QDialog::close);
-//    connect(btn_close,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(close()));
 
     auto *btn_save = new QPushButton("Save", dialog_save_playlist);
-//    connect(btn_save,SIGNAL(clicked(bool)),dialog_save_playlist,SLOT(accept()));
     connect(btn_save,&QPushButton::pressed,dialog_save_playlist,&QDialog::accept);
 
     keyboard->move(QPoint(0,0));
@@ -736,7 +733,8 @@ void mainWindow::dialogSavePlaylist()
    dialog_save_playlist->adjustSize();
    dialog_save_playlist->setAutoFillBackground(1);
 
-   connect(dialog_save_playlist,&QDialog::accepted,[this,le_playlist_name](){
+   connect(dialog_save_playlist,&QDialog::accepted,[this,le_playlist_name]()
+   {
        writePlaylist(le_playlist_name->text());
    });
    dialog_save_playlist->show();
@@ -767,11 +765,9 @@ void mainWindow::dialogLoadPlaylist(){
 
     auto *layout_btn = new QHBoxLayout;
     auto *btn_cancel = new QPushButton("Cancel", dialog_load_playlist);
-//    connect(btn_cancel,SIGNAL(clicked(bool)),dialog_load_playlist,SLOT(close()));
     connect(btn_cancel,&QPushButton::pressed,dialog_load_playlist,&QDialog::close);
 
     auto *btn_load = new QPushButton("Load", dialog_load_playlist);
-//    connect(btn_load,SIGNAL(clicked(bool)),dialog_load_playlist,SLOT(accept()));
     connect(btn_load,&QPushButton::pressed,dialog_load_playlist,&QDialog::accept);
 
     layout_btn->addWidget(btn_cancel);
@@ -967,7 +963,6 @@ void mainWindow::videoInstance(){
         error_message.show();
         QTimer::singleShot(3000,&error_message,SLOT(deleteLater()));
     });
-//    connect(slider_pos,SIGNAL(sliderMoved(int)),video,SLOT(changePosition(int)));
     connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
 }
 
@@ -1032,8 +1027,6 @@ void mainWindow::dialogAdmin()
     connect(button_close,&QPushButton::pressed,dialog_admin,&QDialog::close);
 
     auto *button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
-//    connect(button_exit,SIGNAL(pressed()),dialog_admin,SLOT(close()));
-//    connect(button_exit,SIGNAL(pressed()),this,SLOT(close()));
     connect(button_exit,&QPushButton::pressed,dialog_admin,&QDialog::close);
     connect(button_exit,&QPushButton::pressed,this,&mainWindow::close);
 
@@ -1237,7 +1230,6 @@ void mainWindow::showHits()
 proxy_model->sort(6,Qt::AscendingOrder);
 }
 
-
 int mainWindow::getRandomNumber()
 {
 //    max 100 min 55
@@ -1254,8 +1246,6 @@ void mainWindow::videoEnds()
 
     effect_player->setFile("/usr/share/elroke/soundfx/applause.mp3");
     effect_player->play();
-//    connect(effect_player,SIGNAL(reachEnded()),dialog_random_number,SLOT(close()));
-//    connect(effect_player,SIGNAL(reachEnded()),this,SLOT(playPlayer()));
 
     connect(effect_player,&Player::reachEnded,dialog_random_number,&QDialog::close);
     connect(effect_player,&Player::reachEnded,this,&mainWindow::playPlayer);
@@ -1359,6 +1349,7 @@ void mainWindow::readSettings()
     if(background==NULL) background = ":/usr/share/elroke/background/butterfly.jpeg";
     font_size = setting.value("font_size").toInt();
     if(font_size==0) font_size=16;
+    language = setting.value("language").toString();
     setting.endGroup();
 }
 
