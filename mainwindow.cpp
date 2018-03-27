@@ -853,6 +853,7 @@ void mainWindow::loadPlaylist(const QString &s)
     {
         int id = stuff.toInt();
         Song *song =   db->getSong(id);
+        if(song==nullptr) return;
         songitemwidget *item_song_widget = new songitemwidget;
         item_song_widget->setSong(song);
         QListWidgetItem *item = new QListWidgetItem;
@@ -895,27 +896,31 @@ void mainWindow::tableRule()
 {
     //rebuild rule after sql_model->clear();
     //is there better way to update table?
-    sql_model->setTable("ELROKE123");
-    sql_model->setSort(1,Qt::AscendingOrder);
+//    qDebug()<<"tableRule()";
+//    sql_model->setTable("ELROKE123");
     sql_model->select();
-    table->verticalHeader()->hide();
-    table->setShowGrid(0);
-    table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    table->setSelectionMode(QAbstractItemView::SingleSelection);
-    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    table->hideColumn(0);
-    table->hideColumn(3);
-    table->hideColumn(4);
-    table->hideColumn(5);
-    table->hideColumn(6);
-    table->hideColumn(7);
-    table->hideColumn(8);
-    table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
-    table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
-    table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
-    table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
-    table->horizontalHeader()->setHighlightSections(0);
-    table->setItemDelegate(new NoFocusDelegate());
+//    sql_model->setSort(1,Qt::AscendingOrder);
+// qDebug()<<"tableRule()v";
+//    table->verticalHeader()->hide();
+//    table->setShowGrid(0);
+//    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+//    table->setSelectionMode(QAbstractItemView::SingleSelection);
+//    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+//     qDebug()<<"tableRule()c";
+//    table->hideColumn(0);
+//    table->hideColumn(3);
+//    table->hideColumn(4);
+//    table->hideColumn(5);
+//    table->hideColumn(6);
+//    table->hideColumn(7);
+//    table->hideColumn(8);
+//    table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+//    table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
+//    table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
+//    table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
+//    table->horizontalHeader()->setHighlightSections(0);
+//    table->setItemDelegate(new NoFocusDelegate());
+//     qDebug()<<"tableRule()z";
 }
 
 bool mainWindow::isKeyValid(int key)
@@ -992,14 +997,14 @@ void mainWindow::dialogAdmin()
     {
         addtodatabase atd;
         connect(&atd,SIGNAL(accepted()),this,SLOT(tableRule()));
-        connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
+//        connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
         atd.exec();
     });
 
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
-        sql_model->clear();
+//        sql_model->clear();
         managedb md;
         connect(&md, SIGNAL(finished(int)),this,SLOT(tableRule()));
         md.exec();

@@ -32,6 +32,7 @@
 #include <QTabBar>
 #include <QStackedLayout>
 #include <QHeaderView>
+//using namespace  std;
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
@@ -230,6 +231,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    QGroupBox *gr_audio_channel = new QGroupBox(tr("Audio Channel"), this);
    gr_audio_channel->setLayout(layout_audio_channel);
+   gr_audio_channel->setEnabled(0);
 
    QHBoxLayout *layout_bottom = new QHBoxLayout;
    layout_bottom->addWidget(grup_splitter);
@@ -353,16 +355,30 @@ void addtodatabase::saveToDatabase()
 
     QModelIndexList list =  view->selectionModel()->selectedRows();
 
+    dbmanager *db = new dbmanager(dbmanager::add, this);
+    db->connectToDB();
+    db->prepare();
+
+    bool sql_ok=true;
+
+   QVariantList data;
+   QSet<QString>set_singer;
+   QSet<QString>set_language;
+   QSet<QString>set_genre;
+   QSet<QString>set_folder;
+
     QStringList splitted;
     QString title, singer, language, genre, a_channel, path,folder;
     QString filename;
 
-    if(!automatic)
+    if(!automatic)//manual
     {
         foreach (QModelIndex index, list)
         {
             filename = model->data(model->index(index.row(), 0)).toString();
             path = model->data(model->index(index.row(),1)).toString();
+            QFileInfo info;
+            info.setFile(path);
 
            if(filename.contains(splitter))
            {
@@ -396,6 +412,20 @@ void addtodatabase::saveToDatabase()
                                break;
                }
            }
+                   set_singer.insert(singer.toUpper());
+                   set_language.insert(language.toUpper());
+                   set_genre.insert(genre.toUpper());
+                   set_folder.insert(folder);
+
+                     data.append(title);
+                     data.append(singer);
+                     data.append(language);
+                     data.append(genre);
+                     data.append(a_channel);
+                     data.append(path);
+
+                   sql_ok =  db->insertIntoTable(data);
+                   data.clear();
 
         }
 
@@ -406,112 +436,77 @@ void addtodatabase::saveToDatabase()
         {
             filename = model->data(model->index(index.row(), 0)).toString();
             path = model->data(model->index(index.row(),1)).toString();
+            QFileInfo info;
+            info.setFile(path);
+            folder = info.absolutePath();
 
-            getSplitter(filename);
+            splitter =  getSplitter(filename);
+//           if(filename.contains(splitter))
+//           {
+               splitted = filename.split(splitter);
 
+               switch(splitted.count())
+               {
+                           case 2:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               break;
+                           case 3:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               a_channel =splitted.last();
+                               break;
+                           case 4:
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               language = splitted.at(2);
+                               a_channel =splitted.last();
+                               break;
+                           case 5 :
+                               title = splitted.at(0);
+                               singer = splitted.at(1);
+                               language = splitted.at(2);
+                               genre = splitted.at(3);
+                               a_channel =splitted.last();
+                               break;
+                           default:
+                               break;
+               }
+//           }
+                       set_singer.insert(singer.toUpper());
+                       set_language.insert(language.toUpper());
+                       set_genre.insert(genre.toUpper());
+                       set_folder.insert(folder);
+
+                         data.append(title);
+                         data.append(singer);
+                         data.append(language);
+                         data.append(genre);
+                         data.append(a_channel);
+                         data.append(path);
+
+                       sql_ok =  db->insertIntoTable(data);
+                       data.clear();
+
+        }
     }
-    }
 
-
-     dbmanager *db = new dbmanager(dbmanager::add, this);
-     db->connectToDB();
-     db->prepare();
-
-     bool sql_ok=true;
-
-    QVariantList data;
-    QSet<QString>set_singer;
-    QSet<QString>set_language;
-    QSet<QString>set_genre;
-    QSet<QString>set_folder;
-
-//    while(it.hasNext()){
-//        info.setFile(it.next());
-//        namefile= info.completeBaseName();
-//        path = info.absoluteFilePath();
-//        folder= info.absolutePath();
-
-
-//        if(namefile.contains(splitter)){
-//             filename = namefile.split(splitter);
-//                switch(filename.count()){
-//                            case 2:
-//                                title = filename.at(0);
-//                                singer = filename.at(1);
-//                                break;
-//                            case 3:
-//                                title = filename.at(0);
-//                                singer = filename.at(1);
-//                                a_channel =filename.last();
-//                                break;
-//                            case 4:
-//                                title = filename.at(0);
-//                                singer = filename.at(1);
-//                                language = filename.at(2);
-//                                a_channel =filename.last();
-//                                break;
-//                            case 5 :
-//                                title = filename.at(0);
-//                                singer = filename.at(1);
-//                                language = filename.at(2);
-//                                genre = filename.at(3);
-//                                a_channel =filename.last();
-//                                break;
-//                            default:
-//                                break;
-//                            }
-//        }
-//        else
-//        {//usually name is title - singer or singer - title
-//            if(namefile.contains("-"))
-//            {
-//               filename = namefile.split("-");
-//               title = filename.at(0);
-//               singer = filename.at(1);
-//            }
-//        }
-
-
-//        set_singer.insert(singer.toUpper());
-//        set_language.insert(language.toUpper());
-//        set_genre.insert(genre.toUpper());
-//        set_folder.insert(folder);
-
-//          data.append(title);
-//          data.append(singer);
-//          data.append(language);
-//          data.append(genre);
-//          data.append(a_channel);
-//          data.append(path);
-
-//        sql_ok =  db->insertIntoTable(data);
-//        data.clear();
-
-//    }
     if(sql_ok)       db->submit();
     else               qDebug()<<"sql not ok";
 
-    QList<QString>list_singer=set_singer.toList();
-    QList<QString>list_language= set_language.toList();
-    QList<QString>list_genre=set_genre.toList();
-    QList<QString>list_path = set_folder.toList();
 
-    qSort(list_singer.begin(), list_singer.end());
-    qSort(list_language.begin(), list_language.end());
-    qSort(list_genre.begin(), list_genre.end());
-
-    writeTextStream(data_dir+"/meta/singer", list_singer);
-    writeTextStream(data_dir+"/meta/language", list_language);
-    writeTextStream(data_dir+"meta/genre", list_genre);
-    writeTextStream(data_dir+"/meta/path", list_path);
+    writeTextStream(data_dir+"/meta/singer", set_singer);
+    writeTextStream(data_dir+"/meta/language", set_language);
+    writeTextStream(data_dir+"/meta/genre", set_genre);
+    writeTextStream(data_dir+"/meta/path", set_folder);
 
      setCursor(Qt::ArrowCursor);
-
+    qDebug()<<"fin";
       this->accept();
 
  }
 
-void addtodatabase::writeTextStream(const QString &file, QList<QString>set)
+void addtodatabase::writeTextStream(const QString &file, QSet<QString>set)
 {
     QFileInfo info;
     info.setFile(file);
@@ -529,46 +524,11 @@ void addtodatabase::writeTextStream(const QString &file, QList<QString>set)
     {
           QTextStream stream(&f);
         
-          for(int i=0; i<set.size(); i++)
-          {
-                stream << set.at(i)<<'\n';
+          foreach (QString val, set) {
+              stream << val<<'\n';
           }
     }
-         f.close();
-         
-}
-
-void addtodatabase::setSingerFirst(bool p)
-{
-    if(p)
-    {
-        singer_first=1;
-        cmb_titlefirst->setChecked(0);
-        title_first=0;
-    }
-    else
-    {
-        singer_first=0;
-        title_first=1;
-        cmb_singerfirst->setChecked(1);
-    }
-}
-
-void addtodatabase::setTitleFirst(bool j)
-{
-    if(j)
-    {
-        title_first=1;
-        singer_first=0;
-        cmb_singerfirst->setChecked(0);
-        //button_start->setEnabled(1);
-    }
-    else
-    {
-        title_first=0;
-        singer_first=1;
-        cmb_titlefirst->setChecked(1);
-    }
+         f.close();         
 }
 
 void addtodatabase::getDrive()
@@ -597,45 +557,23 @@ QStringList symbol;
         QRegularExpressionMatch match=i.next();
         symbol<<match.captured();
     }
+
     QSet<QString>s;
     s=s.fromList(symbol);
 
-    foreach (QString val, s) {
-        qDebug()<<val<<symbol.count(val);
+    int x = 0;
+    QString d;
+//get largest count item
+    foreach (QString val, s)
+    {
+        if(x<symbol.count(val))
+        {
+            x = symbol.count(val);
+            d=val;
+        }
     }
 
-//    QSetIterator<QString>it(s);
-
-//    while (it.hasNext()) {
-//        qDebug()<<it.next();
-//    }
-////    qDebug()<<symbol;
-//    foreach (QString x, s) {
-//        qDebug()<<symbol.count(x);
-//    }
-
-//    //trim double item
-//    for (int i=0;i<old_splitter.size();i++)
-//    {
-//        if(!new_splitter.contains(old_splitter.at(i))){
-//            new_splitter<<old_splitter.at(i);
-//        }
-//    }
-
-//    int max=0;
-//    QString splitter="";
-    
-////get greater count
-//    for(int x=0;x<new_splitter.size();x++)
-//    {
-//        if(max<old_splitter.count(new_splitter.at(x)))
-//        {
-//            splitter = new_splitter.at(x);
-//        }
-
-//        max = old_splitter.count(new_splitter.at(x));
-//    }
-    return splitter;
+    return d;
 }
 
 void addtodatabase::enableStartButton(){

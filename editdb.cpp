@@ -40,7 +40,7 @@ managedb::managedb(QWidget *parent) :
    auto *grup_singer = new QGroupBox(tr("Singer"), this);
 
    list_singer = new QListWidget(this);
-   list_singer->addItems(listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/singer"));
+   list_singer->addItems(listStringFileParser::parse(app_dir+"/meta/singer"));
    connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
    QVBoxLayout *lo_grup_singer = new QVBoxLayout;
     lo_grup_singer->addWidget(list_singer);
@@ -309,12 +309,12 @@ managedb::managedb(QWidget *parent) :
     setLayout(lo_main);
 
     QPalette palet;
-    palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, palette().dark().color());
-    palet.setColor(QPalette::Text, palette().light().color());
-    palet.setColor(QPalette::WindowText, palette().light().color());
-    palet.setColor(QPalette::Button, palette().dark().color());
-    palet.setColor(QPalette::ButtonText, palette().light().color());
+    palet.setColor(QPalette::Base, Qt::green);
+    palet.setColor(QPalette::Window, Qt::black);
+    palet.setColor(QPalette::Text, Qt::gray);
+    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Button, Qt::white);
+    palet.setColor(QPalette::ButtonText, Qt::black);
     setPalette(palet);
 
     setWindowFlags(Qt::FramelessWindowHint);

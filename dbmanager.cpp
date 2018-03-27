@@ -141,7 +141,6 @@ void dbmanager::updatePlayedTime(int id)
         qDebug()<<"cant update played time";
     else
         submit();
-
     query.clear();
 }
 
@@ -153,11 +152,18 @@ Song* dbmanager::getSong(int id)
     
     if(query.exec())
     {
+
             while(query.next())
             {
                 rec = query.record();         
             }
     }
+
+   if(!query.first())//check valid
+   {
+       qDebug()<< "song" << id <<"not found";
+        return nullptr;
+   }
     
     Song *the_song  = new Song;
     the_song->setId(rec.value(0).toInt());
@@ -175,5 +181,4 @@ Song* dbmanager::getSong(int id)
 dbmanager::~dbmanager()
 {
     db.close();
-
 }
