@@ -67,6 +67,8 @@ int main(int argc, char *argv[])
         a.installTranslator(&t);
      }
 
+//    addtodatabase s;
+//    s.show();
     mainWindow w;
     w.showFullScreen();
     splash.finish(&w);

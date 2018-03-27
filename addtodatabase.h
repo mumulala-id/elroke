@@ -31,7 +31,6 @@ private :
     QLabel *label_current_dir;
     QTableView *view;
     QStandardItemModel *model;
-    QStringList filelist;
     QCheckBox *cmb_titlefirst;
     QCheckBox *cmb_singerfirst;
     QPushButton *button_start;
@@ -57,7 +56,6 @@ private slots:
      void getDrive();
      QString getSplitter(const QString &);
      void writeTextStream(const QString &file, QSet<QString> set);
-     void enableStartButton();
      QDirIterator::IteratorFlag getSubDirFlag()const{return subdir_flag;}
      void getItem();
 

@@ -71,6 +71,7 @@ void mainWindow::createWidgets(){
     pb_menu->setFlat(1);
     pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
+//     connect(pb_menu,SIGNAL(pressed()),this,SLOT(d_addtodatabse()));
 
     le_search = new CLineEdit(this);
     le_search->setPlaceholderText(tr("SEARCH"));
@@ -166,7 +167,28 @@ void mainWindow::createWidgets(){
     table = new QTableView(this);
     table->setModel(proxy_model);
 //    table->setSortingEnabled(1);
-    tableRule();
+//    tableRule();
+    sql_model->setTable("ELROKE123");
+    sql_model->select();
+    sql_model->setSort(1,Qt::AscendingOrder);
+    table->verticalHeader()->hide();
+    table->setShowGrid(0);
+    table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    table->setSelectionMode(QAbstractItemView::SingleSelection);
+    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    table->hideColumn(0);
+    table->hideColumn(3);
+    table->hideColumn(4);
+    table->hideColumn(5);
+    table->hideColumn(6);
+    table->hideColumn(7);
+    table->hideColumn(8);
+    table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
+    table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
+    table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
+    table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
+    table->horizontalHeader()->setHighlightSections(0);
+    table->setItemDelegate(new NoFocusDelegate());
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
@@ -892,15 +914,15 @@ void mainWindow::setAudioChannelManual()
     }
 }
 
-void mainWindow::tableRule()
-{
-    //rebuild rule after sql_model->clear();
-    //is there better way to update table?
+//void mainWindow::tableRule()
+//{
+//    //rebuild rule after sql_model->clear();
+//    //is there better way to update table?
 //    qDebug()<<"tableRule()";
 //    sql_model->setTable("ELROKE123");
-    sql_model->select();
+//    sql_model->select();
 //    sql_model->setSort(1,Qt::AscendingOrder);
-// qDebug()<<"tableRule()v";
+//    qDebug()<<"tableRule()v";
 //    table->verticalHeader()->hide();
 //    table->setShowGrid(0);
 //    table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -921,7 +943,7 @@ void mainWindow::tableRule()
 //    table->horizontalHeader()->setHighlightSections(0);
 //    table->setItemDelegate(new NoFocusDelegate());
 //     qDebug()<<"tableRule()z";
-}
+//}
 
 bool mainWindow::isKeyValid(int key)
 {
@@ -993,13 +1015,14 @@ void mainWindow::dialogAdmin()
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
-    connect(button_add_to_database,&QPushButton::pressed,[this]()
-    {
-        addtodatabase atd;
-        connect(&atd,SIGNAL(accepted()),this,SLOT(tableRule()));
-//        connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
-        atd.exec();
-    });
+    connect(button_add_to_database,&QPushButton::pressed,this,&mainWindow::d_addtodatabse);
+//    {
+//        addtodatabase atd;
+////        connect(&atd,SIGNAL(accepted()),dialog_admin,SLOT(close()));
+//        connect(&atd,SIGNAL(accepted()),this,SLOT(tableRule()));
+////        connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
+//        atd.exec();
+//    });
 
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
@@ -1096,6 +1119,7 @@ void mainWindow::dialogCreateAdmin()
 
     auto *button_close = new QPushButton("Close", dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
+    connect(this,&mainWindow::loginAccepted,dialog,&QDialog::close);
 
     layout_button->addWidget(button_close);
     layout_button->addWidget(button_create_admin);
@@ -1356,6 +1380,15 @@ void mainWindow::readSettings()
     if(font_size==0) font_size=16;
     language = setting.value("language").toString();
     setting.endGroup();
+}
+
+void mainWindow::d_addtodatabse()
+{
+    addtodatabase *atd  = new addtodatabase;
+//    atd->setAutoFillBackground(1);
+//      atd->setAttribute(Qt::WA_DeleteOnClose);
+    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
+    atd->show();
 }
 
 mainWindow::~mainWindow()

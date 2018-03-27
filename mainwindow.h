@@ -21,7 +21,6 @@
 
 #include "player.h"
 #include "proxymodel.h"
-//#include "delay.h"
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
@@ -123,7 +122,7 @@ private slots:
     void dialogLoadPlaylist();
     void loadPlaylist();//DEFAULT
     void loadPlaylist(const QString &);
-    void tableRule();
+//    void tableRule();
     bool isKeyValid(int);
     void showKeyboard(bool);
     void videoInstance();
@@ -135,6 +134,7 @@ private slots:
     void moveItemToBottom();
     void updateInterface();
     void readSettings();
+    void d_addtodatabse();
 
 protected :
     void keyPressEvent(QKeyEvent *event);

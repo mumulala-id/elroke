@@ -32,7 +32,6 @@
 #include <QTabBar>
 #include <QStackedLayout>
 #include <QHeaderView>
-//using namespace  std;
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
@@ -52,8 +51,12 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
     auto *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
-//    connect(button_refresh,SIGNAL(clicked(bool)),this,SLOT(getDrive()));
     connect(button_refresh,&QPushButton::pressed,this,&addtodatabase::getDrive);
+
+    QHBoxLayout *layout_drive = new QHBoxLayout;
+    layout_drive->addWidget(combo_drive);
+    layout_drive->addWidget(button_refresh);
+    layout_drive->addStretch();
 
      dir_model = new QFileSystemModel(this);
      dir_model->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -100,10 +103,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      view->setModel(model);
      view->setColumnHidden(1,1);
 
-     QHBoxLayout *layout_drive = new QHBoxLayout;
-     layout_drive->addWidget(combo_drive);
-     layout_drive->addWidget(button_refresh);
-     layout_drive->addStretch();
+
 
      layout_top_left->addLayout(layout_drive);
      layout_top_left->addWidget(treeview);
@@ -182,11 +182,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
     cmb_titlefirst = new QCheckBox( this);
     cmb_titlefirst->setText(tr("Title")+splitter+tr("Singer"));
     cmb_titlefirst->setChecked(title_first);
-    connect(cmb_titlefirst,SIGNAL(clicked(bool)),this,SLOT(setTitleFirst(bool)));
+//    connect(cmb_titlefirst,SIGNAL(clicked(bool)),this,SLOT(setTitleFirst(bool)));
 
     cmb_singerfirst = new QCheckBox(this);
     cmb_singerfirst->setText(tr("Singer")+splitter+tr("Title"));
-    connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
+//    connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
 
     QCheckBox *cb_tsgl = new QCheckBox(this);
     cb_tsgl->setText("Title"+splitter+"Singer"+splitter+"Genre"+splitter+"Laguage");
@@ -302,9 +302,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
 
-    setAutoFillBackground(1);
-    setWindowFlags(Qt::FramelessWindowHint );
-    setWindowState(Qt::WindowFullScreen);
+//    setAutoFillBackground(1);
+//    setWindowFlags(Qt::FramelessWindowHint );
+//    setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::getItem()
@@ -502,7 +502,7 @@ void addtodatabase::saveToDatabase()
 
      setCursor(Qt::ArrowCursor);
     qDebug()<<"fin";
-      this->accept();
+      accept();
 
  }
 
@@ -549,11 +549,12 @@ QString addtodatabase::getSplitter(const QString &filename)
 {
 
 //identify splitter
-    qDebug()<<filename;
+
     QRegularExpression exp("[^a-zA-Z0-9\\s]+");
     QRegularExpressionMatchIterator i = exp.globalMatch(filename);
-QStringList symbol;
-    while(i.hasNext()){
+    QStringList symbol;
+    while(i.hasNext())
+    {
         QRegularExpressionMatch match=i.next();
         symbol<<match.captured();
     }
@@ -576,6 +577,3 @@ QStringList symbol;
     return d;
 }
 
-void addtodatabase::enableStartButton(){
-
-}
