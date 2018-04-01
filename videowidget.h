@@ -8,7 +8,8 @@ class VideoWidget : public QWidget
 {
     Q_OBJECT
 public:
-    VideoWidget(QWidget *parent=0);
+    explicit VideoWidget(QWidget *parent=0);
+    ~VideoWidget();
 private :
     Player *_player;
 public :

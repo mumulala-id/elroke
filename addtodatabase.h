@@ -50,12 +50,13 @@ private :
 
 
 private slots:
-     QString getCurrentDrive()const {return currentDrive;}
      void splitterChange(QString);
      void saveToDatabase();
      void getDrive();
+      void writeTextStream(const QString &file, QSet<QString> set);
      QString getSplitter(const QString &);
-     void writeTextStream(const QString &file, QSet<QString> set);
+     QString getCurrentDrive()const {return currentDrive;}
+
      QDirIterator::IteratorFlag getSubDirFlag()const{return subdir_flag;}
      void getItem();
 

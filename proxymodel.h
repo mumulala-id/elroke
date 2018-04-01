@@ -21,7 +21,7 @@ public:
 
 public slots:
   void search(QString);
-  void search(QVariantList);
+//  void search(QVariantList);
   void setAlignment(unsigned int, Qt::Alignment);
   void reset();
 

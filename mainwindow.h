@@ -81,13 +81,11 @@ private :
     dbmanager *db;
     QString userID, password;
     Player *effect_player;
-    opening *cover;
+    Opening *opening;
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
     QAction *autosave_playlist;
-    CLineEdit * le_userName, *le_password;
-    CLineEdit *le_password_confirm;
     QPointer <QDialog> dialog_admin=NULL;
     QString c_font;
     QString language;
@@ -95,12 +93,9 @@ private :
 
 private slots:
     void dialogAdmin();
-    void checkAdmin();
-    void createAdminAccount();
     void dialogCreateAdmin();
     void openingInstance();
     void dialogLogin();
-    void login();
     void dialogNextSong();
     void createShortcut();
     void createWidgets();
@@ -140,8 +135,8 @@ protected :
     void keyPressEvent(QKeyEvent *event);
 
 signals :
-    void loginAccepted();
-    void usernameCreated();
+//    void loginAccepted();
+//    void usernameCreated();
 
 };
 

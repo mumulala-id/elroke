@@ -16,3 +16,7 @@ VideoWidget::VideoWidget(QWidget *parent):
 
 }
 
+VideoWidget::~VideoWidget()
+{
+
+}

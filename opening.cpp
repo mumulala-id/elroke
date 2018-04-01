@@ -20,7 +20,7 @@
 #include <QDebug>
 #include <QTimer>
 
-opening::opening( QWidget *parent) : QWidget(parent)
+Opening::Opening( QWidget *parent) : QWidget(parent)
 {
     resize(QSize(desktop_width,desktop_height));
 
@@ -52,14 +52,14 @@ opening::opening( QWidget *parent) : QWidget(parent)
 //    setAutoFillBackground(1);
     hide();
 }
-void opening::setData(QString title, QString singer){
+void Opening::setData(QString title, QString singer){
       label_title->setText(title);
        label_title->adjustSize();
         label_singer->setText(singer);
          label_singer->adjustSize();
 
 }
-void opening::start(){
+void Opening::start(){
 
     show();
     raise();
@@ -74,7 +74,7 @@ void opening::start(){
     QTimer::singleShot(4000,this,SLOT(finish()));
 }
 
-void opening::finish(){
+void Opening::finish(){
     hide();
     emit passed();
 }

@@ -19,33 +19,33 @@ void ProxyModel::search(QString s){
     invalidateFilter();
 
 }
-void ProxyModel::search(QVariantList var_list)
-{
-    if(var_list.size()!=2)
-        return;
+//void ProxyModel::search(QVariantList var_list)
+//{
+//    if(var_list.size()!=2)
+//        return;
 
-    colom =  var_list.at(0).toInt();
-    text_search = var_list.at(1).toString();
+//    colom =  var_list.at(0).toInt();
+//    text_search = var_list.at(1).toString();
 
-    invalidateFilter();
-}
+//    invalidateFilter();
+//}
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
 //smart mode will search title and singer
-    if(md==ProxyModel::smart)
-    {
+//    if(md==ProxyModel::smart)
+//    {
     QModelIndex indG = sourceModel()->index(source_row, 1, source_parent);
     QModelIndex indD = sourceModel()->index(source_row, 2, source_parent);
     return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive) ||
             sourceModel()->data(indD).toString().contains(text_search, Qt::CaseInsensitive) ;
-    }
+//    }
 
-    if(md==ProxyModel::column)
-    {
-        QModelIndex indG = sourceModel()->index(source_row, colom+1, source_parent);
-         return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive);
-    }
+//    if(md==ProxyModel::column)
+//    {
+//        QModelIndex indG = sourceModel()->index(source_row, colom+1, source_parent);
+//         return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive);
+//    }
     return false;
 }
 

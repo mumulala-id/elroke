@@ -45,7 +45,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
     QVBoxLayout *layout_top_left = new QVBoxLayout;
 
     combo_drive = new QComboBox(this);
-
    //get mounted drive
     getDrive();
 
@@ -222,8 +221,8 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
    QVBoxLayout *layout_audio_channel = new QVBoxLayout;
 
-   QCheckBox *combo_channel_left = new QCheckBox("Left", this);
-   QCheckBox *combo_channel_right = new QCheckBox("Right", this);
+   QCheckBox *combo_channel_left = new QCheckBox(tr("Left"), this);
+   QCheckBox *combo_channel_right = new QCheckBox(tr("Right"), this);
 
    layout_audio_channel->addWidget(combo_channel_left);
    layout_audio_channel->addWidget(combo_channel_right);
@@ -292,7 +291,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_button->addWidget(button_start);
    layout_main->addLayout(layout_button);
 
-    setLayout(layout_main);
+
 
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
@@ -301,10 +300,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::WindowText, Qt::white);
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
+      setLayout(layout_main);
 
 //    setAutoFillBackground(1);
 //    setWindowFlags(Qt::FramelessWindowHint );
-//    setWindowState(Qt::WindowFullScreen);
+    setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::getItem()
@@ -434,11 +434,11 @@ void addtodatabase::saveToDatabase()
     {
         foreach (QModelIndex index, list)
         {
-            filename = model->data(model->index(index.row(), 0)).toString();
             path = model->data(model->index(index.row(),1)).toString();
             QFileInfo info;
             info.setFile(path);
             folder = info.absolutePath();
+            filename = info.baseName();
 
             splitter =  getSplitter(filename);
 //           if(filename.contains(splitter))

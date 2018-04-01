@@ -139,5 +139,5 @@ about::about(QWidget *parent) :
     setWindowTitle(tr("About")+ " Elroke");
     setAutoFillBackground(1);
     setWindowFlags(Qt::FramelessWindowHint);
-    setPalette(palet);
+//    setPalette(palet);
 }

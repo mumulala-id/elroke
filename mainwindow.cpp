@@ -40,6 +40,7 @@
 #include <QCryptographicHash>
 #include <QEventLoop>
 #include <QSettings>
+#include <QScrollBar>
 using namespace std;
 
 mainWindow::mainWindow(QWidget *parent)
@@ -70,8 +71,7 @@ void mainWindow::createWidgets(){
     auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"", this);
     pb_menu->setFlat(1);
     pb_menu->setFocusPolicy(Qt::NoFocus);
-    connect(pb_menu,SIGNAL(pressed()),this,SLOT(checkAdmin()));
-//     connect(pb_menu,SIGNAL(pressed()),this,SLOT(d_addtodatabse()));
+    connect(pb_menu,&QPushButton::pressed,this,&mainWindow::dialogLogin);
 
     le_search = new CLineEdit(this);
     le_search->setPlaceholderText(tr("SEARCH"));
@@ -159,18 +159,18 @@ void mainWindow::createWidgets(){
     sql_model = new QSqlTableModel(this, db->database());
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
 
-    proxy_model = new ProxyModel(ProxyModel::smart, this);
+    proxy_model = new ProxyModel( this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
     proxy_model->setAlignment(2, Qt::AlignRight | Qt::AlignVCenter);
 
     table = new QTableView(this);
     table->setModel(proxy_model);
-//    table->setSortingEnabled(1);
-//    tableRule();
+
     sql_model->setTable("ELROKE123");
     sql_model->select();
-    sql_model->setSort(1,Qt::AscendingOrder);
+    qDebug()<<sql_model->rowCount();
+//    sql_model->setSort(1,Qt::AscendingOrder);
     table->verticalHeader()->hide();
     table->setShowGrid(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -183,12 +183,14 @@ void mainWindow::createWidgets(){
     table->hideColumn(6);
     table->hideColumn(7);
     table->hideColumn(8);
+//    table->horizontalHeader()->setSectionsClickable(false);
     table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
     table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
     table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new NoFocusDelegate());
+//    table->setSortingEnabled(1);
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
@@ -204,10 +206,10 @@ void mainWindow::createWidgets(){
     QHeaderView *vertical = table->verticalHeader();
     vertical->setDefaultSectionSize(vertical->fontMetrics().height()+10);
 
-    connect(table,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(addToPlaylist()));
-    connect(le_search,SIGNAL(focussed(bool)),this,SLOT(showKeyboard(bool)));
-    connect(le_search,SIGNAL(textChanged(QString)),proxy_model,SLOT(search(QString)));
-    connect(button_show_all,SIGNAL(pressed()),proxy_model,SLOT(reset()));
+    connect(table,&QTableView::doubleClicked,this,&mainWindow::addToPlaylist);
+    connect(le_search,&CLineEdit::focussed,this,&mainWindow::showKeyboard);
+    connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
+//    connect(button_show_all,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
     QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spLeft.setHorizontalStretch(3);
@@ -464,11 +466,12 @@ void mainWindow::createWidgets(){
 void mainWindow::createShortcut(){
 
     QShortcut *sc_quit = new QShortcut(QKeySequence("Esc"),this);
-    connect(sc_quit,&QShortcut::activated,this,&mainWindow::close);
+    connect(sc_quit,&QShortcut::activated,qApp,&QApplication::quit);
 
 }
 void mainWindow::getCategory(){
-//QList <QString> s = listStringFileParser::parse(QDir::homePath()+"/.elroke/meta/category");
+QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
+qDebug()<<s;
 }
 
 void mainWindow::addToPlaylist()
@@ -589,16 +592,17 @@ void mainWindow::playPlayer()
 {
     if(playlist_widget->count()==0)
     {
-    video->close();
-    clearMask();
-    return;
+        video->close();
+        clearMask();
+        return;
     }
 
     ////STOP IF PLAYING
     if(video->player()->isPlaying())
     {
-    video->player()->stop();
+        video->player()->stop();
     }
+
     songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
     unsigned int id = item_widget->song()->getId();
@@ -610,24 +614,35 @@ void mainWindow::playPlayer()
     //CHECK IF FILE EXIST
     if (!QFile(file).exists())
     {
-    QMessageBox message(this);
-    message.setIcon(QMessageBox::Information);
-    message.setInformativeText(tr("File is not found."));
-    message.setWindowFlags(Qt::FramelessWindowHint);
-    message.setStandardButtons(QMessageBox::Close);
-    message.setAutoFillBackground(1);
-    message.exec();
-    return;
+        QMessageBox message(this);
+        message.setIcon(QMessageBox::Information);
+        message.setInformativeText(tr("File is not found."));
+        message.setWindowFlags(Qt::FramelessWindowHint);
+        message.setStandardButtons(QMessageBox::Close);
+        message.setAutoFillBackground(1);
+        message.exec();
+        return;
     }
 
     video->player()->setFile(file);
     video->activateWindow();
-    cover->setData(title, singer);
-    cover->start();
 
+    if(this->isActiveWindow())
+    {
+        opening->setParent(this);
+    }
+    else
+    {
+        opening->setParent(video);
+    }
+
+    opening->setData(title, singer);
+    opening->start();
+
+    //update playtimes
     db->updatePlayedTime(id);
-    sql_model->select();
 
+    //lock playlist
     if(lock_playlist)
     {
        moveItemToBottom();
@@ -645,7 +660,7 @@ void mainWindow::playPlayer()
 
 void mainWindow::dialogNextSong()
 {
-    // this will notify next item in playlist before song end
+     // this will notify next item in playlist before song end
     QPalette let;
     let.setColor(QPalette::Background,Qt::white);
     let.setColor(QPalette::Foreground,Qt::black);
@@ -663,20 +678,23 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
-    if(this->isActiveWindow())
-        setParent(this);
-    else
+    if(this->isActiveWindow()){
+             setParent(this);
+               }
+    else{
         setParent(video);
+
+    }
 
     notif->setWindowFlags(Qt::FramelessWindowHint);
     notif->setPalette(let);
     notif->setFont(f);
-    notif->layout()->setMargin(6);
     notif->adjustSize();
     notif->move((desktop_width-notif->width())/2,0);
     notif->setAttribute(Qt::WA_DeleteOnClose);
     QTimer::singleShot(5000, notif, SLOT(close()));
     notif->show();
+
 }
 
 bool mainWindow::eventFilter(QObject *target, QEvent *event)
@@ -871,6 +889,7 @@ void mainWindow::loadPlaylist(const QString &s)
         return;
     stuff= stream.readLine();
     if(stuff==NULL)     return;
+
     while(stuff!=NULL)
     {
         int id = stuff.toInt();
@@ -975,7 +994,7 @@ void mainWindow::showKeyboard(bool x)
 void mainWindow::videoInstance(){
     //video player
     video = new VideoWidget;
-    video->hide();
+     video->hide();
     video->installEventFilter(this);
 
     connect(video->player(),&Player::positionChanged,this,&mainWindow::updateInterface);
@@ -1027,9 +1046,8 @@ void mainWindow::dialogAdmin()
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
-//        sql_model->clear();
         managedb md;
-        connect(&md, SIGNAL(finished(int)),this,SLOT(tableRule()));
+        connect(&md, SIGNAL(finished(int)),sql_model,SLOT(select()));
         md.exec();
     });
 
@@ -1040,28 +1058,31 @@ void mainWindow::dialogAdmin()
         pref->setAttribute(Qt::WA_DeleteOnClose);
         pref->setWindowFlags(Qt::FramelessWindowHint);
         pref->setAutoFillBackground(1);
-        pref->setParent(this);
+//        pref->setParent(this);
         pref->show();
     });
 
-    auto *button_about = new QPushButton(tr("ABOUT"), dialog_admin);
-    connect(button_about,&QPushButton::pressed,[this]()
-    {
-        about About(this);
-        About.exec();
-    });
+    auto *button_change_password = new QPushButton(tr("Change Password"), dialog_admin);
+    connect(button_change_password,&QPushButton::pressed,this,&mainWindow::dialogCreateAdmin);
+
+//    auto *button_about = new QPushButton(tr("ABOUT"), dialog_admin);
+//    connect(button_about,&QPushButton::pressed,[this]()
+//    {
+//        about About;
+//        About.exec();
+//    });
 
     auto *button_close = new QPushButton(tr("CLOSE"), dialog_admin);
     connect(button_close,&QPushButton::pressed,dialog_admin,&QDialog::close);
 
     auto *button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
     connect(button_exit,&QPushButton::pressed,dialog_admin,&QDialog::close);
-    connect(button_exit,&QPushButton::pressed,this,&mainWindow::close);
+    connect(button_exit,&QPushButton::pressed,qApp,&QApplication::quit);
 
     layout_main->addWidget(button_add_to_database);
     layout_main->addWidget(button_manage_database);
     layout_main->addWidget(button_preferences);
-    layout_main->addWidget(button_about);
+    layout_main->addWidget(button_change_password);
     layout_main->addWidget(button_close);
     layout_main->addWidget(button_exit);
 
@@ -1079,25 +1100,9 @@ void mainWindow::dialogAdmin()
     dialog_admin->setAutoFillBackground(1);
 
     dialog_admin->adjustSize();
-//    dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
-//    dialog_admin->setParent(this);
     dialog_admin->show();
 
-}
-
-void mainWindow::checkAdmin()
-{
-    QSettings settings("elroke","elroke");
-    QString user;
-    settings.beginGroup("Authentication");
-    user=settings.value("username").toString();
-    settings.endGroup();
-
-    if(user==NULL)
-        dialogCreateAdmin();
-    else
-        dialogLogin();
 }
 
 void mainWindow::dialogCreateAdmin()
@@ -1105,39 +1110,71 @@ void mainWindow::dialogCreateAdmin()
     QDialog *dialog = new QDialog;
     QVBoxLayout *layout_main = new QVBoxLayout;
 
-    le_userName = new CLineEdit(dialog);
+   auto* le_old_password= new CLineEdit(dialog);
+    le_old_password->setEchoMode(QLineEdit::Password);
 
-    le_password = new CLineEdit(dialog);
+  auto*  le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
 
-    le_password_confirm = new CLineEdit(dialog);
+   auto* le_password_confirm = new CLineEdit(dialog);
     le_password_confirm->setEchoMode(QLineEdit::Password);
 
     QHBoxLayout *layout_button = new QHBoxLayout;
-    auto *button_create_admin = new QPushButton(tr("Create Administrator"), dialog);
-    connect(button_create_admin,&QPushButton::pressed,this,&mainWindow::createAdminAccount);
+    auto *button_create_admin = new QPushButton(tr("Apply"), dialog);
+    connect(button_create_admin,&QPushButton::pressed,[this,dialog,le_old_password,le_password,le_password_confirm]()
+    {
+
+        QString old_pass = le_old_password->text();
+        QString pass = le_password->text();
+        QString pass_confirm = le_password_confirm->text();
+
+        if(old_pass.isEmpty() || pass.isEmpty() || pass_confirm.isEmpty())
+        {
+                return;
+        }
+
+        if(pass!=pass_confirm){
+                return;
+        }
+                QSettings setting("elroke","elroke");
+                setting.beginGroup("Admin");
+                QByteArray p = setting.value("pasword").toByteArray();
+                if(p==NULL){
+                    qDebug()<<"p null";
+                    p=QString("elroke").toUtf8();
+                    qDebug()<<"p now"<<p;
+                }
+
+                if(old_pass!=QString(p))
+                {
+                    qDebug()<<"old_pass"<<old_pass;
+                    qDebug()<<"p "<<p;
+                    return;
+                }
+                setting.setValue("password", QCryptographicHash::hash(pass.toUtf8(), QCryptographicHash::Sha1));
+                setting.endGroup();
+                dialog->close();
+    });
 
     auto *button_close = new QPushButton("Close", dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
-    connect(this,&mainWindow::loginAccepted,dialog,&QDialog::close);
+//    connect(this,&mainWindow::loginAccepted,dialog,&QDialog::close);
 
     layout_button->addWidget(button_close);
     layout_button->addWidget(button_create_admin);
 
-    layout_main->addWidget(new QLabel(tr("First setup,  create administrator account"), dialog));
-    layout_main->addStretch();
-    layout_main->addWidget(new QLabel(tr("Username"),dialog));
-    layout_main->addWidget(le_userName);
+    layout_main->addWidget(new QLabel(tr("Old Password"),dialog));
+    layout_main->addWidget(le_old_password);
 
-    layout_main->addWidget(new QLabel(tr("Password"),dialog));
+    layout_main->addWidget(new QLabel(tr("New Password"),dialog));
     layout_main->addWidget(le_password);
-    layout_main->addWidget(new QLabel(tr("Confirm password"),dialog));
+    layout_main->addWidget(new QLabel(tr("Confirm New password"),dialog));
     layout_main->addWidget(le_password_confirm);
     layout_main->addStretch();
     layout_main->addLayout(layout_button);
 
      dialog->setLayout(layout_main);
-     connect(this,&mainWindow::usernameCreated,dialog,&QDialog::close);
+//     connect(this,&mainWindow::usernameCreated,dialog,&QDialog::close);
      dialog->setWindowFlags(Qt::FramelessWindowHint);
      dialog->setParent(this);
      QPalette palet;
@@ -1164,31 +1201,69 @@ void mainWindow::dialogLogin()
     QDialog *dialog = new QDialog;
     QVBoxLayout *layout_main = new QVBoxLayout;
 
-    le_userName = new CLineEdit(dialog);
-    le_password = new CLineEdit(dialog);
+    auto *le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
+    le_password->setFocus();
+
+    QByteArray pass;
+
+    QSettings setting("elroke", "elroke");
+    setting.beginGroup("Admin");
+    pass = setting.value("password").toByteArray();
+    setting.endGroup();
+
+    if(pass==NULL)
+    {
+        le_password->setText("elroke");
+    }
+
+
+    auto *button_admin = new QPushButton(tr("Administrator"), dialog);
+    connect(le_password,&CLineEdit::returnPressed,button_admin,&QPushButton::pressed);
+    connect(button_admin,&QPushButton::pressed,[this,dialog,le_password,pass]()
+
+    {
+        if(QString(pass).isEmpty() && le_password->text()=="elroke")
+        {
+            //open
+            dialog->close();
+            dialogAdmin();
+        }
+        else
+        {
+           QByteArray p = QCryptographicHash::hash(le_password->text().toUtf8(), QCryptographicHash::Sha1);
+           if(pass==p)
+           {
+               //open
+               dialog->close();
+               dialogAdmin();
+           }
+        }
+
+    });
+
+
+    auto *button_about = new QPushButton(tr("About"), dialog);
+    connect(button_about,&QPushButton::pressed,[this]()
+    {
+        about About(this);
+//        About.setAutoFillBackground(1);
+        About.exec();
+    });
+
 
     auto *button_close = new QPushButton(tr("Close"), dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
 
-    auto *button_login = new QPushButton(tr("Login"), dialog);
 
-    connect(le_userName,&CLineEdit::returnPressed,button_login,&QPushButton::pressed);
-    connect(le_password,&CLineEdit::returnPressed,button_login,&QPushButton::pressed);
-    connect(button_login,&QPushButton::pressed,this,&mainWindow::login);
+      layout_main->addWidget(new QLabel(tr("Password, default \"elroke\""),dialog));
 
-    QHBoxLayout *layout_button = new QHBoxLayout;
-    layout_button->addWidget(button_close);
-    layout_button->addWidget(button_login);
-
-    layout_main->addStretch();
-    layout_main->addWidget(new QLabel(tr("Username"),dialog));
-    layout_main->addWidget(le_userName);
-    layout_main->addWidget(new QLabel(tr("Password"),dialog));
 
     layout_main->addWidget(le_password);
+    layout_main->addWidget(button_admin);
     layout_main->addStretch();
-    layout_main->addLayout(layout_button);
+    layout_main->addWidget(button_about);
+    layout_main->addWidget(button_close);
 
      dialog->setLayout(layout_main);
      dialog->setParent(this);
@@ -1202,54 +1277,11 @@ void mainWindow::dialogLogin()
      palet.setColor(QPalette::ButtonText, palette().light().color());
      dialog->setPalette(palet);
 
-     connect(this,&mainWindow::loginAccepted,dialog,&QDialog::close);
-     dialog->adjustSize();
+     dialog->setFixedWidth(300);
      dialog->setAttribute(Qt::WA_DeleteOnClose);
-     le_userName->setFocus();
+//     le_userName->setFocus();
      dialog->show();
-}
 
-void mainWindow::createAdminAccount()
-{
-    QString user = le_userName->text();
-    QString pass = le_password->text();
-    QString pass_confirm = le_password_confirm->text();
-
-    if(user.isEmpty() || pass.isEmpty() || pass_confirm.isEmpty())
-    {
-        return;
-    }
-
-    if(pass!=pass_confirm){
-        return;
-    }
-        QSettings setting("elroke","elroke");
-        setting.beginGroup("Authentication");
-        setting.setValue("username", QCryptographicHash::hash(user.toUtf8(), QCryptographicHash::Sha1));
-        setting.setValue("password", QCryptographicHash::hash(pass.toUtf8(), QCryptographicHash::Sha1));
-        setting.endGroup();
-
-        emit usernameCreated();
-        dialogLogin();
-}
-
-void mainWindow::login(){
-
-    QSettings settings("elroke","elroke");
-    QByteArray user, password;
-    settings.beginGroup("Authentication");
-    user = settings.value("username").toByteArray();
-    password = settings.value("password").toByteArray();
-    settings.endGroup();
-
-   QByteArray u  = QCryptographicHash::hash(le_userName->text().toUtf8(), QCryptographicHash::Sha1);
-   QByteArray p = QCryptographicHash::hash(le_password->text().toUtf8(), QCryptographicHash::Sha1);
-
-    if(u==user && p==password)
-    {
-        emit loginAccepted();
-        dialogAdmin();
-    }
 }
 
 void mainWindow::showHits()
@@ -1310,9 +1342,10 @@ void mainWindow::randomNumberInstance(){
 
 void mainWindow::openingInstance()
 {
-    cover = new opening();
-    connect(cover,&opening::passed,video,&VideoWidget::show);
-    connect(cover,&opening::passed,video->player(),&Player::play);
+    opening = new Opening();
+    opening->setAutoFillBackground(1);
+    connect(opening,&Opening::passed,video,&VideoWidget::show);
+    connect(opening,&Opening::passed,video->player(),&Player::play);
 }
 
 void mainWindow::moveItemToBottom()
@@ -1384,6 +1417,7 @@ void mainWindow::readSettings()
 
 void mainWindow::d_addtodatabse()
 {
+    //FIXME
     addtodatabase *atd  = new addtodatabase;
 //    atd->setAutoFillBackground(1);
 //      atd->setAttribute(Qt::WA_DeleteOnClose);
@@ -1393,8 +1427,8 @@ void mainWindow::d_addtodatabse()
 
 mainWindow::~mainWindow()
 {
+
     delete video;
-    delete cover;
     if(autosave_playlist->isChecked())
         writePlaylist();
 }

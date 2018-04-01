@@ -6,7 +6,7 @@
 #include <QLabel>
 #include <QPropertyAnimation>
 
-class opening : public QWidget
+class Opening : public QWidget
 {
     Q_OBJECT
 
@@ -21,7 +21,7 @@ private :
 private slots:
     void finish();
 public:
-    explicit opening(QWidget *parent=0);
+    explicit Opening(QWidget *parent=0);
     void setData(QString title,QString singer);
     void start();
 
