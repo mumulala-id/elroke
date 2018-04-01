@@ -169,8 +169,11 @@ void mainWindow::createWidgets(){
 
     sql_model->setTable("ELROKE123");
     sql_model->select();
-    qDebug()<<sql_model->rowCount();
-//    sql_model->setSort(1,Qt::AscendingOrder);
+
+     while (sql_model->canFetchMore()) {
+         sql_model->fetchMore();
+     }
+    sql_model->setSort(1,Qt::AscendingOrder);
     table->verticalHeader()->hide();
     table->setShowGrid(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -190,7 +193,7 @@ void mainWindow::createWidgets(){
     table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new NoFocusDelegate());
-//    table->setSortingEnabled(1);
+    table->setSortingEnabled(1);
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
@@ -205,6 +208,10 @@ void mainWindow::createWidgets(){
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
     vertical->setDefaultSectionSize(vertical->fontMetrics().height()+10);
+
+
+//    scrolB->setFixedWidth(80);
+
 
     connect(table,&QTableView::doubleClicked,this,&mainWindow::addToPlaylist);
     connect(le_search,&CLineEdit::focussed,this,&mainWindow::showKeyboard);
@@ -556,7 +563,7 @@ void mainWindow::moveItemToTop()
         item->setTitle(item_current->song()->getTitle());
         item->setSinger(item_current->song()->getSinger());
         item->setPath(item_current->song()->getPath());
-        item->setPath(item_current->song()->getgetCategory());
+        item->setCategory(item_current->song()->getCategory());
         item->setLanguage(item_current->song()->getLanguage());
         item->setAudioChannel(item_current->song()->getAudioChannel());
         item->setPlaytimes(item_current->song()->getPlayTimes());
@@ -625,10 +632,10 @@ void mainWindow::playPlayer()
     }
 
     video->player()->setFile(file);
-    video->activateWindow();
 
     if(this->isActiveWindow())
     {
+        clearMask();
         opening->setParent(this);
     }
     else
@@ -678,13 +685,15 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
+    qDebug()<<"before";
     if(this->isActiveWindow()){
-             setParent(this);
+           notif-> setParent(this);
                }
     else{
-        setParent(video);
+       notif->setParent(video);
 
     }
+    qDebug()<<"after";
 
     notif->setWindowFlags(Qt::FramelessWindowHint);
     notif->setPalette(let);
@@ -737,7 +746,7 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event)
 void mainWindow::dialogSavePlaylist()
 {
     QDialog *dialog_save_playlist = new QDialog;
-    dialog_save_playlist->setParent(this);
+//    dialog_save_playlist->setParent(this);
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
@@ -783,7 +792,7 @@ void mainWindow::dialogSavePlaylist()
 void mainWindow::dialogLoadPlaylist(){
 
     auto *dialog_load_playlist = new QDialog;
-    dialog_load_playlist->setParent(this);
+//    dialog_load_playlist->setParent(this);
 
     QDirIterator it(app_dir+"/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
     QList<QString> list_play;
@@ -820,7 +829,7 @@ void mainWindow::dialogLoadPlaylist(){
     dialog_load_playlist->setLayout(layout_main);
 
     dialog_load_playlist->setWindowFlags(Qt::FramelessWindowHint);
-    dialog_load_playlist->setAutoFillBackground(1);
+//    dialog_load_playlist->setAutoFillBackground(1);
     dialog_load_playlist->setAttribute(Qt::WA_DeleteOnClose);
     dialog_load_playlist->setMinimumSize(300,200);
 
@@ -994,6 +1003,8 @@ void mainWindow::showKeyboard(bool x)
 void mainWindow::videoInstance(){
     //video player
     video = new VideoWidget;
+    video->setWindowFlags( Qt::FramelessWindowHint);
+    video->setWindowState(Qt::WindowFullScreen);
      video->hide();
     video->installEventFilter(this);
 
@@ -1034,14 +1045,21 @@ void mainWindow::dialogAdmin()
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
-    connect(button_add_to_database,&QPushButton::pressed,this,&mainWindow::d_addtodatabse);
-//    {
-//        addtodatabase atd;
-////        connect(&atd,SIGNAL(accepted()),dialog_admin,SLOT(close()));
-//        connect(&atd,SIGNAL(accepted()),this,SLOT(tableRule()));
-////        connect(&atd,SIGNAL(accepted()),this,SLOT(getCategory()));
-//        atd.exec();
-//    });
+    connect(button_add_to_database,&QPushButton::pressed,[this]()
+    {
+    addtodatabase *atd  = new addtodatabase(this);
+//    atd->setAutoFillBackground(1);
+      atd->setAttribute(Qt::WA_DeleteOnClose);
+    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
+    connect(atd,&addtodatabase::accepted,[this]()
+    {
+        while(sql_model->canFetchMore())
+        {
+            sql_model->fetchMore();
+        }
+    });
+    atd->show();
+    });
 
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
@@ -1139,7 +1157,7 @@ void mainWindow::dialogCreateAdmin()
                 QSettings setting("elroke","elroke");
                 setting.beginGroup("Admin");
                 QByteArray p = setting.value("pasword").toByteArray();
-                if(p==NULL){
+                if(QString(p).isEmpty()){
                     qDebug()<<"p null";
                     p=QString("elroke").toUtf8();
                     qDebug()<<"p now"<<p;
@@ -1212,7 +1230,7 @@ void mainWindow::dialogLogin()
     pass = setting.value("password").toByteArray();
     setting.endGroup();
 
-    if(pass==NULL)
+    if(QString(pass).isEmpty())
     {
         le_password->setText("elroke");
     }
@@ -1246,8 +1264,8 @@ void mainWindow::dialogLogin()
     auto *button_about = new QPushButton(tr("About"), dialog);
     connect(button_about,&QPushButton::pressed,[this]()
     {
-        about About(this);
-//        About.setAutoFillBackground(1);
+        about About;
+        About.setAutoFillBackground(1);
         About.exec();
     });
 
@@ -1305,11 +1323,22 @@ void mainWindow::videoEnds()
 
     QLabel *value_label = new QLabel(dialog_random_number);
 
-    effect_player->setFile("/usr/share/elroke/soundfx/applause.mp3");
+    QFile file("/usr/share/elroke/soundfx/applause.mp3");
+
+    if(!file.exists())
+    {
+        QTimer::singleShot(2000,dialog_random_number,SLOT(close()));
+        QTimer::singleShot(2000,this,SLOT(playPlayer()));
+    }
+    else
+    {
+
+    effect_player->setFile(file.fileName());
     effect_player->play();
 
     connect(effect_player,&Player::reachEnded,dialog_random_number,&QDialog::close);
     connect(effect_player,&Player::reachEnded,this,&mainWindow::playPlayer);
+    }
 
     QFont font;
     font.setPointSize(156);
@@ -1344,8 +1373,9 @@ void mainWindow::openingInstance()
 {
     opening = new Opening();
     opening->setAutoFillBackground(1);
-    connect(opening,&Opening::passed,video,&VideoWidget::show);
-    connect(opening,&Opening::passed,video->player(),&Player::play);
+//    connect(opening,&Opening::passed,video,&VideoWidget::show);
+//    connect(opening,&Opening::passed,video->player(),&Player::play);
+    connect(opening,&Opening::passed,video,&VideoWidget::play);
 }
 
 void mainWindow::moveItemToBottom()
@@ -1363,7 +1393,7 @@ void mainWindow::moveItemToBottom()
          item->setTitle(item_current->song()->getTitle());
          item->setSinger(item_current->song()->getSinger());
          item->setPath(item_current->song()->getPath());
-         item->setPath(item_current->song()->getgetCategory());
+         item->setCategory(item_current->song()->getCategory());
          item->setLanguage(item_current->song()->getLanguage());
          item->setPlaytimes(item_current->song()->getPlayTimes());
          item->setAudioChannel(item_current->song()->getAudioChannel());

@@ -152,7 +152,6 @@ Song* dbmanager::getSong(int id)
     
     if(query.exec())
     {
-
             while(query.next())
             {
                 rec = query.record();         

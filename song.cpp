@@ -60,7 +60,7 @@ QString Song::getLanguage()
     return language;
 }
 
-QString Song::getgetCategory()
+QString Song::getCategory()
 {
     return category;
 }

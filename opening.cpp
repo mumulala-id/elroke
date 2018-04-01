@@ -76,5 +76,6 @@ void Opening::start(){
 
 void Opening::finish(){
     hide();
+    setParent(NULL);
     emit passed();
 }

@@ -14,7 +14,7 @@ private :
     Player *_player;
 public :
     Player *player()const{return _player;};
-
+    void play();
 };
 
 #endif // VIDEOWIDGET_H

@@ -74,10 +74,17 @@ managedb::managedb(QWidget *parent) :
 
     grup_folder->setLayout(lo_grup_folder);
 
+    QGroupBox *grup_video = new QGroupBox(tr("Preview"), this);
+    video = new VideoWidget(this);
+    QVBoxLayout *layout_video = new QVBoxLayout;
+    layout_video->addWidget(video);
+    grup_video->setLayout(layout_video);
+
     lo_top->addWidget(grup_singer);
     lo_top->addWidget(grup_language);
     lo_top->addWidget(grup_genre);
     lo_top->addWidget(grup_folder);
+    lo_top->addWidget(grup_video);
     lo_top->setMargin(0);
     lo_top->setSpacing(0);
 
@@ -91,6 +98,9 @@ managedb::managedb(QWidget *parent) :
     sql_model->setTable("ELROKE123");
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
     sql_model->select();
+    while(sql_model->canFetchMore()){
+        sql_model->fetchMore();
+    }
 
     proxy_model = new ProxyModel(ProxyModel::column, this);
     proxy_model->setSourceModel(sql_model);
@@ -222,7 +232,6 @@ managedb::managedb(QWidget *parent) :
     combo_search = new QComboBox(this);
     combo_search->addItem(tr("Title"));
     combo_search->addItem(tr("Singer"));
-//    connect(combo_search,SIGNAL(a),this,SLOT(comboSearchChange(int)));
     connect(combo_search,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),this,&managedb::comboSearchChange);
 
     le_search = new CLineEdit(this);
@@ -233,7 +242,6 @@ managedb::managedb(QWidget *parent) :
     CLineEdit *le_jump = new CLineEdit(this);
     le_jump->setFixedWidth(100);
     le_jump->setValidator(new QIntValidator(this));
-//    connect( le_jump,SIGNAL(textChanged(QString)), this, SLOT(jumpTo(QString)));
     connect(le_jump,&CLineEdit::textChanged,this,&managedb::jumpTo);
 
     auto *scroll_top = new QPushButton(tr("Top"), this);
@@ -255,8 +263,9 @@ managedb::managedb(QWidget *parent) :
     lo_search->addStretch();
 
     table->setModel(proxy_model);
-//    table->verticalHeader()->hide();
-    table->setAlternatingRowColors(1);
+    table->verticalHeader()->hide();
+    table->resizeColumnsToContents();
+//    table->resizeColumnToContents(7);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -471,6 +480,9 @@ void managedb::save()
     if(!sql_model->submitAll())
         qDebug()<<"error o submit"<<sql_model->lastError();
     sql_model->select();
+    while(sql_model->canFetchMore()){
+        sql_model->fetchMore();
+    }
     total_count_label->setText(QString::number(sql_model->rowCount()));
     anyChange=false;
 
@@ -606,6 +618,13 @@ void managedb::selectedCount()
 {
     QModelIndexList list = table->selectionModel()->selectedRows();
     selected_count_label->setText(QString::number(list.count()));
+
+    if(list.count()==1){
+        int row = list.at(0).row();
+                 QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
+                 video->player()->setFile(file);
+                 video->player()->play();
+    }
 }
 
 void managedb::comboSearchChange(int i){

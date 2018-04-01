@@ -4,7 +4,7 @@
 #include "proxymodel.h"
 #include "keyboard.h"
 #include "clineedit.h"
-
+#include "videowidget.h"
 #include <QDialog>
 #include <QListWidget>
 #include <QStandardPaths>
@@ -31,6 +31,7 @@ private :
     QComboBox *combo_audio_channel;
     QComboBox *combo_search;
     CLineEdit *le_search;
+    VideoWidget *video;
     QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     bool anyChange=false;
 

@@ -10,9 +10,14 @@ VideoWidget::VideoWidget(QWidget *parent):
        pal.setColor(QPalette::Background,Qt::black);
        pal.setColor(QPalette::Foreground,Qt::white);
        setPalette(pal);
+    setCursor(Qt::BlankCursor);
+       setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-       setWindowFlags( Qt::FramelessWindowHint);
-       setWindowState(Qt::WindowFullScreen);
+}
+void VideoWidget::play()
+{
+    show();
+    _player->play();
 
 }
 

@@ -123,6 +123,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     layout_sub_font->addWidget(combo_font);
     layout_sub_font->addWidget(spin_font_size);
+    layout_sub_font->addStretch();
     layout_font->addLayout(layout_sub_font);
     layout_font->addStretch();
     group_font->setLayout(layout_font);

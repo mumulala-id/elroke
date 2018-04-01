@@ -32,7 +32,7 @@
 #include <QTabBar>
 #include <QStackedLayout>
 #include <QHeaderView>
-
+#include <QTimer>
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
@@ -101,8 +101,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
      model->setColumnCount(2);
      view->setModel(model);
      view->setColumnHidden(1,1);
-
-
 
      layout_top_left->addLayout(layout_drive);
      layout_top_left->addWidget(treeview);
@@ -441,8 +439,7 @@ void addtodatabase::saveToDatabase()
             filename = info.baseName();
 
             splitter =  getSplitter(filename);
-//           if(filename.contains(splitter))
-//           {
+
                splitted = filename.split(splitter);
 
                switch(splitted.count())
@@ -472,7 +469,7 @@ void addtodatabase::saveToDatabase()
                            default:
                                break;
                }
-//           }
+
                        set_singer.insert(singer.toUpper());
                        set_language.insert(language.toUpper());
                        set_genre.insert(genre.toUpper());
@@ -502,6 +499,7 @@ void addtodatabase::saveToDatabase()
 
      setCursor(Qt::ArrowCursor);
     qDebug()<<"fin";
+//    QTimer::singleShot(3000,this,SLOT(accept()));
       accept();
 
  }
