@@ -55,9 +55,9 @@ managedb::managedb(QWidget *parent) :
     lo_grup_language->addWidget(list_language);
     grup_language->setLayout(lo_grup_language);
 
-    auto *grup_genre = new QGroupBox(tr("Category"), this);
+    auto *grup_genre = new QGroupBox(tr("Genre"), this);
     list_genre = new QListWidget(this);
-    list_genre->addItems(listStringFileParser::parse(app_dir+"/meta/category"));
+    list_genre->addItems(listStringFileParser::parse(app_dir+"/meta/genre"));
     connect(list_genre, &QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
 
     QVBoxLayout *lo_grup_genre = new QVBoxLayout;
@@ -78,6 +78,31 @@ managedb::managedb(QWidget *parent) :
     video = new VideoWidget(this);
     QVBoxLayout *layout_video = new QVBoxLayout;
     layout_video->addWidget(video);
+    auto *layout_button_video = new QHBoxLayout;
+    auto *button_L = new QPushButton("L", this);
+    connect(button_L,&QPushButton::pressed,video->player(),&Player::setAudioChannelLeft);
+    auto *button_S = new QPushButton("S", this);
+    connect(button_S,&QPushButton::pressed,video->player(),&Player::setAudioChannelStereo);
+    auto *button_R = new QPushButton("R", this);
+    connect(button_R,&QPushButton::pressed,video->player(),&Player::setAudioChannelRight);
+    auto *button_play = new QPushButton("\u25B6", this);
+    connect(button_play,&QPushButton::pressed,[this]()
+    {
+      uint row= proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
+    QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
+    video->player()->setFile(file);
+    video->player()->play();
+
+    });
+    auto *button_stop = new QPushButton("\u25A0", this);
+    connect(button_stop,&QPushButton::pressed,video->player(),&Player::stop);
+    layout_button_video->addWidget(button_L);
+    layout_button_video->addWidget(button_S);
+    layout_button_video->addWidget(button_R);
+    layout_button_video->addWidget(button_play);
+    layout_button_video->addWidget(button_stop);
+    layout_button_video->addStretch();
+    layout_video->addLayout(layout_button_video);
     grup_video->setLayout(layout_video);
 
     lo_top->addWidget(grup_singer);
@@ -265,12 +290,20 @@ managedb::managedb(QWidget *parent) :
     table->setModel(proxy_model);
     table->verticalHeader()->hide();
     table->resizeColumnsToContents();
-//    table->resizeColumnToContents(7);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
     connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
+    connect(table,&QTableView::doubleClicked,[this](QModelIndex index)
+    {
+
+          uint row =  proxy_model->mapToSource( index).row();
+                     QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
+                     video->player()->setFile(file);
+                     video->player()->play();
+
+    });
 
     QVBoxLayout *lo_bottom_right = new QVBoxLayout;
 
@@ -496,25 +529,21 @@ void managedb::onListWidgetClicked(QListWidgetItem *item)
     QObject *obj = sender();
     QString text=item->text();
 
-    int column=0;
+    uint column=0;
     if (obj==list_singer)
-        column=1;
-    else if(obj==list_language)
         column=2;
-    else if(obj==list_genre)
+    else if(obj==list_language)
         column=3;
+    else if(obj==list_genre)
+        column=4;
     else if(obj==list_folder)
-            column=6;
+    {
+            column=7;
+            proxy_model->searchByColumn(column, text);
+    }
 
-    QVariantList list;
-    list.append(column);
-    list.append(text);
-
-    emit toSearch(list);
-    table->selectAll();
-
+    proxy_model->fixSearchByColumn(column, text);
     setCursor(Qt::ArrowCursor);
-
 }
 
 void managedb::updateList()
@@ -542,6 +571,13 @@ void managedb::updateList()
     QList<QString>cat = set_category.toList();
     QList<QString>path= set_folder.toList();
 
+    singer.removeAll("");
+    singer.removeAll(" ");
+    lang.removeAll("");
+    lang.removeAll(" ");
+    cat.removeAll("");
+    cat.removeAll(" ");
+
     //SORT LIST
     qSort(singer.begin(), singer.end());
     qSort(lang.begin(), lang.end());
@@ -560,37 +596,8 @@ void managedb::updateList()
     setCursor(Qt::ArrowCursor);
 }
 
-managedb::~managedb(){
-//update latest change
-    QSet<QString>set_singer;
-    QSet<QString>set_language;
-    QSet<QString>set_category;
-    QSet<QString>set_folder;
-
-    for(int i=0; i<sql_model->rowCount(); i++)
-    {
-        set_singer.insert(sql_model->data(sql_model->index(i,2),Qt::DisplayRole).toString().toUpper());
-        set_language.insert(sql_model->data(sql_model->index(i,3),Qt::DisplayRole).toString().toUpper());
-        set_category.insert(sql_model->data(sql_model->index(i,4),Qt::DisplayRole).toString().toUpper());
-        QFileInfo info;
-        info.setFile(sql_model->data(sql_model->index(i,7),Qt::DisplayRole).toString());
-        set_folder.insert(info.path());
-    }
-
-    QList<QString>singer= set_singer.toList();
-    QList<QString>lang = set_language.toList();
-    QList<QString>cat = set_category.toList();
-    QList<QString>path= set_folder.toList();
-
-    qSort(singer.begin(), singer.end());
-    qSort(lang.begin(), lang.end());
-    qSort(cat.begin(),cat.end());
-    qSort(path.begin(), path.end());
-
-    writeTextStream(app_dir+"/meta/singer", singer);
-    writeTextStream (app_dir+"/meta/language", lang);
-    writeTextStream(app_dir+"/meta/category", cat);
-    writeTextStream(app_dir+"/meta/path", path);
+managedb::~managedb()
+{
 }
 
 void managedb::writeTextStream(const QString &file, QList<QString>set){
@@ -619,12 +626,7 @@ void managedb::selectedCount()
     QModelIndexList list = table->selectionModel()->selectedRows();
     selected_count_label->setText(QString::number(list.count()));
 
-    if(list.count()==1){
-        int row = list.at(0).row();
-                 QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
-                 video->player()->setFile(file);
-                 video->player()->play();
-    }
+
 }
 
 void managedb::comboSearchChange(int i){

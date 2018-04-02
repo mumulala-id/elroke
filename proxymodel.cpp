@@ -16,37 +16,53 @@ void ProxyModel::search(QString s){
 
     if(text_search!=s)
     text_search=s;
+    md = ProxyModel::smart;
     invalidateFilter();
 
 }
-//void ProxyModel::search(QVariantList var_list)
-//{
-//    if(var_list.size()!=2)
-//        return;
 
-//    colom =  var_list.at(0).toInt();
-//    text_search = var_list.at(1).toString();
+void ProxyModel::searchByColumn(int column, const QString &text)
+{
+    md = ProxyModel::column;
+    text_search = text;
+    _colom = column;
+    invalidateFilter();
+}
 
-//    invalidateFilter();
-//}
+void ProxyModel::fixSearchByColumn(int column, const QString &fixText)
+{
+    md = ProxyModel::fixed;
+    text_search = fixText;
+    _colom = column;
+    invalidateFilter();
+
+}
 
 bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_parent) const
 {
 //smart mode will search title and singer
-//    if(md==ProxyModel::smart)
-//    {
+    if(md==ProxyModel::smart)
+    {
     QModelIndex indG = sourceModel()->index(source_row, 1, source_parent);
     QModelIndex indD = sourceModel()->index(source_row, 2, source_parent);
     return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive) ||
             sourceModel()->data(indD).toString().contains(text_search, Qt::CaseInsensitive) ;
-//    }
+    }
 
-//    if(md==ProxyModel::column)
-//    {
-//        QModelIndex indG = sourceModel()->index(source_row, colom+1, source_parent);
-//         return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive);
-//    }
-    return false;
+    else if(md==ProxyModel::column)
+    {
+        QModelIndex indG = sourceModel()->index(source_row, _colom, source_parent);
+         return sourceModel()->data(indG).toString().contains(text_search, Qt::CaseInsensitive);
+    }
+    else if(md==ProxyModel::fixed)
+    {
+        QModelIndex indG = sourceModel()->index(source_row, _colom, source_parent);
+        int x = QString::compare(text_search,sourceModel()->data(indG).toString(),Qt::CaseInsensitive);
+        if(x==0) return true;
+        return false;
+
+    }
+    return true;
 }
 
 QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -128,7 +144,7 @@ bool ProxyModel::lessThan(const QModelIndex &left,
     }
 }
 void ProxyModel::reset(){
-    colom =  0;
-    text_search ="";
-    invalidateFilter();
+//    _colom =  0;
+//    text_search ="";
+//    invalidateFilter();
 }

@@ -470,9 +470,9 @@ void addtodatabase::saveToDatabase()
                                break;
                }
 
-                       set_singer.insert(singer.toUpper());
-                       set_language.insert(language.toUpper());
-                       set_genre.insert(genre.toUpper());
+                       set_singer.insert(singer.trimmed().toUpper());
+                       set_language.insert(language.trimmed().toUpper());
+                       set_genre.insert(genre.trimmed().toUpper());
                        set_folder.insert(folder);
 
                          data.append(title);
@@ -492,14 +492,21 @@ void addtodatabase::saveToDatabase()
     else               qDebug()<<"sql not ok";
 
 
+    set_singer.remove("");
+    set_singer.remove(" ");
+    set_genre.remove("");
+    set_genre.remove(" ");
+    set_language.remove("");
+    set_language.remove(" ");
+
+
     writeTextStream(data_dir+"/meta/singer", set_singer);
     writeTextStream(data_dir+"/meta/language", set_language);
     writeTextStream(data_dir+"/meta/genre", set_genre);
     writeTextStream(data_dir+"/meta/path", set_folder);
 
      setCursor(Qt::ArrowCursor);
-    qDebug()<<"fin";
-//    QTimer::singleShot(3000,this,SLOT(accept()));
+
       accept();
 
  }
@@ -522,8 +529,9 @@ void addtodatabase::writeTextStream(const QString &file, QSet<QString>set)
     {
           QTextStream stream(&f);
         
-          foreach (QString val, set) {
-              stream << val<<'\n';
+          foreach (const QString &val, set)
+          {
+                 stream << val<<'\n';
           }
     }
          f.close();         

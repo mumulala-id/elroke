@@ -10,7 +10,7 @@ class ProxyModel : public QSortFilterProxyModel
     QMap<int, Qt::Alignment>alignMap;
 
 public:
-      enum mode{column,smart};
+      enum mode{column,smart,fixed};
       enum role{sortRole=Qt::UserRole};
 
     explicit ProxyModel(QObject* parent = 0);
@@ -22,6 +22,8 @@ public:
 public slots:
   void search(QString);
 //  void search(QVariantList);
+  void fixSearchByColumn(int column, const QString &fixText);
+  void searchByColumn(int column, const QString &text);
   void setAlignment(unsigned int, Qt::Alignment);
   void reset();
 
@@ -30,7 +32,7 @@ private slots:
 
 private:
     QString text_search;
-    int colom=0;
+    unsigned short int _colom=0;
     mode md;
 
 protected :
