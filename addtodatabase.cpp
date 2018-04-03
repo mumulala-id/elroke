@@ -86,21 +86,26 @@ addtodatabase::addtodatabase(QWidget *parent) :
      file_model->setFilter(QDir::Files | QDir::NoDotAndDotDot);
      file_model->setNameFilters(supported_video);
      file_model->setNameFilterDisables(false);
-
      file_model->setRootPath(getCurrentDrive());
 
      label_current_dir = new QLabel(this);
+
+     model = new QStandardItemModel(view);
+     model->setColumnCount(2);
 
      view = new QTableView(this);
      view->setEditTriggers(QTableView::NoEditTriggers);
      view->setSelectionBehavior(QAbstractItemView::SelectRows);
      view->setSelectionMode(QAbstractItemView::ExtendedSelection);
      view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-
-     model = new QStandardItemModel(view);
-     model->setColumnCount(2);
      view->setModel(model);
      view->setColumnHidden(1,1);
+     connect(view->selectionModel(),&QItemSelectionModel::selectionChanged,[this]()
+     {
+        QModelIndexList list =view->selectionModel()->selectedRows();
+        if(list.count()>1)
+            button_start->setEnabled(1);
+     });
 
      layout_top_left->addLayout(layout_drive);
      layout_top_left->addWidget(treeview);
@@ -122,11 +127,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      auto *button_select_all = new QPushButton(tr("Select All"), this);
 
-     connect(button_select_all,&QPushButton::pressed,[this]()
-     {
-         view->selectAll();
-         button_start->setEnabled(1);
-     });
+     connect(button_select_all,&QPushButton::pressed,view,&QTableView::selectAll);
 
      QHBoxLayout *layout_below_view = new QHBoxLayout;
      layout_below_view->addWidget(check_subfolder);
@@ -337,7 +338,7 @@ void addtodatabase::getItem()
     setCursor(Qt::ArrowCursor);
 }
 
-void addtodatabase::splitterChange(QString split)
+void addtodatabase::splitterChange(const QString &split)
 {
     if(split==NULL)
         return;
@@ -474,6 +475,7 @@ void addtodatabase::saveToDatabase()
                        set_language.insert(language.trimmed().toUpper());
                        set_genre.insert(genre.trimmed().toUpper());
                        set_folder.insert(folder);
+                      a_channel = a_channel.trimmed().toUpper();
 
                          data.append(title);
                          data.append(singer);
@@ -488,8 +490,11 @@ void addtodatabase::saveToDatabase()
         }
     }
 
-    if(sql_ok)       db->submit();
-    else               qDebug()<<"sql not ok";
+    if(sql_ok)   {
+        db->submit();
+    }    else {
+         qDebug()<<"sql not ok";
+    }
 
 
     set_singer.remove("");

@@ -10,7 +10,7 @@ void Song::setTitle(QString _title)
     titile = _title;
 }
 
-void Song::setId(int _id)
+void Song::setId(QString _id)
 {
     id = _id;
 }
@@ -40,7 +40,7 @@ void Song::setAudioChannel(QString _audioChannel)
     audio_channel = _audioChannel;
 }
 
-unsigned int Song::getId()
+QString Song::getId()
 {
     return id;
 }

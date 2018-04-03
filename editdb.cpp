@@ -16,7 +16,7 @@
     along with ElRoke.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "editdb.h"
-#include "dbmanager.h"
+//#include "dbmanager.h"
 #include "liststringfileparser.h"
 #include <QGroupBox>
 #include <QPushButton>
@@ -116,7 +116,7 @@ managedb::managedb(QWidget *parent) :
     /// bottom area ---------------------------------------------------------------------
 
     //DATABASE
-    dbmanager *db = new dbmanager(dbmanager::edit, this);
+    db = new dbmanager(dbmanager::edit, this);
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
@@ -254,15 +254,15 @@ managedb::managedb(QWidget *parent) :
 
 //right bottom
     QHBoxLayout *lo_search = new QHBoxLayout;
-    combo_search = new QComboBox(this);
-    combo_search->addItem(tr("Title"));
-    combo_search->addItem(tr("Singer"));
-    connect(combo_search,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),this,&managedb::comboSearchChange);
+//    combo_search = new QComboBox(this);
+//    combo_search->addItem(tr("Title"));
+//    combo_search->addItem(tr("Singer"));
+//    connect(combo_search,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),this,&managedb::comboSearchChange);
 
     le_search = new CLineEdit(this);
     le_search->setMaximumWidth(300);
     le_search->setPlaceholderText(tr("SEARCH"));
-    connect(le_search,&CLineEdit::textChanged,this,&managedb::receiverSearch);
+    connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
 
     CLineEdit *le_jump = new CLineEdit(this);
     le_jump->setFixedWidth(100);
@@ -278,13 +278,22 @@ managedb::managedb(QWidget *parent) :
     auto *reset = new QPushButton(tr("Show All"), this);
     connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
-    lo_search->addWidget(combo_search);
+
+    auto *to_be_fixed = new QPushButton(tr("To Be Fixed"), this);
+    connect(to_be_fixed,&QPushButton::pressed,proxy_model,&ProxyModel::toBeFixed);
+
+    auto *button_rename = new QPushButton(tr("Rename File"), this);
+    connect(button_rename,&QPushButton::pressed,this,&managedb::renameFile);
+
+//    lo_search->addWidget(combo_search);
     lo_search->addWidget(le_search);
     lo_search->addWidget(new QLabel(tr("Scroll to : ")));
     lo_search->addWidget(le_jump);
     lo_search->addWidget(scroll_top);
     lo_search->addWidget(scroll_bottom);
     lo_search->addWidget(reset);
+    lo_search->addWidget(to_be_fixed);
+    lo_search->addWidget(button_rename);
     lo_search->addStretch();
 
     table->setModel(proxy_model);
@@ -629,17 +638,17 @@ void managedb::selectedCount()
 
 }
 
-void managedb::comboSearchChange(int i){
-    QVariantList list;
-    list.append(i);
-    QString text = le_search->text();
-    if(text==NULL)
-        return;
+//void managedb::comboSearchChange(int i){
+//    QVariantList list;
+//    list.append(i);
+//    QString text = le_search->text();
+//    if(text==NULL)
+//        return;
 
-    list.append(text);
+//    list.append(text);
 
-    emit toSearch(list);
-}
+////    emit toSearch(list);
+//}
 
 void managedb::receiverSearch(QString s){
 
@@ -647,14 +656,64 @@ void managedb::receiverSearch(QString s){
     list.append(combo_search->currentIndex());
     list.append(s);
 
-    emit toSearch(list);
+//    emit toSearch(list);
 }
 
 void managedb::jumpTo(QString t)
-{   bool a;
+{
+    bool a;
     int x = t.toInt(&a);
     if(a)
     table->scrollTo( table->model()->index(x-1,0), QAbstractItemView::PositionAtTop);
+
+}
+
+void managedb::renameFile()
+{
+    QModelIndexList list = table->selectionModel()->selectedRows();
+
+
+        auto the_string = [this](QModelIndex index,int col){
+
+            int r =  proxy_model->mapToSource( index).row();
+            return sql_model->index(r,col).data().toString();
+    };
+        foreach (QModelIndex i, list)
+        {
+
+            uint row = proxy_model->mapToSource(i).row();
+            QString id = the_string(i,0);
+            QString title  = the_string(i, 1);
+            QString singer  = the_string(i, 2);
+            QString lang = the_string(i,3);
+            QString genre = the_string(i,4);
+            QString audio = the_string(i,5);
+            QString file = the_string(i,7);
+
+            QFileInfo info;
+            info.setFile(file);
+
+            QString path = info.path();
+            QString ext = info.suffix();
+
+            QString filename;
+            filename.append(title);
+            filename.append("#");
+            filename.append(singer);
+            filename.append("#");
+            filename.append(lang);
+            filename.append("#");
+            filename.append(genre);
+            filename.append("#");
+            filename.append(audio);
+
+            sql_model->setData(sql_model->index(row, 7), path+"/"+filename+"."+ext);
+            db->updatePath(id, path+"/"+filename+"."+ext);
+
+            QFile f(file);
+            f.rename(file, path+"/"+filename+"."+ext);
+       }
+
 
 }
 

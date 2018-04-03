@@ -123,11 +123,11 @@ bool dbmanager::insertIntoTable(const QVariantList &data)
      return true;
 }
 
-void dbmanager::updatePlayedTime(int id)
+void dbmanager::updatePlayedTime(QString id)
 {
     QSqlQuery query(db);
     unsigned int value=0;
-    query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+QString::number(id));
+    query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+id);
 
     if(query.exec())
     {
@@ -136,7 +136,7 @@ void dbmanager::updatePlayedTime(int id)
     }
     query.clear();
     this->prepare();
-    query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+QString::number(id));
+    query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+id);
     if(!query.exec())
         qDebug()<<"cant update played time";
     else
@@ -144,11 +144,24 @@ void dbmanager::updatePlayedTime(int id)
     query.clear();
 }
 
-Song* dbmanager::getSong(int id)
+void dbmanager::updatePath(QString id, QString path)
+{
+    QSqlQuery query(db);
+     query.prepare("UPDATE ELROKE123 SET PATH ="+path+" WHERE ID = "+id);
+
+     if(!query.exec()){
+         qDebug()<<"cant update path";
+     }     else {
+         qDebug()<<"path updated";
+         submit();
+     }
+}
+
+Song* dbmanager::getSong(QString id)
 {
     QSqlQuery query(db); 
     QSqlRecord rec;
-    query.prepare("SELECT * FROM ELROKE123 WHERE ID="+QString::number(id));
+    query.prepare("SELECT * FROM ELROKE123 WHERE ID="+id);
     
     if(query.exec())
     {
@@ -165,7 +178,7 @@ Song* dbmanager::getSong(int id)
    }
     
     Song *the_song  = new Song;
-    the_song->setId(rec.value(0).toInt());
+    the_song->setId(rec.value(0).toString());
     the_song->setTitle(rec.value(1).toString());
     the_song->setSinger(rec.value(2).toString());
     the_song->setLanguage(rec.value(3).toString());

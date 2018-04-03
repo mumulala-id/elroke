@@ -11,13 +11,14 @@ public:
     explicit Song(QObject *parent = nullptr);
 
 private :
-    unsigned int id, playtimes;
+    unsigned int  playtimes;
+    QString id;
     QString titile,singer, path,language, category, audio_channel;
     
     
 public slots:
     
-    void setId(int);
+    void setId(QString);
     void setTitle(QString _title);
     void setSinger(QString);
     void setLanguage(QString);
@@ -25,7 +26,7 @@ public slots:
     void setPath(QString);
     void setPlaytimes(int);
     void setAudioChannel(QString);
-   unsigned int getId();
+   QString getId();
     QString getTitle();
     QString getSinger();
     QString getLanguage();

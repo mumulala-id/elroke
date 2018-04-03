@@ -37,10 +37,10 @@ Opening::Opening( QWidget *parent) : QWidget(parent)
     label_singer->setFont(fontSinger);
 
     singer_animation = new QPropertyAnimation(label_singer, "geometry", this);
-    singer_animation->setDuration(1200);
+    singer_animation->setDuration(500);
 
     title_animaton = new QPropertyAnimation(label_title, "geometry", this);
-    title_animaton->setDuration(1200);
+    title_animaton->setDuration(500);
 
     QPalette let;
     let.setColor(QPalette::Background,Qt::gray);
@@ -76,6 +76,6 @@ void Opening::start(){
 
 void Opening::finish(){
     hide();
-    setParent(NULL);
+    setParent(nullptr);
     emit passed();
 }

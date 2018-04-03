@@ -42,7 +42,7 @@ private slots:
     void on_searchWebView_linkClicked(QUrl url);
     void beginDownload();
     void download(int exit);
-    void errorHandler(QNetworkReply::NetworkError);
+//    void errorHandler(QNetworkReply::NetworkError);
 
 public slots:
     QString getPath()const{

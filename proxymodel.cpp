@@ -62,6 +62,31 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
         return false;
 
     }
+    else if(md==ProxyModel::tobefixed)
+    {
+        auto the_string = [this,source_row,source_parent](int col){
+        QModelIndex indG = sourceModel()->index(source_row, col, source_parent);
+        return sourceModel()->data(indG).toString();
+        };
+
+        QString title = the_string(1);
+        QString singer = the_string(2);
+        QString lang = the_string(3);
+        QString genre = the_string(4);
+        QString audio = the_string(5);
+        bool a =
+        QString::compare(audio,"LEFT",Qt::CaseInsensitive)==0||
+        QString::compare(audio,"RIGHT",Qt::CaseInsensitive)==0||
+        QString::compare(audio, "STEREO", Qt::CaseInsensitive)==0;
+
+
+        if(title.isEmpty() || singer.isEmpty() || lang.isEmpty() || genre.isEmpty() || audio.isEmpty() || !a){
+            return true;
+        } else {
+            return false;
+        }
+
+    }
     return true;
 }
 
@@ -147,4 +172,10 @@ void ProxyModel::reset(){
 //    _colom =  0;
 //    text_search ="";
 //    invalidateFilter();
+}
+void ProxyModel::toBeFixed(){
+
+    md=ProxyModel::tobefixed;
+    invalidateFilter();
+
 }

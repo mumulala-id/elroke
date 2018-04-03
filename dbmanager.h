@@ -32,8 +32,9 @@ public slots:
     void closeDB();
     void rollBack();
     bool insertIntoTable(const QVariantList & );
-    void updatePlayedTime(int id);
-    Song *getSong(int id);
+    void updatePlayedTime(QString id);
+    void updatePath(QString id, QString path);
+    Song *getSong(QString id);
 
 private slots:
     bool restoreDB();

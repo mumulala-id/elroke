@@ -4,6 +4,7 @@
 #include "proxymodel.h"
 #include "keyboard.h"
 #include "clineedit.h"
+#include "dbmanager.h"
 #include "videowidget.h"
 #include <QDialog>
 #include <QListWidget>
@@ -24,6 +25,7 @@ private :
     QListWidget *list_singer,  *list_language, *list_genre,  *list_folder;
     CLineEdit  *le_title_fixed,  *le_set_title,  *le_set_language, *le_set_singer,  *le_set_category;
     QTableView *table;
+    dbmanager *db;
     ProxyModel *proxy_model;
     QSqlTableModel *sql_model;
     QLabel *total_count_label;
@@ -56,11 +58,12 @@ private slots:
     void writeTextStream(const QString &file, QList<QString>set);
     void setAudioChannel();
     void receiverSearch(QString);
-    void comboSearchChange(int);
+//    void comboSearchChange(int);
     void jumpTo(QString);
     void undo();
+    void renameFile();
 signals :
-    void toSearch(QVariantList);
+//    void toSearch(QVariantList);
 
 
 };

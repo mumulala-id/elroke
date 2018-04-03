@@ -171,7 +171,7 @@ void YoutubeDownloader::on_search(){
         connect(searchReply, SIGNAL(finished()), this, SLOT(processSearchReply()));
     }
 
-    connect(searchReply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(errorHandler(QNetworkReply::NetworkError)));
+//    connect(searchReply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(errorHandler(QNetworkReply::NetworkError)));
 
 }
 
@@ -309,7 +309,7 @@ void YoutubeDownloader::download(int exit){
         item_succeed->setTextAlignment(Qt::AlignCenter);
         model->setItem(currentRow-1, 2, item_succeed);
     }
-qDebug()<<currentRow<<model->rowCount();
+
     if(currentRow==model->rowCount()){
 
         //finish
@@ -322,11 +322,9 @@ qDebug()<<currentRow<<model->rowCount();
 
     tview->selectRow(currentRow);
      tview->setIndexWidget(model->index(currentRow,2), progressbar);
+     qDebug()<<progressbar->parentWidget();
      QString currenUrl = model->data(model->index(currentRow,1)).toString();
-     qDebug()<<currenUrl;
-
      QStringList arguments;
-     qDebug()<<arguments;
      arguments<<"-f" << "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" << "-o" << Dir + "/%(title)s.%(ext)s" << currenUrl;
 
      process->setArguments(arguments);
@@ -335,16 +333,16 @@ qDebug()<<currentRow<<model->rowCount();
     currentRow++;
 }
 
-void YoutubeDownloader::errorHandler(QNetworkReply::NetworkError err){
+//void YoutubeDownloader::errorHandler(QNetworkReply::NetworkError err){
 
-    QString error = searchReply->errorString();
-qDebug()<<error;
-//view->
-    view->setHtml("<body>test</body>");
-    view->update();
-}
+//    QString error = searchReply->errorString();
+//qDebug()<<error;
+////view->
+//    view->setHtml("<body>test</body>");
+//    view->update();
+//}
 
 YoutubeDownloader::~YoutubeDownloader(){
 
-    delete progressbar;
+//    delete progressbar;
 }

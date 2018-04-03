@@ -57,6 +57,7 @@ mainWindow::mainWindow(QWidget *parent)
     randomNumberInstance();
     createShortcut();
     setBackground();
+    dialogNextSong();
 
     getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
@@ -173,7 +174,7 @@ void mainWindow::createWidgets(){
      while (sql_model->canFetchMore()) {
          sql_model->fetchMore();
      }
-    sql_model->setSort(1,Qt::AscendingOrder);
+//    sql_model->setSort(2,Qt::DescendingOrder);
     table->verticalHeader()->hide();
     table->setShowGrid(0);
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -194,6 +195,7 @@ void mainWindow::createWidgets(){
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new NoFocusDelegate());
     table->setSortingEnabled(1);
+    proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Base, Qt::transparent);
@@ -476,15 +478,15 @@ void mainWindow::createShortcut(){
     connect(sc_quit,&QShortcut::activated,qApp,&QApplication::quit);
 
 }
-void mainWindow::getCategory(){
-QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
-qDebug()<<s;
+void mainWindow::getCategory()
+{
+    QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
 }
 
 void mainWindow::addToPlaylist()
 {
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
-    int id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toInt();
+   QString id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toString();
 
    Song *song =   db->getSong(id);
    songitemwidget *item_song_widget = new songitemwidget;
@@ -612,7 +614,7 @@ void mainWindow::playPlayer()
 
     songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
-    unsigned int id = item_widget->song()->getId();
+    QString id = item_widget->song()->getId();
     QString file= item_widget->song()->getPath();
     QString title = item_widget->song()->getTitle();
     QString singer = item_widget->song()->getSinger();
@@ -667,6 +669,9 @@ void mainWindow::playPlayer()
 
 void mainWindow::dialogNextSong()
 {
+    auto *dialog = new QDialog();
+
+    auto *layout =new QVBoxLayout;
      // this will notify next item in playlist before song end
     QPalette let;
     let.setColor(QPalette::Background,Qt::white);
@@ -676,6 +681,8 @@ void mainWindow::dialogNextSong()
     f.setPointSize(32);
 
     QLabel *notif = new QLabel;
+    layout->addWidget(notif);
+    dialog->setLayout(layout);
 
     if(playlist_widget->count()==0)
          notif->setText(tr("Playlist Is Empty"));
@@ -687,22 +694,24 @@ void mainWindow::dialogNextSong()
 
     qDebug()<<"before";
     if(this->isActiveWindow()){
-           notif-> setParent(this);
+           dialog-> setParent(this);
                }
     else{
-       notif->setParent(video);
+       dialog->setParent(video);
 
     }
     qDebug()<<"after";
 
-    notif->setWindowFlags(Qt::FramelessWindowHint);
-    notif->setPalette(let);
+    dialog->setWindowFlags(Qt::FramelessWindowHint);
+    dialog->setAutoFillBackground(1);
+    dialog->setPalette(let);
     notif->setFont(f);
-    notif->adjustSize();
-    notif->move((desktop_width-notif->width())/2,0);
-    notif->setAttribute(Qt::WA_DeleteOnClose);
-    QTimer::singleShot(5000, notif, SLOT(close()));
-    notif->show();
+    dialog->adjustSize();
+    dialog->move((desktop_width-dialog->width())/2,0);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    QTimer::singleShot(5000, dialog, SLOT(close()));
+    dialog->exec();
+//    dialog->raise();
 
 }
 
@@ -866,7 +875,7 @@ void mainWindow::writePlaylist(const QString &playlistname)
      for(int i =0;i<playlist_widget->count();i++)
      {
        songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->item(i)));
-       stream<<QString::number(item_widget->song()->getId())<<"\n";
+       stream<<item_widget->song()->getId()<<"\n";
      }
 
      file.close();
@@ -901,8 +910,8 @@ void mainWindow::loadPlaylist(const QString &s)
 
     while(stuff!=NULL)
     {
-        int id = stuff.toInt();
-        Song *song =   db->getSong(id);
+//        int id = stuff.toInt();
+        Song *song =   db->getSong(stuff);
         if(song==nullptr) return;
         songitemwidget *item_song_widget = new songitemwidget;
         item_song_widget->setSong(song);
@@ -1047,18 +1056,20 @@ void mainWindow::dialogAdmin()
     auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
     connect(button_add_to_database,&QPushButton::pressed,[this]()
     {
-    addtodatabase *atd  = new addtodatabase(this);
+    addtodatabase atd; // = new addtodatabase;
 //    atd->setAutoFillBackground(1);
-      atd->setAttribute(Qt::WA_DeleteOnClose);
-    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
-    connect(atd,&addtodatabase::accepted,[this]()
+//      atd->setAttribute(Qt::WA_DeleteOnClose);
+    connect(&atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
+    connect(&atd,&addtodatabase::accepted,[this]()
     {
         while(sql_model->canFetchMore())
         {
             sql_model->fetchMore();
         }
     });
-    atd->show();
+    atd.exec();
+
+
     });
 
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);

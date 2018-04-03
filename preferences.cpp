@@ -21,17 +21,18 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     QVBoxLayout *layout_button = new QVBoxLayout;
 
-    auto *button_background = new QPushButton(tr("Background"), this);
+    auto *button_system = new QPushButton(tr("System"), this);
     auto *button_font = new QPushButton(tr("Font"), this);
     auto *button_theme = new QPushButton(tr("Theme"), this);
     auto *button_menu = new QPushButton(tr("Menu"), this);
-    auto *button_system = new QPushButton(tr("System"), this);
+    auto *button_background = new QPushButton(tr("Background"), this);
 
-    layout_button->addWidget(button_background);
+    layout_button->addWidget(button_system);
     layout_button->addWidget(button_font);
     layout_button->addWidget(button_theme);
     layout_button->addWidget(button_menu);
-    layout_button->addWidget(button_system);
+    layout_button->addWidget(button_background);
+
     layout_button->setSpacing(0);
     layout_button->setMargin(0);
     layout_button->addStretch();
@@ -100,8 +101,18 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
          QStringList f_list =  QFileDialog::getOpenFileNames(NULL,tr("Choose image"), QDir::homePath(),tr("Image Files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)"));
     });
 
-    QGroupBox *group_background = new QGroupBox(tr("Background"), this);
-    group_background->setLayout(layout_background);
+    auto *group_system = new QGroupBox(tr("System"),this);
+    QVBoxLayout *layout_system = new QVBoxLayout;
+
+    check_startapp  = new QCheckBox(tr("Run at startup"), this);
+    check_startapp->setChecked(startup);
+    layout_system->addWidget(check_startapp);
+
+    connect(check_startapp,&QCheckBox::toggled,[this](bool d)
+    {
+        startup = d;
+    });
+
 
     QGroupBox *group_font = new QGroupBox(tr("Font"), this);
 
@@ -168,17 +179,19 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
        list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
     });
 
-    auto *group_system = new QGroupBox(tr("System"),this);
-    QVBoxLayout *layout_system = new QVBoxLayout;
+    QGroupBox *group_background = new QGroupBox(tr("Background"), this);
+    group_background->setLayout(layout_background);
+//    auto *group_system = new QGroupBox(tr("System"),this);
+//    QVBoxLayout *layout_system = new QVBoxLayout;
 
-    check_startapp  = new QCheckBox(tr("Run at startup"), this);
-    check_startapp->setChecked(startup);
-    layout_system->addWidget(check_startapp);
+//    check_startapp  = new QCheckBox(tr("Run at startup"), this);
+//    check_startapp->setChecked(startup);
+//    layout_system->addWidget(check_startapp);
 
-    connect(check_startapp,&QCheckBox::toggled,[this](bool d)
-    {
-        startup = d;
-    });
+//    connect(check_startapp,&QCheckBox::toggled,[this](bool d)
+//    {
+//        startup = d;
+//    });
 
     QComboBox *combo_language = new QComboBox(this);
     combo_language->addItem("English");
@@ -204,15 +217,16 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_system->addStretch();
     group_system->setLayout(layout_system);
 
-    stack->addWidget(group_background);
+    stack->addWidget(group_system);
     stack->addWidget(group_font);
     stack->addWidget(group_theme);
     stack->addWidget(group_menu);
-    stack->addWidget(group_system);
+    stack->addWidget(group_background);
+
 
     connect(button_background,&QPushButton::pressed,[this]()
     {
-        stack->setCurrentIndex(0);
+        stack->setCurrentIndex(4);
     });
 
     connect(button_font,&QPushButton::pressed,[this]()
@@ -230,7 +244,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     });
     connect(button_system,&QPushButton::pressed,[this]()
     {
-        stack->setCurrentIndex(4);
+        stack->setCurrentIndex(0);
     });
 
     QPalette palet;
