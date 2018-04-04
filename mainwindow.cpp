@@ -40,8 +40,12 @@
 #include <QCryptographicHash>
 #include <QEventLoop>
 #include <QSettings>
-#include <QScrollBar>
+//#include <QScrollBar>
 using namespace std;
+
+
+
+
 
 mainWindow::mainWindow(QWidget *parent)
     : QDialog(parent)
@@ -57,7 +61,7 @@ mainWindow::mainWindow(QWidget *parent)
     randomNumberInstance();
     createShortcut();
     setBackground();
-    dialogNextSong();
+//    dialogNextSong();
 
     getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
@@ -147,18 +151,20 @@ void mainWindow::createWidgets(){
 
     QHBoxLayout *layout_table = new QHBoxLayout;
 
-    QPalette table_palette;
-    table_palette.setColor(QPalette::Base, Qt::transparent);
-    table_palette.setColor(QPalette::Text, Qt::white);
+//    QPalette table_palette;
+////    table_palette.setColor(QPalette::Base, Qt::transparent);
+//    table_palette.setColor(QPalette::Text, QColor(0,0,0,128));
 //    table_palette.setColor(QPalette::Active,Qt::red);
-    table_palette.setColor(QPalette::Highlight, Qt::blue);
-    table_palette.setColor(QPalette::HighlightedText, Qt::yellow);
+//    table_palette.setColor(QPalette::Highlight, Qt::blue);
+//    table_palette.setColor(QPalette::HighlightedText, Qt::yellow);
 
     db = new dbmanager(dbmanager::show, this);
     db->connectToDB();
 
     sql_model = new QSqlTableModel(this, db->database());
     sql_model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+    sql_model->setTable("ELROKE123");
+    sql_model->select();
 
     proxy_model = new ProxyModel( this);
     proxy_model->setSourceModel(sql_model);
@@ -167,9 +173,6 @@ void mainWindow::createWidgets(){
 
     table = new QTableView(this);
     table->setModel(proxy_model);
-
-    sql_model->setTable("ELROKE123");
-    sql_model->select();
 
      while (sql_model->canFetchMore()) {
          sql_model->fetchMore();
@@ -205,7 +208,7 @@ void mainWindow::createWidgets(){
     header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
 
     table->horizontalHeader()->setPalette(header_palette);
-    table->setPalette(table_palette);
+//    table->setPalette(table_palette);
 
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
@@ -232,10 +235,10 @@ void mainWindow::createWidgets(){
     playlist_widget->viewport()->setAcceptDrops(true);
     playlist_widget->setDropIndicatorShown(true);
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
-    playlist_widget->setPalette(table_palette);
     playlist_widget->setAutoScroll(1);
+    playlist_widget->setItemDelegate(new itemDelegate);
 
-    connect(playlist_widget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(playPlayer()));
+    connect(playlist_widget,&ListWidget::doubleClicked,this,&mainWindow::playPlayer);
 
     auto *layout_button_playlist = new QHBoxLayout;
 
@@ -310,6 +313,9 @@ void mainWindow::createWidgets(){
              button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/lock.png"));
     });
 
+    auto *widget_control_playlist = new QWidget(this);
+    widget_control_playlist->setAutoFillBackground(1);
+
     layout_button_playlist->addWidget(button_menu);
     layout_button_playlist->addWidget(button_delete);
     layout_button_playlist->addWidget(button_clear_playlist);
@@ -319,7 +325,12 @@ void mainWindow::createWidgets(){
     layout_button_playlist->setSpacing(0);
     layout_button_playlist->setMargin(0);
 
-    layout_playlist->addLayout(layout_button_playlist);
+    widget_control_playlist->setLayout(layout_button_playlist);
+    QPalette palt;
+    palt.setBrush(QPalette::Background, QColor("#9C27B0"));;
+    widget_control_playlist->setPalette(palt);
+
+    layout_playlist->addWidget(widget_control_playlist);
     layout_playlist->addWidget(playlist_widget);
     layout_playlist->setSpacing(0);
     layout_playlist->setMargin(0);
@@ -369,7 +380,7 @@ void mainWindow::createWidgets(){
      button_play_pause->setFlat(1);
      button_play_pause->setIconSize(QSize(64,64));
      button_play_pause->setFocusPolicy(Qt::NoFocus);
-     //connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPausePlayer()));
+     connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPlayer()));
 
      auto *button_favorit = new QPushButton(QIcon(":/usr/share/elroke/icon/favorit.png"), "", this);
       button_favorit->setFlat(1);
@@ -491,6 +502,7 @@ void mainWindow::addToPlaylist()
    Song *song =   db->getSong(id);
    songitemwidget *item_song_widget = new songitemwidget;
    item_song_widget->setSong(song);
+
 
    QListWidgetItem *item = new QListWidgetItem;
    playlist_widget->addItem(item);
@@ -922,6 +934,7 @@ void mainWindow::loadPlaylist(const QString &s)
         item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
         stuff= stream.readLine();
     }
+    playlist_widget->setCurrentRow(0);
 }
 
 QRegion mainWindow::getMaska()

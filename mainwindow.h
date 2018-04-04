@@ -27,7 +27,6 @@
 #include "opening.h"
 #include "songitemwidget.h"
 #include "ProgressCircle.h"
-#include "listwidget.h"
 #include "videowidget.h"
 
 #include <QApplication>
@@ -44,6 +43,37 @@
 #include <QStandardPaths>
 #include <QThread>
 #include <QPointer>
+#include <QListWidget>
+#include <QListWidget>
+#include <QDrag>
+#include <QMimeData>
+#include <QPainter>
+
+class ListWidget : public QListWidget
+{
+
+public :
+    ListWidget(QWidget *parent) :
+        QListWidget(parent){}
+
+protected :
+    void startDrag(Qt::DropActions supportedActions)
+{
+    QDrag *drag = new QDrag(this);
+    drag->setMimeData(model()->mimeData(selectedIndexes()));
+    QPixmap pixmap(viewport()->visibleRegion().boundingRect().size());
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    for(QModelIndex index: selectedIndexes())
+    {
+        painter.drawPixmap(visualRect(index), viewport()->grab(visualRect(index)));
+    }
+    drag->setPixmap(pixmap);
+    drag->setHotSpot(viewport()->mapFromGlobal(QCursor::pos()));
+    drag->exec(supportedActions, Qt::MoveAction);
+}
+};
+
 
 class mainWindow : public QDialog
 {
@@ -75,8 +105,6 @@ private :
     unsigned short  int desktop_height = desktop->height();
     QString channel;
     bool lock_playlist=false;
-//    delay * m_worker;
-//    bool on_delay=false;
     Keyboard *keyboard;
     dbmanager *db;
     QString userID, password;
@@ -134,10 +162,6 @@ private slots:
 protected :
     void keyPressEvent(QKeyEvent *event);
 
-signals :
-//    void loginAccepted();
-//    void usernameCreated();
-
 };
 
 // this class hide the focus of qtableview (dotted rectangle on selected item)
@@ -145,16 +169,29 @@ class NoFocusDelegate : public QStyledItemDelegate{
 
 protected:
 
-            void paint(QPainter* painter, const QStyleOptionViewItem & option, const QModelIndex &index) const
+            void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
                     {
                         QStyleOptionViewItem itemOption(option);
                         if (itemOption.state & QStyle::State_HasFocus)
                             itemOption.state = itemOption.state ^ QStyle::State_HasFocus;
 
-                        if ((itemOption.state & QStyle::State_Selected) &&
-                                (itemOption.state & QStyle::State_Active))
-                                itemOption.palette.setColor(QPalette::Highlight, Qt::transparent);
-                        QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
+                        if (itemOption.state & QStyle::State_Selected) {
+                                itemOption.palette.setColor(QPalette::Highlight, QColor("#F5F5F5"));
+                                itemOption.palette.setColor(QPalette::HighlightedText, QColor("#E91E63"));
+                                QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
+
+                               itemOption.palette.setColor(QPalette::Normal,QPalette::Background, Qt::green);
+
+
+            }
+                        else{
+                            itemOption.palette.setColor(QPalette::Text, QColor(0,0,0,128));
+                            itemOption.palette.setColor(QPalette::Background, QColor(255,255,255,80));
+                            QPen blackPen(QColor(0,0,0,128));
+                             painter->setPen(blackPen);
+//                             painter->setBrush(QColor(0,0,0,128));
+                            painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
+                        }
 
                         QStyledItemDelegate::paint(painter, itemOption, index);
                     }

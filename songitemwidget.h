@@ -4,6 +4,34 @@
 #include <QWidget>
 #include <QLabel>
 #include <song.h>
+#include <QStyledItemDelegate>
+#include <QPainter>
+#include "songitemwidget.h"
+#include <QDebug>
+#include <QListWidget>
+
+class itemDelegate : public QStyledItemDelegate{
+
+    protected:
+        void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index)const
+    {       
+         QStyleOptionViewItem itemOption(option);
+        if(option.state & QStyle::State_Selected)
+        {
+            itemOption.palette.setColor(QPalette::Text,QColor("#9C27B0"));
+            painter->fillRect(option.rect, QColor("#9C27B0"));
+            painter->drawText(option.rect,index.model()->data(index,Qt::DisplayRole).toString());
+        } else{
+            QPen blackPen(QColor("#9C27B0"));
+             painter->setPen(blackPen);
+            painter->fillRect(option.rect, Qt::white);
+            painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
+            QStyledItemDelegate::paint(painter, option, index);
+        }
+    }
+
+};
+
 
 class songitemwidget : public QWidget
 {

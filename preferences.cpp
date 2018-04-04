@@ -63,7 +63,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     }
 
     img_resizer = new resizer();
-    img_resizer->setInput(bg_list);
+    img_resizer->setInputs(bg_list);
 
     thread_resizer = new QThread(this);
 

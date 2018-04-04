@@ -2,6 +2,7 @@
 #define CLINEEDIT_H
 
 #include <QLineEdit>
+#include <QMouseEvent>
 
 class CLineEdit : public QLineEdit
 {
@@ -16,6 +17,8 @@ signals :
 protected :
     virtual void focusInEvent(QFocusEvent *);
     virtual void focusOutEvent(QFocusEvent *);
+    void paintEvent(QPaintEvent*);
+    void mousePressEvent(QMouseEvent*);
 
 };
 

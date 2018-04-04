@@ -79,8 +79,13 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
         QString::compare(audio,"RIGHT",Qt::CaseInsensitive)==0||
         QString::compare(audio, "STEREO", Qt::CaseInsensitive)==0;
 
-
-        if(title.isEmpty() || singer.isEmpty() || lang.isEmpty() || genre.isEmpty() || audio.isEmpty() || !a){
+        QString u ="UNKNWON";
+        if(title==u
+           || singer==u
+           || genre==u
+           || lang==u
+           || audio==u
+           || !a){
             return true;
         } else {
             return false;

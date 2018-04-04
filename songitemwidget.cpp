@@ -2,11 +2,13 @@
 #include <QVBoxLayout>
 #include <QDebug>
 
+
+
 songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
     QHBoxLayout *main_layout = new QHBoxLayout;
     QVBoxLayout *sub_main_layout = new QVBoxLayout;
-    setAutoFillBackground(1);
+//    setAutoFillBackground(1);
 
     label_title = new QLabel(this);
 
@@ -27,11 +29,10 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     main_layout->addLayout(sub_main_layout);
     main_layout->addWidget(label_drag,0);
     main_layout->setSpacing(4);
-
     QPalette pal;
-    pal.setColor(QPalette::Window, Qt::green);
-    pal.setColor(QPalette::WindowText,Qt::yellow);
-    setPalette(pal);
+//    pal.setColor(QPalette::Text,QColor(0,0,0,128));
+//    pal.setColor(QPalette::HighlightedText,Qt::red);
+//setPalette(pal);
     setLayout(main_layout);
 }
 

@@ -33,6 +33,25 @@
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QTimer>
+#include <QDragMoveEvent>
+
+ class myListWidget :  public QListWidget
+{
+public :
+     myListWidget(QWidget *parent) :
+         QListWidget(parent){}
+
+protected:
+    void dragMoveEvent(QDragMoveEvent *e){
+            if(e->source() != this){
+                e->accept();
+            } else {
+                e->ignore();
+            }
+        }
+ };
+
+
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
@@ -90,7 +109,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      label_current_dir = new QLabel(this);
 
-     model = new QStandardItemModel(view);
+     model = new QStandardItemModel;
      model->setColumnCount(2);
 
      view = new QTableView(this);
@@ -144,27 +163,17 @@ addtodatabase::addtodatabase(QWidget *parent) :
     // ----
 
     QVBoxLayout *layout_splitter = new QVBoxLayout;
-    QCheckBox *cb_auto = new QCheckBox(tr("Auto"), this);
+    auto *cb_auto = new QCheckBox(tr("Auto"), this);
     cb_auto->setChecked(automatic);
 
     QHBoxLayout *layout_use_char = new QHBoxLayout;
-    QCheckBox *cb_splitby= new QCheckBox(tr("Split by"), this);
+    auto *cb_splitby= new QCheckBox(tr("Split by"), this);
 
-    connect(cb_auto,&QCheckBox::toggled,[this,cb_splitby](bool a)
-    {
-        automatic = a;
-        cb_splitby->setChecked(!a);
-    });
-    connect(cb_splitby,&QCheckBox::toggled,[this, cb_auto](bool c)
-    {
-        automatic = !c;
-       cb_auto->setChecked(!c);
-    });
+
 
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
     le_splitter->setText(splitter);
-    connect(le_splitter,&QLineEdit::textChanged,this,&addtodatabase::splitterChange);
     layout_use_char->addWidget(cb_splitby);
     layout_use_char->addWidget(le_splitter);
     layout_use_char->addStretch();
@@ -172,40 +181,51 @@ addtodatabase::addtodatabase(QWidget *parent) :
     layout_splitter->addLayout(layout_use_char,0);
     layout_splitter->addStretch();
 
-    QGroupBox *grup_splitter = new QGroupBox(tr("Splitter"), this);
+    auto *grup_splitter = new QGroupBox(tr("Splitter"), this);
     grup_splitter->setLayout(layout_splitter);
 
+////////////////////////////////////////// pattern/////////////////////////////////////////////////
     QVBoxLayout *layout_pattern = new QVBoxLayout;
 
-    cmb_titlefirst = new QCheckBox( this);
-    cmb_titlefirst->setText(tr("Title")+splitter+tr("Singer"));
-    cmb_titlefirst->setChecked(title_first);
-//    connect(cmb_titlefirst,SIGNAL(clicked(bool)),this,SLOT(setTitleFirst(bool)));
+    auto *view_choose_pattern = new myListWidget(this);
+    view_choose_pattern->setFlow(QListView::LeftToRight);
+    view_choose_pattern->setDragEnabled(true);
+    view_choose_pattern->setDragDropMode(QAbstractItemView::DragDrop);
+    view_choose_pattern->viewport()->setAcceptDrops(true);
+    view_choose_pattern->setDropIndicatorShown(true);
+    view_choose_pattern->setFixedHeight(view_choose_pattern->fontMetrics().height()+4);
+    view_choose_pattern->setDefaultDropAction(Qt::MoveAction);
 
-    cmb_singerfirst = new QCheckBox(this);
-    cmb_singerfirst->setText(tr("Singer")+splitter+tr("Title"));
-//    connect(cmb_singerfirst,SIGNAL(clicked(bool)),this,SLOT(setSingerFirst(bool)));
+     QStringList patternList{"Title", "Singer", "Language"," Genre","Audio"};
+     foreach (const QString &val, patternList) {
+         auto *item = new QListWidgetItem;
+         item->setText(val);
+         view_choose_pattern->addItem(item);
+     }
 
-    QCheckBox *cb_tsgl = new QCheckBox(this);
-    cb_tsgl->setText("Title"+splitter+"Singer"+splitter+"Genre"+splitter+"Laguage");
+    auto *view_pattern = new myListWidget(this);
+    view_pattern->setFlow(QListView::LeftToRight);
+    view_pattern->setDragEnabled(true);
+    view_pattern->setDragDropMode(QAbstractItemView::DragDrop);
+    view_pattern->viewport()->setAcceptDrops(true);
+    view_pattern->setDropIndicatorShown(true);
+    view_pattern->setDefaultDropAction(Qt::MoveAction);
+    view_pattern->setFixedHeight(view_pattern->fontMetrics().height()+4);
 
-    QCheckBox *cb_tslg = new QCheckBox(this);
-    cb_tslg->setText("Title"+splitter+"Singer"+splitter+"Language"+splitter+"Genre");
-
-    layout_pattern->addWidget(cmb_titlefirst);
-    layout_pattern->addWidget(cmb_singerfirst);
-    layout_pattern->addWidget(cb_tsgl);
-    layout_pattern->addWidget(cb_tslg);
+    layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag and Drop)"), this));
+    layout_pattern->addWidget(view_choose_pattern);
+    layout_pattern->addWidget(new QLabel(tr("Pattern"), this));
+    layout_pattern->addWidget(view_pattern);
     layout_pattern->addStretch();
 
-    QGroupBox *grup_pattern = new QGroupBox(tr("Pattern"), this);
+    auto *grup_pattern = new QGroupBox(tr("Pattern"), this);
     grup_pattern->setLayout(layout_pattern);
 
    QGridLayout *layout_additional_item = new QGridLayout;
 
-   QLineEdit *le_singer = new QLineEdit(this);
-   QLineEdit *le_language = new QLineEdit(this);
-   QLineEdit *le_genre = new QLineEdit(this);
+   auto *le_singer = new QLineEdit(this);
+   auto *le_language = new QLineEdit(this);
+   auto *le_genre = new QLineEdit(this);
 
    layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
    layout_additional_item->addWidget(le_singer,0,1);
@@ -215,27 +235,43 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_additional_item->addWidget(le_genre,2,1);
    layout_additional_item->setVerticalSpacing(0);
 
-   QGroupBox *gr_addcat = new QGroupBox(tr("Add metadata if not available"));
-   gr_addcat->setLayout(layout_additional_item);
+   auto *group_add_genre = new QGroupBox(tr("Add metadata if not available"));
+   group_add_genre->setLayout(layout_additional_item);
 
    QVBoxLayout *layout_audio_channel = new QVBoxLayout;
 
-   QCheckBox *combo_channel_left = new QCheckBox(tr("Left"), this);
-   QCheckBox *combo_channel_right = new QCheckBox(tr("Right"), this);
+   auto *combo_channel_left = new QCheckBox(tr("Left"), this);
+   auto *combo_channel_right = new QCheckBox(tr("Right"), this);
 
    layout_audio_channel->addWidget(combo_channel_left);
    layout_audio_channel->addWidget(combo_channel_right);
    layout_audio_channel->addStretch();
 
-   QGroupBox *gr_audio_channel = new QGroupBox(tr("Audio Channel"), this);
-   gr_audio_channel->setLayout(layout_audio_channel);
-   gr_audio_channel->setEnabled(0);
+   auto *group_audio_channel = new QGroupBox(tr("Audio Channel"), this);
+   group_audio_channel->setLayout(layout_audio_channel);
+
+   connect(cb_auto,&QCheckBox::toggled,[this,cb_splitby,grup_pattern,group_add_genre,group_audio_channel](bool a)
+   {
+       automatic = a;
+       cb_splitby->setChecked(!a);
+       grup_pattern->setEnabled(!a);
+       group_add_genre->setEnabled(!a);
+       group_audio_channel->setEnabled(!a);
+   });
+   connect(cb_splitby,&QCheckBox::toggled,[this, cb_auto,grup_pattern,group_add_genre,group_audio_channel](bool c)
+   {
+       automatic = !c;
+      cb_auto->setChecked(!c);
+      grup_pattern->setEnabled(c);
+      group_add_genre->setEnabled(c);
+      group_audio_channel->setEnabled(c);
+   });
 
    QHBoxLayout *layout_bottom = new QHBoxLayout;
    layout_bottom->addWidget(grup_splitter);
    layout_bottom->addWidget(grup_pattern);
-   layout_bottom->addWidget(gr_addcat);
-   layout_bottom->addWidget(gr_audio_channel);
+   layout_bottom->addWidget(group_add_genre);
+   layout_bottom->addWidget(group_audio_channel);
 
    QWidget *widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
@@ -338,14 +374,6 @@ void addtodatabase::getItem()
     setCursor(Qt::ArrowCursor);
 }
 
-void addtodatabase::splitterChange(const QString &split)
-{
-    if(split==NULL)
-        return;
-    cmb_titlefirst->setText(tr("Title")+split+tr("Singer"));
-    cmb_singerfirst->setText(tr("Singer")+split+tr("Title"));
-}
-
 void addtodatabase::saveToDatabase()
 {
     setCursor(Qt::BusyCursor);
@@ -370,6 +398,17 @@ void addtodatabase::saveToDatabase()
     QString title, singer, language, genre, a_channel, path,folder;
     QString filename;
 
+//    auto fillDefault = [](QString x){
+//        if(x.isEmpty())
+//                return "unknown";
+//        return x;
+////                qDebug()<<x;
+
+////        } else {
+//////              qDebug()<<x;
+////        }
+//    };
+
     if(!automatic)//manual
     {
         foreach (QModelIndex index, list)
@@ -383,6 +422,12 @@ void addtodatabase::saveToDatabase()
            {
                splitted = filename.split(splitter);
 
+               singer.clear();
+               title.clear();
+               language.clear();
+               genre.clear();
+               a_channel.clear();
+
                switch(splitted.count())
                {
                            case 2:
@@ -410,21 +455,23 @@ void addtodatabase::saveToDatabase()
                            default:
                                break;
                }
+
            }
-                   set_singer.insert(singer.toUpper());
-                   set_language.insert(language.toUpper());
-                   set_genre.insert(genre.toUpper());
-                   set_folder.insert(folder);
 
-                     data.append(title);
-                     data.append(singer);
-                     data.append(language);
-                     data.append(genre);
-                     data.append(a_channel);
-                     data.append(path);
+        set_singer.insert(singer.toUpper());
+        set_language.insert(language.toUpper());
+        set_genre.insert(genre.toUpper());
+        set_folder.insert(folder);
 
-                   sql_ok =  db->insertIntoTable(data);
-                   data.clear();
+        data.append(title);
+        data.append(singer);
+        data.append(language);
+        data.append(genre);
+        data.append(a_channel);
+        data.append(path);
+
+        sql_ok =  db->insertIntoTable(data);
+        data.clear();
 
         }
 
@@ -437,55 +484,78 @@ void addtodatabase::saveToDatabase()
             QFileInfo info;
             info.setFile(path);
             folder = info.absolutePath();
-            filename = info.baseName();
-
+            filename = info.completeBaseName();
             splitter =  getSplitter(filename);
 
-               splitted = filename.split(splitter);
+            splitted = filename.split(splitter);
+            singer.clear();
+            title.clear();
+            language.clear();
+            genre.clear();
+            a_channel.clear();
+
+            if(splitter.isEmpty())
+                title = filename;
 
                switch(splitted.count())
                {
-                           case 2:
-                               title = splitted.at(0);
-                               singer = splitted.at(1);
-                               break;
-                           case 3:
-                               title = splitted.at(0);
-                               singer = splitted.at(1);
-                               a_channel =splitted.last();
-                               break;
-                           case 4:
-                               title = splitted.at(0);
-                               singer = splitted.at(1);
-                               language = splitted.at(2);
-                               a_channel =splitted.last();
-                               break;
-                           case 5 :
-                               title = splitted.at(0);
-                               singer = splitted.at(1);
-                               language = splitted.at(2);
-                               genre = splitted.at(3);
-                               a_channel =splitted.last();
-                               break;
-                           default:
-                               break;
-               }
+                   case 2:
+                       title = splitted.at(0);
+                       singer = splitted.at(1);
+                       break;
+                   case 3:
+                       title = splitted.at(0);
+                       singer = splitted.at(1);
+                       a_channel =splitted.last();
+                       break;
+                   case 4:
+                       title = splitted.at(0);
+                       singer = splitted.at(1);
+                       language = splitted.at(2);
+                       a_channel =splitted.last();
+                       break;
+                   case 5 :
+                       title = splitted.at(0);
+                       singer = splitted.at(1);
+                       language = splitted.at(2);
+                       genre = splitted.at(3);
+                       a_channel =splitted.last();
+                       break;
+                   default:
+                       title = splitted.at(0);
+                       singer = splitted.at(1);
+                       language = splitted.at(2);
+                       genre = splitted.at(3);
+                       a_channel =splitted.last();
+                       break;
+           }
 
-                       set_singer.insert(singer.trimmed().toUpper());
-                       set_language.insert(language.trimmed().toUpper());
-                       set_genre.insert(genre.trimmed().toUpper());
-                       set_folder.insert(folder);
-                      a_channel = a_channel.trimmed().toUpper();
+             if(singer.isEmpty())
+                 singer="UNKNOWN";
+             if(title.isEmpty())
+                 title="UNKNOWN";
+             if(language.isEmpty())
+                 language="UNKNOWN";
+             if(genre.isEmpty())
+                 genre="UNKNOWN";
+             if(a_channel.isEmpty())
+                 a_channel="UNKNOWN";
 
-                         data.append(title);
-                         data.append(singer);
-                         data.append(language);
-                         data.append(genre);
-                         data.append(a_channel);
-                         data.append(path);
+               set_singer.insert(singer.trimmed().toUpper());
+               set_language.insert(language.trimmed().toUpper());
+               set_genre.insert(genre.trimmed().toUpper());
+               set_folder.insert(folder);
+               a_channel = a_channel.trimmed().toUpper();
 
-                       sql_ok =  db->insertIntoTable(data);
-                       data.clear();
+            data.append(title.toUpper());
+            data.append(singer.toUpper());
+            data.append(language.toUpper());
+            data.append(genre.toUpper());
+            data.append(a_channel.toUpper());
+            data.append(path);
+
+            sql_ok =  db->insertIntoTable(data);
+            data.clear();
 
         }
     }
@@ -558,9 +628,7 @@ void addtodatabase::getDrive()
 
 QString addtodatabase::getSplitter(const QString &filename)
 {
-
 //identify splitter
-
     QRegularExpression exp("[^a-zA-Z0-9\\s]+");
     QRegularExpressionMatchIterator i = exp.globalMatch(filename);
     QStringList symbol;
@@ -584,7 +652,7 @@ QString addtodatabase::getSplitter(const QString &filename)
             d=val;
         }
     }
-
+qDebug()<<d<<filename;
     return d;
 }
 

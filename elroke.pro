@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui sql webkitwidgets xml
+QT       += core gui sql webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,7 +27,6 @@ HEADERS  += mainwindow.h \
     song.h \
     songitemwidget.h\
     ProgressCircle.h \
-    listwidget.h \
     youtube_downloader.h \
     preferences.h \
     videowidget.h \
@@ -48,7 +47,6 @@ SOURCES += main.cpp\
     song.cpp \
     songitemwidget.cpp \
     ProgressCircle.cpp \
-    listwidget.cpp \
     youtube_downloader.cpp \
     preferences.cpp \
     videowidget.cpp \

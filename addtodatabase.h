@@ -12,6 +12,7 @@
 #include <QComboBox>
 #include <QLabel>
 #include <QStandardPaths>
+#include <QStringListModel>
 #include "youtube_downloader.h"
 
 class addtodatabase : public QDialog
@@ -31,8 +32,8 @@ private :
     QLabel *label_current_dir;
     QTableView *view;
     QStandardItemModel *model;
-    QCheckBox *cmb_titlefirst;
-    QCheckBox *cmb_singerfirst;
+//    QCheckBox *cmb_titlefirst;
+//    QCheckBox *cmb_singerfirst;
     QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
@@ -50,7 +51,7 @@ private :
 
 
 private slots:
-     void splitterChange(const QString &);
+//     void splitterChange(const QString &);
      void saveToDatabase();
      void getDrive();
      void writeTextStream(const QString &file, QSet<QString> set);
