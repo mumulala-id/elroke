@@ -33,23 +33,8 @@
 #include <QStackedLayout>
 #include <QHeaderView>
 #include <QTimer>
-#include <QDragMoveEvent>
 
- class myListWidget :  public QListWidget
-{
-public :
-     myListWidget(QWidget *parent) :
-         QListWidget(parent){}
 
-protected:
-    void dragMoveEvent(QDragMoveEvent *e){
-            if(e->source() != this){
-                e->accept();
-            } else {
-                e->ignore();
-            }
-        }
- };
 
 
 addtodatabase::addtodatabase(QWidget *parent) :
@@ -163,21 +148,24 @@ addtodatabase::addtodatabase(QWidget *parent) :
     // ----
 
     QVBoxLayout *layout_splitter = new QVBoxLayout;
-    auto *cb_auto = new QCheckBox(tr("Auto"), this);
-    cb_auto->setChecked(automatic);
+    auto *check_auto = new QCheckBox(tr("Auto"), this);
+    check_auto->setChecked(automatic);
 
     QHBoxLayout *layout_use_char = new QHBoxLayout;
-    auto *cb_splitby= new QCheckBox(tr("Split by"), this);
-
-
+    auto *check_split_by= new QCheckBox(tr("Split by"), this);
 
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
     le_splitter->setText(splitter);
-    layout_use_char->addWidget(cb_splitby);
+    connect(le_splitter,&QLineEdit::textChanged,[this](const QString &text)
+    {
+        splitter = text;
+    });
+
+    layout_use_char->addWidget(check_split_by);
     layout_use_char->addWidget(le_splitter);
     layout_use_char->addStretch();
-    layout_splitter->addWidget(cb_auto);
+    layout_splitter->addWidget(check_auto);
     layout_splitter->addLayout(layout_use_char,0);
     layout_splitter->addStretch();
 
@@ -203,7 +191,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
          view_choose_pattern->addItem(item);
      }
 
-    auto *view_pattern = new myListWidget(this);
+    view_pattern = new myListWidget(this);
     view_pattern->setFlow(QListView::LeftToRight);
     view_pattern->setDragEnabled(true);
     view_pattern->setDragDropMode(QAbstractItemView::DragDrop);
@@ -211,15 +199,21 @@ addtodatabase::addtodatabase(QWidget *parent) :
     view_pattern->setDropIndicatorShown(true);
     view_pattern->setDefaultDropAction(Qt::MoveAction);
     view_pattern->setFixedHeight(view_pattern->fontMetrics().height()+4);
+    connect(view_choose_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
+    connect(view_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
+    label_pattern = new QLabel(this);
 
     layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag and Drop)"), this));
     layout_pattern->addWidget(view_choose_pattern);
-    layout_pattern->addWidget(new QLabel(tr("Pattern"), this));
+    layout_pattern->addWidget(new QLabel("\u25BC\u25B2", this),0,Qt::AlignCenter);
     layout_pattern->addWidget(view_pattern);
+    layout_pattern->addWidget(new QLabel(tr("Pattern :"),this));
+    layout_pattern->addWidget(label_pattern);
     layout_pattern->addStretch();
 
-    auto *grup_pattern = new QGroupBox(tr("Pattern"), this);
-    grup_pattern->setLayout(layout_pattern);
+    auto *group_pattern = new QGroupBox(tr("Pattern"), this);
+    group_pattern->setLayout(layout_pattern);
+    group_pattern->setEnabled(!automatic);
 
    QGridLayout *layout_additional_item = new QGridLayout;
 
@@ -235,42 +229,70 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_additional_item->addWidget(le_genre,2,1);
    layout_additional_item->setVerticalSpacing(0);
 
-   auto *group_add_genre = new QGroupBox(tr("Add metadata if not available"));
-   group_add_genre->setLayout(layout_additional_item);
+   auto *group_metadata = new QGroupBox(tr("Add metadata if not available"));
+   group_metadata->setLayout(layout_additional_item);
+   group_metadata->setEnabled(!automatic);
 
    QVBoxLayout *layout_audio_channel = new QVBoxLayout;
 
-   auto *combo_channel_left = new QCheckBox(tr("Left"), this);
-   auto *combo_channel_right = new QCheckBox(tr("Right"), this);
+   auto *check_audio_left = new QCheckBox(tr("Left"), this);
+   auto *check_audio_right = new QCheckBox(tr("Right"), this);
+   auto *check_audio_stereo = new QCheckBox(tr("Stereo"), this);
 
-   layout_audio_channel->addWidget(combo_channel_left);
-   layout_audio_channel->addWidget(combo_channel_right);
+   connect(check_audio_left,&QCheckBox::toggled,[this,check_audio_right,check_audio_stereo](bool s)
+   {
+       if(s){
+       check_audio_right->setChecked(!s);
+       check_audio_stereo->setChecked(!s);
+       }
+   });
+
+   connect(check_audio_right,&QCheckBox::toggled,[this,check_audio_left,check_audio_stereo](bool e)
+   {
+       if(e){
+       check_audio_left->setChecked(!e);
+       check_audio_stereo->setChecked(!e);
+       }
+   });
+
+   connect(check_audio_stereo,&QCheckBox::toggled,[this,check_audio_left,check_audio_right](bool x)
+   {
+       if(x){
+       check_audio_left->setChecked(!x);
+       check_audio_right->setChecked(!x);
+       }
+   });
+
+   layout_audio_channel->addWidget(check_audio_left);
+   layout_audio_channel->addWidget(check_audio_right);
+   layout_audio_channel->addWidget(check_audio_stereo);
    layout_audio_channel->addStretch();
 
    auto *group_audio_channel = new QGroupBox(tr("Audio Channel"), this);
    group_audio_channel->setLayout(layout_audio_channel);
+   group_audio_channel->setEnabled(!automatic);
 
-   connect(cb_auto,&QCheckBox::toggled,[this,cb_splitby,grup_pattern,group_add_genre,group_audio_channel](bool a)
+   connect(check_auto,&QCheckBox::toggled,[this,check_split_by,group_pattern,group_metadata,group_audio_channel](bool a)
    {
        automatic = a;
-       cb_splitby->setChecked(!a);
-       grup_pattern->setEnabled(!a);
-       group_add_genre->setEnabled(!a);
+       check_split_by->setChecked(!a);
+       group_pattern->setEnabled(!a);
+       group_metadata->setEnabled(!a);
        group_audio_channel->setEnabled(!a);
    });
-   connect(cb_splitby,&QCheckBox::toggled,[this, cb_auto,grup_pattern,group_add_genre,group_audio_channel](bool c)
+   connect(check_split_by,&QCheckBox::toggled,[this, check_auto,group_pattern,group_metadata,group_audio_channel](bool c)
    {
        automatic = !c;
-      cb_auto->setChecked(!c);
-      grup_pattern->setEnabled(c);
-      group_add_genre->setEnabled(c);
+      check_auto->setChecked(!c);
+      group_pattern->setEnabled(c);
+      group_metadata->setEnabled(c);
       group_audio_channel->setEnabled(c);
    });
 
    QHBoxLayout *layout_bottom = new QHBoxLayout;
    layout_bottom->addWidget(grup_splitter);
-   layout_bottom->addWidget(grup_pattern);
-   layout_bottom->addWidget(group_add_genre);
+   layout_bottom->addWidget(group_pattern);
+   layout_bottom->addWidget(group_metadata);
    layout_bottom->addWidget(group_audio_channel);
 
    QWidget *widget_top = new QWidget(this);
@@ -566,7 +588,6 @@ void addtodatabase::saveToDatabase()
          qDebug()<<"sql not ok";
     }
 
-
     set_singer.remove("");
     set_singer.remove(" ");
     set_genre.remove("");
@@ -652,7 +673,15 @@ QString addtodatabase::getSplitter(const QString &filename)
             d=val;
         }
     }
-qDebug()<<d<<filename;
     return d;
 }
 
+void addtodatabase::pattern(){
+    QStringList p;
+    for(int i=0;i < view_pattern->count();i++)
+    {
+        QListWidgetItem *item = view_pattern->item(i);
+        p<<item->data(Qt::DisplayRole).toString();
+    }
+   label_pattern->setText(p.join(splitter));
+}

@@ -10,7 +10,35 @@
 #include <QListWidgetItem>
 #include <QStandardItemModel>
 #include <QLabel>
-#include "resizer.h"
+
+class resizer : public QObject
+{
+    Q_OBJECT
+public:
+ explicit   resizer(QObject *parent=0) :
+    QObject(parent){}
+private :
+     QStringList _filename;
+public slots:
+     void setInputs(const QStringList &filenames){
+         _filename = filenames;
+     }
+
+     void start(){
+         QList<QImage> imglist;
+         foreach (const QString &x, _filename) {
+             QImage output(x);
+             output = output.scaled(QSize(160,90), Qt::KeepAspectRatio, Qt::FastTransformation );
+             imglist<<output;
+         }
+        emit finished( imglist );
+     }
+
+signals :
+     void error();
+     void finished(QList<QImage>output);
+};
+
 class preferences : public QDialog
 {
     Q_OBJECT

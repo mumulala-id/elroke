@@ -13,7 +13,31 @@
 #include <QLabel>
 #include <QStandardPaths>
 #include <QStringListModel>
+#include <QThread>
 #include "youtube_downloader.h"
+#include <QDragMoveEvent>
+class myListWidget :  public QListWidget
+{
+    Q_OBJECT
+public :
+    myListWidget(QWidget *parent=0) :
+        QListWidget(parent){}
+
+signals :
+    void dropped();
+protected:
+   void dragMoveEvent(QDragMoveEvent *e)
+   {
+       e->accept();
+       }
+   void dropEvent(QDropEvent *e)
+   {
+       QListWidget::dropEvent(e);
+       emit dropped();
+       e->accept();
+   }
+};
+
 
 class addtodatabase : public QDialog
 {
@@ -32,8 +56,7 @@ private :
     QLabel *label_current_dir;
     QTableView *view;
     QStandardItemModel *model;
-//    QCheckBox *cmb_titlefirst;
-//    QCheckBox *cmb_singerfirst;
+    QLabel *label_pattern;
     QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
@@ -43,6 +66,7 @@ private :
     QString defafult_language;
     QString default_genre;
     YoutubeDownloader *ydownloader;
+    myListWidget *view_pattern;
 
      bool title_first=true;
      bool singer_first=false;
@@ -55,6 +79,7 @@ private slots:
      void saveToDatabase();
      void getDrive();
      void writeTextStream(const QString &file, QSet<QString> set);
+     void pattern();
      QString getSplitter(const QString &);
      QString getCurrentDrive() const { return currentDrive; }
 

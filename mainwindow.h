@@ -53,7 +53,7 @@ class ListWidget : public QListWidget
 {
 
 public :
-    ListWidget(QWidget *parent) :
+    ListWidget(QWidget *parent=0) :
         QListWidget(parent){}
 
 protected :
