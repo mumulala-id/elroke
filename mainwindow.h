@@ -24,9 +24,10 @@
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
-#include "opening.h"
+//#include "opening.h"
 #include "songitemwidget.h"
-#include "ProgressCircle.h"
+//#include "ProgressCircle.h"
+#include "spinnerprogress.h"
 #include "videowidget.h"
 
 #include <QApplication>
@@ -92,7 +93,8 @@ private :
     VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;
-    ProgressCircle *circle;
+//    ProgressCircle *circle;
+    spinnerProgress *spinner_progress;
     QString  app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString category1;
     QString category2;
@@ -109,7 +111,7 @@ private :
     dbmanager *db;
     QString userID, password;
     Player *effect_player;
-    Opening *opening;
+//    Opening *opening;
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
@@ -122,7 +124,7 @@ private :
 private slots:
     void dialogAdmin();
     void dialogCreateAdmin();
-    void openingInstance();
+//    void openingInstance();
     void dialogLogin();
     void dialogNextSong();
     void createShortcut();
@@ -186,10 +188,9 @@ protected:
             }
                         else{
                             itemOption.palette.setColor(QPalette::Text, QColor(0,0,0,128));
-                            itemOption.palette.setColor(QPalette::Background, QColor(255,255,255,80));
-                            QPen blackPen(QColor(0,0,0,128));
-                             painter->setPen(blackPen);
-//                             painter->setBrush(QColor(0,0,0,128));
+//                            QPen blackPen(QColor(0,0,0,128));
+                             painter->setPen(QColor(0,0,0,128));
+                             painter->fillRect(option.rect,QColor(255,255,255));
                             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
                         }
 

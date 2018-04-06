@@ -21,16 +21,15 @@ HEADERS  += mainwindow.h \
     keyboard.h \
     editdb.h \
     dbmanager.h \
-    opening.h \
     liststringfileparser.h \
     clineedit.h \
     song.h \
     songitemwidget.h\
-    ProgressCircle.h \
     youtube_downloader.h \
     preferences.h \
     videowidget.h \
-    resizer.h
+    resizer.h \
+    spinnerprogress.h
 
 
 SOURCES += main.cpp\
@@ -42,19 +41,17 @@ SOURCES += main.cpp\
     keyboard.cpp \
     editdb.cpp \
     dbmanager.cpp \
-    opening.cpp \
     clineedit.cpp \
     song.cpp \
     songitemwidget.cpp \
-    ProgressCircle.cpp \
     youtube_downloader.cpp \
     preferences.cpp \
     videowidget.cpp \
-    resizer.cpp
+    resizer.cpp \
+    spinnerprogress.cpp
 
 TRANSLATIONS = file/languages/elroke_id.ts
 
-DISTFILES +=
 CONFIG += c++14
 RESOURCES += \
     file.qrc

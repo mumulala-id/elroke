@@ -56,7 +56,7 @@ mainWindow::mainWindow(QWidget *parent)
     createWidgets();
     keyBoardInstance();
     videoInstance();
-    openingInstance();
+//    openingInstance();
     audioEffectInstance();
     randomNumberInstance();
     createShortcut();
@@ -138,11 +138,8 @@ void mainWindow::createWidgets(){
     layout_top->setMargin(0);
 
     QWidget *widget_top = new QWidget(this);
-//    QPixmap bg_trans(":/usr/share/elroke/background/backgroundTrans.png");
     QPalette transparent_palette;
-
-//    bg_trans =   bg_trans.scaled(widget_top->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
-    transparent_palette.setBrush(QPalette::Background, QColor("#009688"));
+    transparent_palette.setBrush(QPalette::Background, QColor("#00796B"));
 
     widget_top->setAutoFillBackground(1);
     widget_top->setPalette(transparent_palette);
@@ -201,11 +198,11 @@ void mainWindow::createWidgets(){
     proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
-    header_palette.setColor(QPalette::Base, Qt::transparent);
-    header_palette.setColor(QPalette::Button, Qt::transparent);
-    header_palette.setColor(QPalette::Background, Qt::transparent);
-    header_palette.setColor(QPalette::ButtonText, Qt::black);
-    header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
+//    header_palette.setColor(QPalette::Base, Qt::transparent);
+    header_palette.setColor(QPalette::Button, QColor("#009688"));
+    header_palette.setColor(QPalette::Background, Qt::white);
+//    header_palette.setColor(QPalette::ButtonText, Qt::black);
+//    header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
 
     table->horizontalHeader()->setPalette(header_palette);
 //    table->setPalette(table_palette);
@@ -327,7 +324,7 @@ void mainWindow::createWidgets(){
 
     widget_control_playlist->setLayout(layout_button_playlist);
     QPalette palt;
-    palt.setBrush(QPalette::Background, QColor("#9C27B0"));;
+    palt.setBrush(QPalette::Background, QColor("#009688"));
     widget_control_playlist->setPalette(palt);
 
     layout_playlist->addWidget(widget_control_playlist);
@@ -358,10 +355,11 @@ void mainWindow::createWidgets(){
 
      auto *layout_player_control = new QHBoxLayout;
 
-    circle = new ProgressCircle(this);
-    circle->setMaximum(100);
-    circle->setColor(Qt::gray);
-    circle->setFixedSize(64,64);
+    spinner_progress = new spinnerProgress(this);
+//    circle = new ProgressCircle(this);
+//    circle->setMaximum(100);
+//    circle->setColor(Qt::gray);
+    spinner_progress->setFixedSize(64,64);
 
      auto *btn_next = new QPushButton(this);
      btn_next->setIcon(QIcon(":/usr/share/elroke/icon/next.png"));
@@ -445,7 +443,7 @@ void mainWindow::createWidgets(){
          }
      });
 
-     layout_player_control->addWidget( circle);
+     layout_player_control->addWidget( spinner_progress);
      layout_player_control->addStretch();
      layout_player_control->addWidget(btn_next);
      layout_player_control->addWidget(button_play_pause);
@@ -461,9 +459,20 @@ void mainWindow::createWidgets(){
      layout_player_control->setMargin(0);
 
      QWidget *widget_bottom = new QWidget(this);
-     widget_bottom->setAutoFillBackground(1);
-     widget_bottom->setPalette(transparent_palette);
+     QPalette plt;
+     plt.setBrush(QPalette::Background, Qt::black);
+
+      widget_bottom->setAutoFillBackground(1);
+     widget_bottom->setPalette(plt);
      widget_bottom->setLayout(layout_player_control);
+
+//     QWidget *widget_top = new QWidget(this);
+//     QPalette transparent_palette;
+//     transparent_palette.setBrush(QPalette::Background, QColor("#00796B"));
+
+//     widget_top->setAutoFillBackground(1);
+//     widget_top->setPalette(transparent_palette);
+//     widget_top->setLayout(layout_top);
 
     layout_main->addWidget(widget_top);
     layout_main->addWidget(all_table);
@@ -647,18 +656,9 @@ void mainWindow::playPlayer()
 
     video->player()->setFile(file);
 
-    if(this->isActiveWindow())
-    {
-        clearMask();
-        opening->setParent(this);
-    }
-    else
-    {
-        opening->setParent(video);
-    }
-
-    opening->setData(title, singer);
-    opening->start();
+    video->setData(title, singer);
+    video->play();
+//    opening->start();
 
     //update playtimes
     db->updatePlayedTime(id);
@@ -704,17 +704,18 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
-    qDebug()<<"before";
-    if(this->isActiveWindow()){
-           dialog-> setParent(this);
-               }
-    else{
-       dialog->setParent(video);
+//    qDebug()<<"before";
+//    if(this->isActiveWindow()){
+//           dialog-> setParent(this);
+//               }
+//    else{
+//       dialog->setParent(video);
 
-    }
-    qDebug()<<"after";
+//    }
+//    qDebug()<<"after";
 
     dialog->setWindowFlags(Qt::FramelessWindowHint);
+    dialog->setWindowFlags(Qt::Popup);
     dialog->setAutoFillBackground(1);
     dialog->setPalette(let);
     notif->setFont(f);
@@ -940,7 +941,7 @@ void mainWindow::loadPlaylist(const QString &s)
 QRegion mainWindow::getMaska()
 {
     unsigned short int   free_top_point = spacer->mapToGlobal(spacer->rect().topLeft()).y();
-    unsigned short int   free_bottom_point = spacer->mapToGlobal( spacer->rect().bottomLeft()).y();
+    unsigned short int   free_bottom_point = spacer->mapToGlobal(spacer->rect().bottomLeft()).y();
     QRegion r(0,free_top_point,desktop_width,free_bottom_point-free_top_point, QRegion::Rectangle);
     QRegion desk (0,0, desktop_width, desktop_height, QRegion::Rectangle);
     return desk.subtracted(r);
@@ -1025,9 +1026,7 @@ void mainWindow::showKeyboard(bool x)
 void mainWindow::videoInstance(){
     //video player
     video = new VideoWidget;
-    video->setWindowFlags( Qt::FramelessWindowHint);
-    video->setWindowState(Qt::WindowFullScreen);
-     video->hide();
+    video->hide();
     video->installEventFilter(this);
 
     connect(video->player(),&Player::positionChanged,this,&mainWindow::updateInterface);
@@ -1393,14 +1392,16 @@ void mainWindow::randomNumberInstance(){
       qsrand(static_cast<uint>(QTime::currentTime().msec()));
 }
 
-void mainWindow::openingInstance()
-{
-    opening = new Opening();
-    opening->setAutoFillBackground(1);
-//    connect(opening,&Opening::passed,video,&VideoWidget::show);
-//    connect(opening,&Opening::passed,video->player(),&Player::play);
-    connect(opening,&Opening::passed,video,&VideoWidget::play);
-}
+//void mainWindow::openingInstance()
+//{
+//    opening = new Opening();
+//    opening->setAutoFillBackground(1);
+////    opening->setWindowState(Qt::WindowFullScreen);
+////       qDebug()<<opening->windowState();
+////    connect(opening,&Opening::passed,video,&VideoWidget::show);
+////    connect(opening,&Opening::passed,video->player(),&Player::play);
+//    connect(opening,&Opening::passed,video,&VideoWidget::play);
+//}
 
 void mainWindow::moveItemToBottom()
 {
@@ -1436,7 +1437,7 @@ void mainWindow::moveItemToBottom()
 }
 void mainWindow::updateInterface()
 {
-    circle->setValue(video->player()->position());
+    spinner_progress->setValue(video->player()->position());
     slider_vol->setSliderPosition(video->player()->volume());
 }
 

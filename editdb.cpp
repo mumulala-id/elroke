@@ -131,7 +131,7 @@ managedb::managedb(QWidget *parent) :
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(6, Qt::AlignCenter);
 
-    connect(this,SIGNAL(toSearch(QVariantList)),proxy_model,SLOT(search(QVariantList)));
+//    connect(this,SIGNAL(toSearch(QVariantList)),proxy_model,SLOT(search(QVariantList)));
 
     QHBoxLayout *lo_bottom = new QHBoxLayout;
     QFrame *frame_left_bottom = new QFrame;
