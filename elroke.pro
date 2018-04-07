@@ -27,14 +27,9 @@ HEADERS  += mainwindow.h \
     songitemwidget.h\
     youtube_downloader.h \
     preferences.h \
-<<<<<<< HEAD
     videowidget.h \
-    resizer.h \
-    spinnerprogress.h
-=======
-    videowidget.h
->>>>>>> 16090f0562eb1d5141cb2f8507d5789d69d6126d
-
+    spinnerprogress.h \
+    scoring.h
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -50,13 +45,10 @@ SOURCES += main.cpp\
     songitemwidget.cpp \
     youtube_downloader.cpp \
     preferences.cpp \
-<<<<<<< HEAD
     videowidget.cpp \
-    resizer.cpp \
-    spinnerprogress.cpp
-=======
-    videowidget.cpp
->>>>>>> 16090f0562eb1d5141cb2f8507d5789d69d6126d
+    spinnerprogress.cpp \
+    scoring.cpp
+
 
 TRANSLATIONS = file/languages/elroke_id.ts
 

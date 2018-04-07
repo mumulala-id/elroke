@@ -24,12 +24,10 @@
 #include "keyboard.h"
 #include "dbmanager.h"
 #include "clineedit.h"
-//#include "opening.h"
 #include "songitemwidget.h"
-//#include "ProgressCircle.h"
 #include "spinnerprogress.h"
 #include "videowidget.h"
-
+#include <scoring.h>
 #include <QApplication>
 #include <QDialog>
 #include <QComboBox>
@@ -93,7 +91,6 @@ private :
     VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;
-//    ProgressCircle *circle;
     spinnerProgress *spinner_progress;
     QString  app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QString category1;
@@ -111,7 +108,6 @@ private :
     dbmanager *db;
     QString userID, password;
     Player *effect_player;
-//    Opening *opening;
     QWidget *spacer;
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
@@ -120,11 +116,11 @@ private :
     QString c_font;
     QString language;
    unsigned short  int font_size;
+   Scoring *scoring;
 
 private slots:
     void dialogAdmin();
     void dialogCreateAdmin();
-//    void openingInstance();
     void dialogLogin();
     void dialogNextSong();
     void createShortcut();
@@ -133,9 +129,8 @@ private slots:
     void moveItemToTop();
     bool eventFilter(QObject *, QEvent *);
     QRegion getMaska();
-//    void setMute();
     void audioEffectInstance();
-    void randomNumberInstance();
+    void scoringInstance();
     void setAudioChannelManual();
     void setAudioChannelAuto();
     void addToPlaylist();
@@ -147,14 +142,12 @@ private slots:
     void dialogLoadPlaylist();
     void loadPlaylist();//DEFAULT
     void loadPlaylist(const QString &);
-//    void tableRule();
     bool isKeyValid(int);
     void showKeyboard(bool);
     void videoInstance();
     void keyBoardInstance();
     void fontSetup();
     void videoEnds();
-    int getRandomNumber();
     void showHits();
     void moveItemToBottom();
     void updateInterface();

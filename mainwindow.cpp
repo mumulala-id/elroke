@@ -56,12 +56,10 @@ mainWindow::mainWindow(QWidget *parent)
     createWidgets();
     keyBoardInstance();
     videoInstance();
-//    openingInstance();
+    scoringInstance();
     audioEffectInstance();
-    randomNumberInstance();
     createShortcut();
     setBackground();
-//    dialogNextSong();
 
     getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
@@ -704,28 +702,14 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
-//    qDebug()<<"before";
-//    if(this->isActiveWindow()){
-//           dialog-> setParent(this);
-//               }
-//    else{
-//       dialog->setParent(video);
-
-//    }
-//    qDebug()<<"after";
-
-    dialog->setWindowFlags(Qt::FramelessWindowHint);
-    dialog->setWindowFlags(Qt::Popup);
-    dialog->setAutoFillBackground(1);
+    dialog->setWindowFlags(Qt::FramelessWindowHint | Qt::Popup);
     dialog->setPalette(let);
     notif->setFont(f);
     dialog->adjustSize();
     dialog->move((desktop_width-dialog->width())/2,0);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     QTimer::singleShot(5000, dialog, SLOT(close()));
-    dialog->exec();
-//    dialog->raise();
-
+    dialog->show();
 }
 
 bool mainWindow::eventFilter(QObject *target, QEvent *event)
@@ -1332,54 +1316,9 @@ void mainWindow::showHits()
 proxy_model->sort(6,Qt::AscendingOrder);
 }
 
-int mainWindow::getRandomNumber()
-{
-//    max 100 min 55
-    return (qrand()%46)+60;
-}
-
 void mainWindow::videoEnds()
 {
-    auto *dialog_random_number = new QDialog;
-    dialog_random_number->setAttribute(Qt::WA_DeleteOnClose);
-    dialog_random_number->setWindowFlags(Qt::FramelessWindowHint);
-
-    QLabel *value_label = new QLabel(dialog_random_number);
-
-    QFile file("/usr/share/elroke/soundfx/applause.mp3");
-
-    if(!file.exists())
-    {
-        QTimer::singleShot(2000,dialog_random_number,SLOT(close()));
-        QTimer::singleShot(2000,this,SLOT(playPlayer()));
-    }
-    else
-    {
-
-    effect_player->setFile(file.fileName());
-    effect_player->play();
-
-    connect(effect_player,&Player::reachEnded,dialog_random_number,&QDialog::close);
-    connect(effect_player,&Player::reachEnded,this,&mainWindow::playPlayer);
-    }
-
-    QFont font;
-    font.setPointSize(156);
-    font.setBold(1);
-
-    value_label->setFont(font);
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(value_label);
-    dialog_random_number->setLayout(layout);
-    value_label->setText(QString::number(getRandomNumber()));
-
-    QPalette pal;
-    pal.setColor(QPalette::WindowText,Qt::blue);
-    pal.setColor(QPalette::Window,Qt::white);
-
-    dialog_random_number->setPalette(pal);
-    dialog_random_number->show();
+    scoring->start();
 }
 
 void mainWindow::audioEffectInstance()
@@ -1387,21 +1326,11 @@ void mainWindow::audioEffectInstance()
     effect_player = new Player(this);
 }
 
-void mainWindow::randomNumberInstance(){
-    //need to generate random number, for random scoring.
-      qsrand(static_cast<uint>(QTime::currentTime().msec()));
+void mainWindow::scoringInstance()
+{
+    scoring = new Scoring();
+    connect(scoring,&Scoring::finished,this,&mainWindow::playPlayer);
 }
-
-//void mainWindow::openingInstance()
-//{
-//    opening = new Opening();
-//    opening->setAutoFillBackground(1);
-////    opening->setWindowState(Qt::WindowFullScreen);
-////       qDebug()<<opening->windowState();
-////    connect(opening,&Opening::passed,video,&VideoWidget::show);
-////    connect(opening,&Opening::passed,video->player(),&Player::play);
-//    connect(opening,&Opening::passed,video,&VideoWidget::play);
-//}
 
 void mainWindow::moveItemToBottom()
 {

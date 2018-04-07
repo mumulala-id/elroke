@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/usr/share/elroke">
         <file>background/background.jpg</file>
-        <file>background/backgroundTrans.png</file>
         <file>background/splash.png</file>
         <file>icon/next.png</file>
         <file>icon/left.png</file>
