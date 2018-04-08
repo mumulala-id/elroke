@@ -1036,16 +1036,15 @@ void mainWindow::dialogAdmin()
         }
     });
     atd->show();
-
-
     });
 
     auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
-        managedb md;
-        connect(&md, SIGNAL(finished(int)),sql_model,SLOT(select()));
-        md.exec();
+        managedb *md = new managedb;
+        md->setAttribute(Qt::WA_DeleteOnClose);
+        connect(md, SIGNAL(finished(int)),sql_model,SLOT(select()));
+        md->show();
     });
 
     auto *button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
@@ -1053,7 +1052,6 @@ void mainWindow::dialogAdmin()
     {
         preferences *pref = new preferences;
         pref->setAttribute(Qt::WA_DeleteOnClose);
-//        pref->
         pref->show();
     });
 
@@ -1075,17 +1073,16 @@ void mainWindow::dialogAdmin()
     layout_main->addWidget(button_exit);
 
     dialog_admin->setLayout(layout_main);
-//    dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
+
     QPalette palet;
-    palet.setColor(QPalette::Base, palette().dark().color());
+    palet.setColor(QPalette::Base, Qt::white);
     palet.setColor(QPalette::Window, Qt::white);
-    palet.setColor(QPalette::Text, QColor(0,0,0,80));
-    palet.setColor(QPalette::WindowText, palette().light().color());
+    palet.setColor(QPalette::Text, QColor(0,0,0,128));
+    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
-    palet.setColor(QPalette::ButtonText, palette().light().color());
+    palet.setColor(QPalette::ButtonText, Qt::white);
 
     dialog_admin->setPalette(palet);
-//    dialog_admin->setAutoFillBackground(1);
 
     dialog_admin->adjustSize();
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
@@ -1128,18 +1125,12 @@ void mainWindow::dialogCreateAdmin()
                 QSettings setting("elroke","elroke");
                 setting.beginGroup("Admin");
                 QByteArray p = setting.value("pasword").toByteArray();
-                if (QString(p).isEmpty()){
-                    qDebug()<<"p null";
+                if (QString(p).isEmpty())
                     p=QString("elroke").toUtf8();
-                    qDebug()<<"p now"<<p;
-                }
 
                 if (old_pass!=QString(p))
-                {
-                    qDebug()<<"old_pass"<<old_pass;
-                    qDebug()<<"p "<<p;
-                    return;
-                }
+                       return;
+
                 setting.setValue("password", QCryptographicHash::hash(pass.toUtf8(), QCryptographicHash::Sha1));
                 setting.endGroup();
                 dialog->close();
@@ -1147,7 +1138,6 @@ void mainWindow::dialogCreateAdmin()
 
     auto *button_close = new QPushButton("Close", dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
-//    connect(this,&mainWindow::loginAccepted,dialog,&QDialog::close);
 
     layout_button->addWidget(button_close);
     layout_button->addWidget(button_create_admin);
@@ -1163,19 +1153,17 @@ void mainWindow::dialogCreateAdmin()
     layout_main->addLayout(layout_button);
 
      dialog->setLayout(layout_main);
-//     connect(this,&mainWindow::usernameCreated,dialog,&QDialog::close);
      dialog->setWindowFlags(Qt::Popup);
-//     dialog->setParent(this);
+
      QPalette palet;
-     palet.setColor(QPalette::Base, palette().dark().color());
-     palet.setColor(QPalette::Window, Qt::black);
+     palet.setColor(QPalette::Base, Qt::white);
+     palet.setColor(QPalette::Window, Qt::white);
      palet.setColor(QPalette::Text, QColor(0,0,0,128));
      palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
      palet.setColor(QPalette::Button, palette().dark().color());
      palet.setColor(QPalette::ButtonText, QColor(0,0,0,128));
      dialog->setPalette(palet);
      dialog->adjustSize();
-     dialog->setAutoFillBackground(1);
      dialog->setAttribute(Qt::WA_DeleteOnClose);
      dialog->show();
 }

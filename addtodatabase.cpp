@@ -307,14 +307,14 @@ addtodatabase::addtodatabase(QWidget *parent) :
    local_widget->setLayout(layout_local);
 
 //########################network widget############################
-   ydownloader = new YoutubeDownloader(this);
+   auto *ydownloader = new YoutubeDownloader(this);
 
    QStackedLayout *stack = new QStackedLayout;
    stack->addWidget(local_widget);
    stack->addWidget(ydownloader);
     connect(tabbar,&QTabBar::currentChanged,stack,&QStackedLayout::setCurrentIndex);
     connect(ydownloader,&YoutubeDownloader::finished,
-           [this,stack](){
+           [this,stack,ydownloader](){
                                    stack->setCurrentIndex(0);
                                    current_dir = ydownloader->getPath();
                                    label_current_dir->setText(current_dir);

@@ -64,7 +64,7 @@ private :
     QString default_singer;
     QString defafult_language;
     QString default_genre;
-    YoutubeDownloader *ydownloader;
+//    YoutubeDownloader *ydownloader;
     myListWidget *view_pattern;
 
      bool title_first=true;
