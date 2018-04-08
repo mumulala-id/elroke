@@ -20,10 +20,11 @@ class itemDelegate : public QStyledItemDelegate{
         {
             itemOption.palette.setColor(QPalette::Text,QColor("#9C27B0"));
             painter->fillRect(option.rect, QColor("#9C27B0"));
-            painter->drawText(option.rect,index.model()->data(index,Qt::DisplayRole).toString());
         } else{
             QPen blackPen(QColor("#9C27B0"));
              painter->setPen(blackPen);
+             itemOption.palette.setBrush(QPalette::HighlightedText,Qt::white);
+//             itemOption.widget->setPalette(QPalette::Highlight,Qt::red);
             painter->fillRect(option.rect, Qt::white);
             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
             QStyledItemDelegate::paint(painter, option, index);

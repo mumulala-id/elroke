@@ -19,7 +19,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "player.h"
 #include "proxymodel.h"
 #include "keyboard.h"
 #include "dbmanager.h"
@@ -43,14 +42,13 @@
 #include <QThread>
 #include <QPointer>
 #include <QListWidget>
-#include <QListWidget>
 #include <QDrag>
 #include <QMimeData>
-#include <QPainter>
+
 
 class ListWidget : public QListWidget
 {
-
+//list for playlist
 public :
     ListWidget(QWidget *parent=0) :
         QListWidget(parent){}
@@ -70,7 +68,7 @@ protected :
     drag->setPixmap(pixmap);
     drag->setHotSpot(viewport()->mapFromGlobal(QCursor::pos()));
     drag->exec(supportedActions, Qt::MoveAction);
-}
+    }
 };
 
 
@@ -112,7 +110,7 @@ private :
     QPushButton *button_audio_channel;
     bool main_window_visible=false;
     QAction *autosave_playlist;
-    QPointer <QDialog> dialog_admin=NULL;
+    QPointer <QDialog> dialog_admin=nullptr;
     QString c_font;
     QString language;
    unsigned short  int font_size;
@@ -152,7 +150,7 @@ private slots:
     void moveItemToBottom();
     void updateInterface();
     void readSettings();
-    void d_addtodatabse();
+//    void d_addtodatabse();
 
 protected :
     void keyPressEvent(QKeyEvent *event);
@@ -175,13 +173,9 @@ protected:
                                 itemOption.palette.setColor(QPalette::HighlightedText, QColor("#E91E63"));
                                 QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
 
-                               itemOption.palette.setColor(QPalette::Normal,QPalette::Background, Qt::green);
-
-
-            }
+                     }
                         else{
                             itemOption.palette.setColor(QPalette::Text, QColor(0,0,0,128));
-//                            QPen blackPen(QColor(0,0,0,128));
                              painter->setPen(QColor(0,0,0,128));
                              painter->fillRect(option.rect,QColor(255,255,255));
                             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());

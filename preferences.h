@@ -15,7 +15,7 @@ class resizer : public QObject
 {
     Q_OBJECT
 public:
- explicit   resizer(QObject *parent=0) :
+ explicit   resizer(QObject *parent=nullptr) :
     QObject(parent){}
 private :
      QStringList _filename;

@@ -13,7 +13,7 @@ class Player : public QObject
     Q_OBJECT
 
 public:
-    explicit Player(QObject *parent = 0);
+    explicit Player(QObject *parent =nullptr);
     ~Player();
 
 private:

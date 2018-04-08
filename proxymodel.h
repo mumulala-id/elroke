@@ -13,8 +13,8 @@ public:
       enum mode{column,smart,fixed,tobefixed};
       enum role{sortRole=Qt::UserRole};
 
-    explicit ProxyModel(QObject* parent = 0);
-    explicit ProxyModel(mode, QObject *parent=0);
+    explicit ProxyModel(QObject* parent = nullptr);
+    explicit ProxyModel(mode, QObject *parent=nullptr);
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const;
     QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;

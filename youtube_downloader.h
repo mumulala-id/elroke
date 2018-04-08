@@ -17,7 +17,7 @@ class YoutubeDownloader: public QWidget
     Q_OBJECT
 
 public:
-    YoutubeDownloader(QWidget *parent = 0);
+    YoutubeDownloader(QWidget *parent = nullptr);
     ~YoutubeDownloader();
 
 private :

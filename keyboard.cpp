@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QGridLayout>
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QDebug>
 
 Keyboard::Keyboard(QWidget *parent) :
@@ -62,9 +61,11 @@ Keyboard::Keyboard(QWidget *parent) :
     main_layout->setSizeConstraint( QLayout::SetFixedSize );
 
     setLayout(main_layout);
-    setAutoFillBackground(true);
-    setWindowFlags(Qt::FramelessWindowHint );
+    setWindowFlags(Qt::FramelessWindowHint);
     setMinimumSize(960,96);
+    QPalette palette;
+    palette.setColor(QPalette::ButtonText,QColor(0,0,0,150));
+    setPalette(palette);
 }
 
 QPushButton *Keyboard::createButton( const QString &text){
@@ -78,7 +79,6 @@ QPushButton *Keyboard::createButton( const QString &text){
     button->setFont(font);
     button->setFocusPolicy(Qt::NoFocus);
     button->setObjectName(text);
-//    connect(button,SIGNAL(pressed()),this,SLOT(onButtonClicked()));
     connect(button,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
 
     return button;

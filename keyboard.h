@@ -8,7 +8,7 @@ class Keyboard : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Keyboard(QWidget *parent = 0);
+    explicit Keyboard(QWidget *parent = nullptr);
     ~Keyboard();
     void showKeyboard(QPoint);
 

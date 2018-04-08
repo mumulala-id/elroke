@@ -12,7 +12,7 @@ class dbmanager
 
 public:
     enum dbcontype{ show, edit, add};
-     dbmanager(dbcontype contype, QObject *parent=0);
+     dbmanager(dbcontype contype, QObject *parent=nullptr);
      ~dbmanager();
 
 private:

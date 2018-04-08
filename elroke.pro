@@ -19,7 +19,6 @@ HEADERS  += mainwindow.h \
     addtodatabase.h \
     proxymodel.h \
     keyboard.h \
-    editdb.h \
     dbmanager.h \
     liststringfileparser.h \
     clineedit.h \
@@ -29,7 +28,8 @@ HEADERS  += mainwindow.h \
     preferences.h \
     videowidget.h \
     spinnerprogress.h \
-    scoring.h
+    scoring.h \
+    editdatabse.h
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -38,7 +38,6 @@ SOURCES += main.cpp\
     addtodatabase.cpp \
     proxymodel.cpp \
     keyboard.cpp \
-    editdb.cpp \
     dbmanager.cpp \
     clineedit.cpp \
     song.cpp \
@@ -47,7 +46,8 @@ SOURCES += main.cpp\
     preferences.cpp \
     videowidget.cpp \
     spinnerprogress.cpp \
-    scoring.cpp
+    scoring.cpp \
+    editdatabase.cpp
 
 
 TRANSLATIONS = file/languages/elroke_id.ts

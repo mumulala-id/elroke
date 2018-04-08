@@ -8,7 +8,6 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
     QHBoxLayout *main_layout = new QHBoxLayout;
     QVBoxLayout *sub_main_layout = new QVBoxLayout;
-//    setAutoFillBackground(1);
 
     label_title = new QLabel(this);
 
@@ -30,9 +29,9 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     main_layout->addWidget(label_drag,0);
     main_layout->setSpacing(4);
     QPalette pal;
-//    pal.setColor(QPalette::Text,QColor(0,0,0,128));
-//    pal.setColor(QPalette::HighlightedText,Qt::red);
-//setPalette(pal);
+    pal.setColor(QPalette::Text,QColor(0,0,0,128));
+    pal.setBrush(QPalette::HighlightedText,Qt::red);
+    setPalette(pal);
     setLayout(main_layout);
 }
 

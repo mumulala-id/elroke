@@ -16,7 +16,7 @@
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
     readSetting();
-    setCursor(Qt::WaitCursor);
+//    setCursor(Qt::WaitCursor);
     QHBoxLayout *main_layout = new QHBoxLayout;
 
     QVBoxLayout *layout_button = new QVBoxLayout;
@@ -98,7 +98,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_background->addWidget(button_add,0,Qt::AlignLeft);
     connect(button_add,&QPushButton::pressed,[this]()
     {
-         QStringList f_list =  QFileDialog::getOpenFileNames(NULL,tr("Choose image"), QDir::homePath(),tr("Image Files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)"));
+         QStringList f_list =  QFileDialog::getOpenFileNames(nullptr,tr("Choose image"), QDir::homePath(),tr("Image Files (*.png *.jpg *.jpeg *.PNG *.JPG *.JPEG)"));
     });
 
     auto *group_system = new QGroupBox(tr("System"),this);
@@ -181,17 +181,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     QGroupBox *group_background = new QGroupBox(tr("Background"), this);
     group_background->setLayout(layout_background);
-//    auto *group_system = new QGroupBox(tr("System"),this);
-//    QVBoxLayout *layout_system = new QVBoxLayout;
-
-//    check_startapp  = new QCheckBox(tr("Run at startup"), this);
-//    check_startapp->setChecked(startup);
-//    layout_system->addWidget(check_startapp);
-
-//    connect(check_startapp,&QCheckBox::toggled,[this](bool d)
-//    {
-//        startup = d;
-//    });
 
     QComboBox *combo_language = new QComboBox(this);
     combo_language->addItem("English");
@@ -248,25 +237,19 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     });
 
     QPalette palet;
-    palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, palette().light().color());
-    palet.setColor(QPalette::WindowText, palette().light().color());
+    palet.setColor(QPalette::Base, Qt::white);
+    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Text, QColor(0,0,0,128));
+    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
-    palet.setColor(QPalette::ButtonText, palette().light().color());
+    palet.setColor(QPalette::ButtonText, Qt::white);
 
     setPalette(palet);
 
     main_layout->addLayout(layout_button);
     main_layout->addLayout(stack);
     setLayout(main_layout);
-
-//    connect(box,&QDialogButtonBox::accepted,[]()
-//    {
-
-
-//    });
-
+    setWindowFlags(Qt::Popup);
 }
 
 QStringList preferences::getLanguageGenre()
@@ -348,8 +331,6 @@ void preferences::handleImage(QList<QImage> imglist)
         item->setData(bg_list.at(i),Qt::UserRole);
         model->setItem(i,0,item);
     }
-
-    setCursor(Qt::ArrowCursor);
 }
 
 preferences::~preferences()

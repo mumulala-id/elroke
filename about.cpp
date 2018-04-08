@@ -34,12 +34,12 @@ about::about(QWidget *parent) :
     QDialog(parent)
 {
     QPalette palet;
-    palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, palette().light().color());
-    palet.setColor(QPalette::WindowText, palette().light().color());
+    palet.setColor(QPalette::Base, Qt::white);
+    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Text,QColor(0,0,0,128));
+    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
-    palet.setColor(QPalette::ButtonText, palette().light().color());
+    palet.setColor(QPalette::ButtonText,Qt::white);
 
     QVBoxLayout *lo_main = new QVBoxLayout;
 

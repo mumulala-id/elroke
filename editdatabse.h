@@ -18,7 +18,7 @@ class managedb : public QDialog
 {
     Q_OBJECT
 public:
-    explicit managedb(QWidget *parent=0);
+    explicit managedb(QWidget *parent=nullptr);
     ~managedb();
 
 private :

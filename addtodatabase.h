@@ -10,10 +10,9 @@
 #include <QStandardItemModel>
 #include <QPushButton>
 #include <QComboBox>
-#include <QLabel>
 #include <QStandardPaths>
 #include <QStringListModel>
-#include <QThread>
+#include <QLabel>
 #include "youtube_downloader.h"
 #include <QDragMoveEvent>
 class myListWidget :  public QListWidget

@@ -5,6 +5,10 @@ CLineEdit::CLineEdit(QWidget *parent) :
     QLineEdit(parent)
 {
 
+    QPalette palette;
+    palette.setColor(QPalette::Base, QColor(255,255,255,120));
+    palette.setColor(QPalette::Text,QColor(0,0,0,80));
+    setPalette(palette);
 }
 
 CLineEdit::~CLineEdit(){
@@ -25,25 +29,3 @@ void CLineEdit::focusOutEvent(QFocusEvent *e)
     emit(focussed(false));
 }
 
-void CLineEdit::mousePressEvent(QMouseEvent *e)
-{
-    QPainter painter(this);
-    if(e->button()==Qt::LeftButton)
-        qDebug()<<"tes";
-    clear();
-    painter.drawText(rect(),"");
-}
-
-void CLineEdit::paintEvent(QPaintEvent *){
-
-    QPainter painter(this);
-    QPen pen(Qt::white);
-    painter.setPen(pen);
-    painter.fillRect(rect(), Qt::transparent);
-    painter.drawLine(rect().bottomLeft(),rect().bottomRight());
-
-    if(text().isEmpty())
-        painter.drawText(rect(), placeholderText());
-    painter.drawText(rect(),text());
-
-}

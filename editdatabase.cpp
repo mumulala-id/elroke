@@ -15,8 +15,7 @@
     You should have received a copy of the GNU General Public License
     along with ElRoke.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "editdb.h"
-//#include "dbmanager.h"
+#include "editdatabse.h"
 #include "liststringfileparser.h"
 #include <QGroupBox>
 #include <QPushButton>
@@ -362,12 +361,12 @@ managedb::managedb(QWidget *parent) :
     setLayout(lo_main);
 
     QPalette palet;
-    palet.setColor(QPalette::Base, Qt::black);
-    palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, Qt::gray);
-    palet.setColor(QPalette::WindowText, Qt::white);
-    palet.setColor(QPalette::Button, Qt::white);
-    palet.setColor(QPalette::ButtonText, Qt::black);
+    palet.setColor(QPalette::Base, Qt::white);
+    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Text, QColor(0,0,0,128));
+    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
+    palet.setColor(QPalette::Button, palette().dark().color());
+    palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
 
     setWindowFlags(Qt::FramelessWindowHint);

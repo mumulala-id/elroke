@@ -19,7 +19,7 @@
 #include "mainwindow.h"
 #include "about.h"
 #include "addtodatabase.h"
-#include "editdb.h"
+#include "editdatabse.h"
 #include "liststringfileparser.h"
 #include "preferences.h"
 
@@ -36,21 +36,13 @@
 #include <QMessageBox>
 #include <thread>
 #include <chrono>
-#include <QMutex>
 #include <QCryptographicHash>
-#include <QEventLoop>
 #include <QSettings>
-//#include <QScrollBar>
-using namespace std;
-
-
-
-
+//using namespace std;
 
 mainWindow::mainWindow(QWidget *parent)
     : QDialog(parent)
 {
-
     readSettings();
     fontSetup();
     createWidgets();
@@ -196,22 +188,14 @@ void mainWindow::createWidgets(){
     proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
-//    header_palette.setColor(QPalette::Base, Qt::transparent);
     header_palette.setColor(QPalette::Button, QColor("#009688"));
+    header_palette.setColor(QPalette::ButtonText, Qt::white);
     header_palette.setColor(QPalette::Background, Qt::white);
-//    header_palette.setColor(QPalette::ButtonText, Qt::black);
-//    header_palette.setColor(QPalette::Normal, QPalette::Window, Qt::green);
-
     table->horizontalHeader()->setPalette(header_palette);
-//    table->setPalette(table_palette);
 
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
     vertical->setDefaultSectionSize(vertical->fontMetrics().height()+10);
-
-
-//    scrolB->setFixedWidth(80);
-
 
     connect(table,&QTableView::doubleClicked,this,&mainWindow::addToPlaylist);
     connect(le_search,&CLineEdit::focussed,this,&mainWindow::showKeyboard);
@@ -247,7 +231,7 @@ void mainWindow::createWidgets(){
     autosave_playlist->setCheckable(1);
     autosave_playlist->setChecked(1);
     //load playlist
-    if(autosave_playlist->isChecked())
+    if (autosave_playlist->isChecked())
         loadPlaylist();
 
     auto*save_as = new QAction(tr("Save as"),  this);
@@ -302,7 +286,7 @@ void mainWindow::createWidgets(){
     connect(button_lock_playlist,&QPushButton::clicked,[this, button_lock_playlist](bool lock)
     {
         lock_playlist = lock;
-        if(lock)
+        if (lock)
             button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/unlock.png"));
         else
              button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/lock.png"));
@@ -397,7 +381,7 @@ void mainWindow::createWidgets(){
      button_vol_down->setIconSize(QSize(24,24));
      connect(button_vol_down,&QPushButton::pressed,[this]()
      {
-         if(video->player()->volume()<5)
+         if (video->player()->volume()<5)
               video->player()->setVolume(0);
          else
          video->player()->setVolume(video->player()->volume()-5);
@@ -414,7 +398,7 @@ void mainWindow::createWidgets(){
      button_vol_up->setFlat(1);
      connect(button_vol_up,&QPushButton::pressed,[this]()
      {
-         if(video->player()-> volume()>95)
+         if (video->player()-> volume()>95)
              video->player()->setVolume(100);
          else
           video->player()->setVolume(video->player()->volume()+5);
@@ -426,10 +410,10 @@ void mainWindow::createWidgets(){
      button_audio_mute->setFlat(1);
      connect(button_audio_mute,&QPushButton::pressed,[this]()
      {
-         if(!video->player()->isPlaying())
+         if (!video->player()->isPlaying())
              return;
 
-         if(video->player()->isMute())
+         if (video->player()->isMute())
          {
              video->player()->setMute(0);
              button_audio_mute->setIcon(QIcon(":/usr/share/elroke/icon/unmute.png"));
@@ -524,41 +508,41 @@ void mainWindow::addToPlaylist()
 void mainWindow::keyPressEvent(QKeyEvent *event){
 
   //IF USER TYPE USER TYPE NUMBER OR ALPHABET DIRECT TO LINEEDIT SEARCH
-    if(isKeyValid(event->key()))
+    if (isKeyValid(event->key()))
     {
         le_search->setFocus();
         le_search->setText(event->text());
     }
 
-    if(event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return)
+    if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return)
     {
         //send item to playlist with enter key
-        if(focusWidget()==table)
+        if (focusWidget()==table)
         {
             addToPlaylist();
         }
         //play item with enter key
-         else if(focusWidget()==playlist_widget)
+         else if (focusWidget()==playlist_widget)
         {
             playPlayer();
         }
     }
 
         //move focus widget from table to playlist with right key
-        else if(event->key()==Qt::Key_Right && qApp->focusWidget()==table)
+        else if (event->key()==Qt::Key_Right && qApp->focusWidget()==table)
         {
             playlist_widget->setFocus();
         }
 
         //move focus widget from playlist to table with left key
-        else if(event->key()==Qt::Key_Left && qApp->focusWidget()==playlist_widget)
+        else if (event->key()==Qt::Key_Left && qApp->focusWidget()==playlist_widget)
         {
             table->setFocus();
         }
 
-        if(event->key()==Qt::Key_Backspace)
+        if (event->key()==Qt::Key_Backspace)
         {
-            if(le_search->text().isEmpty())
+            if (le_search->text().isEmpty())
                 return;
             else
             {
@@ -572,7 +556,7 @@ void mainWindow::moveItemToTop()
 {
     int row = playlist_widget->currentIndex().row();
 //ignore first item
-    if(row==0)
+    if (row==0)
     {
         return;
     }
@@ -618,7 +602,7 @@ void mainWindow::setBackground()
 
 void mainWindow::playPlayer()
 {
-    if(playlist_widget->count()==0)
+    if (playlist_widget->count()==0)
     {
         video->close();
         clearMask();
@@ -626,10 +610,8 @@ void mainWindow::playPlayer()
     }
 
     ////STOP IF PLAYING
-    if(video->player()->isPlaying())
-    {
+    if (video->player()->isPlaying())
         video->player()->stop();
-    }
 
     songitemwidget *item_widget = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
 
@@ -653,28 +635,23 @@ void mainWindow::playPlayer()
     }
 
     video->player()->setFile(file);
-
     video->setData(title, singer);
     video->play();
-//    opening->start();
 
     //update playtimes
     db->updatePlayedTime(id);
 
     //lock playlist
-    if(lock_playlist)
+    if (lock_playlist)
     {
        moveItemToBottom();
-    }
-    else
-    {
+    }    else    {
         qDeleteAll(playlist_widget->selectedItems());
     }
 
-    if(playlist_widget->count()>1)
-    {
+    if (playlist_widget->count()>1)
         playlist_widget->setCurrentRow(0);
-    }
+
 }
 
 void mainWindow::dialogNextSong()
@@ -694,10 +671,10 @@ void mainWindow::dialogNextSong()
     layout->addWidget(notif);
     dialog->setLayout(layout);
 
-    if(playlist_widget->count()==0)
-         notif->setText(tr("Playlist Is Empty"));
-    else
+    if (playlist_widget->count()==0)
     {
+         notif->setText(tr("Playlist Is Empty"));
+    }    else    {
         songitemwidget * widget_song = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->item(0)));
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
@@ -714,50 +691,46 @@ void mainWindow::dialogNextSong()
 
 bool mainWindow::eventFilter(QObject *target, QEvent *event)
 {
-    if(target==video)
+    if (target==video)
     {
-        if(event->type()==QEvent::KeyPress )
+        if (event->type()==QEvent::KeyPress )
         {
-                QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
-                if(isKeyValid(keyEvent->key()))
-                {
-                        this->activateWindow();
-                        this->setMask(getMaska());
-                }
-
-               le_search->setFocus();
-               le_search->setText(keyEvent->text());
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            if (isKeyValid(keyEvent->key()))
+            {
+                this->activateWindow();
+                this->setMask(getMaska());
+                le_search->setFocus();
+                le_search->setText(keyEvent->text());
+            }
          }
 
     //if video is playing, user click, mainwindow will be shown
-     if(event->type()==QEvent::MouseButtonPress)
+     if (event->type()==QEvent::MouseButtonPress)
      {
-         if(!main_window_visible)
+         if (!main_window_visible)
          {
              this->activateWindow();
              this->setMask(getMaska());
              main_window_visible=true;
-         }
-         else
-         {
+         }  else   {
              video->activateWindow();
              main_window_visible=false;
          }
       }
     }
 
-        return QObject::eventFilter(target, event);
+    return QObject::eventFilter(target, event);
 }
 
 void mainWindow::dialogSavePlaylist()
 {
     QDialog *dialog_save_playlist = new QDialog;
-//    dialog_save_playlist->setParent(this);
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
     connect(le_playlist_name,&CLineEdit::focussed,keyboard,&Keyboard::setVisible);
-    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", this);
+    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", dialog_save_playlist);
     le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
     connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
@@ -781,7 +754,7 @@ void mainWindow::dialogSavePlaylist()
     layout_main->addLayout(layout_btn);
     dialog_save_playlist->setLayout(layout_main);
 
-   dialog_save_playlist->setWindowFlags( Qt::FramelessWindowHint);
+   dialog_save_playlist->setWindowFlags( Qt::FramelessWindowHint | Qt::Popup);
    dialog_save_playlist->setAttribute(Qt::WA_DeleteOnClose);
 
    le_playlist_name->setFocus();
@@ -806,7 +779,7 @@ void mainWindow::dialogLoadPlaylist(){
     while(it.hasNext())
     {
         info.setFile(it.next());
-        if(info.suffix()=="elp" && info.baseName()!="playlist" )//exception for "playlist", this is for default /auto save
+        if (info.suffix()=="elp" && info.baseName()!="playlist" )//exception for "playlist", this is for default /auto save
         list_play << info.baseName();
     }
 
@@ -852,16 +825,17 @@ void mainWindow::writePlaylist()
 
 void mainWindow::writePlaylist(const QString &playlistname)
 {
-    if(playlistname==NULL)        return;
+    if (playlistname.isEmpty())
+        return;
 
     QString dir_playlist =app_dir+"/playlist";
 
-    if(!QDir(dir_playlist).exists())
+    if (!QDir(dir_playlist).exists())
         QDir().mkpath(dir_playlist);
 
     QFile file(dir_playlist+"/"+playlistname+".elp");
 
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
     {
         qDebug()<<"cant open playlist file";
     }
@@ -888,10 +862,10 @@ void mainWindow::loadPlaylist(const QString &s)
 {
     playlist_widget->clear();
     QFile file(app_dir+"/playlist/"+s+".elp");
-    if(!file.exists())
+    if (!file.exists())
         return;
 
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "cant read playlist" << s;
     return;
@@ -900,16 +874,16 @@ void mainWindow::loadPlaylist(const QString &s)
     QTextStream stream(&file);
     QString stuff= stream.readLine();
     //validate first line
-    if(stuff!="[elroke playlist]")
+    if (stuff!="[elroke playlist]")
         return;
     stuff= stream.readLine();
-    if(stuff==NULL)     return;
+    if (stuff==NULL)     return;
 
     while(stuff!=NULL)
     {
 //        int id = stuff.toInt();
         Song *song =   db->getSong(stuff);
-        if(song==nullptr) return;
+        if (song==nullptr) return;
         songitemwidget *item_song_widget = new songitemwidget;
         item_song_widget->setSong(song);
         QListWidgetItem *item = new QListWidgetItem;
@@ -988,7 +962,7 @@ bool mainWindow::isKeyValid(int key)
                    <<0x44<<0x45<<0x46<<0x47<<0x48<<0x49<<0x4a<<0x4b<<0x4c<<0x4d<<0x4e<<0x4f<<0x50
                    <<0x51<<0x52<<0x53<<0x54<<0x55<<0x56<<0x57<<0x58<<0x59<<0x5a<<0x20;
 
-    if(validKey.contains(key))
+    if (validKey.contains(key))
         return true;
 
     return false;
@@ -996,7 +970,7 @@ bool mainWindow::isKeyValid(int key)
 
 void mainWindow::showKeyboard(bool x)
 {
-    if(x){
+    if (x){
         int x =(table->width()-keyboard->width())/2;
         int y = table->mapToGlobal(table->rect().bottomLeft()).y()-keyboard->height();
         //key show on the midle of table
@@ -1045,25 +1019,23 @@ void mainWindow::fontSetup()
 void mainWindow::dialogAdmin()
 {
     dialog_admin = new QDialog;
-    dialog_admin->setParent(this);
 
     QVBoxLayout *layout_main = new QVBoxLayout;
 
     auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
     connect(button_add_to_database,&QPushButton::pressed,[this]()
     {
-    addtodatabase atd; // = new addtodatabase;
-//    atd->setAutoFillBackground(1);
-//      atd->setAttribute(Qt::WA_DeleteOnClose);
-    connect(&atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
-    connect(&atd,&addtodatabase::accepted,[this]()
+    addtodatabase *atd = new addtodatabase;
+    atd->setAttribute(Qt::WA_DeleteOnClose);
+    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
+    connect(atd,&addtodatabase::accepted,[this]()
     {
         while(sql_model->canFetchMore())
         {
             sql_model->fetchMore();
         }
     });
-    atd.exec();
+    atd->show();
 
 
     });
@@ -1081,21 +1053,12 @@ void mainWindow::dialogAdmin()
     {
         preferences *pref = new preferences;
         pref->setAttribute(Qt::WA_DeleteOnClose);
-        pref->setWindowFlags(Qt::FramelessWindowHint);
-        pref->setAutoFillBackground(1);
-//        pref->setParent(this);
+//        pref->
         pref->show();
     });
 
-    auto *button_change_password = new QPushButton(tr("Change Password"), dialog_admin);
+    auto *button_change_password = new QPushButton(tr("CHANGE PASSWORD"), dialog_admin);
     connect(button_change_password,&QPushButton::pressed,this,&mainWindow::dialogCreateAdmin);
-
-//    auto *button_about = new QPushButton(tr("ABOUT"), dialog_admin);
-//    connect(button_about,&QPushButton::pressed,[this]()
-//    {
-//        about About;
-//        About.exec();
-//    });
 
     auto *button_close = new QPushButton(tr("CLOSE"), dialog_admin);
     connect(button_close,&QPushButton::pressed,dialog_admin,&QDialog::close);
@@ -1112,20 +1075,21 @@ void mainWindow::dialogAdmin()
     layout_main->addWidget(button_exit);
 
     dialog_admin->setLayout(layout_main);
-    dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
+//    dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
     QPalette palet;
     palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, palette().light().color());
+    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Text, QColor(0,0,0,80));
     palet.setColor(QPalette::WindowText, palette().light().color());
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, palette().light().color());
 
     dialog_admin->setPalette(palet);
-    dialog_admin->setAutoFillBackground(1);
+//    dialog_admin->setAutoFillBackground(1);
 
     dialog_admin->adjustSize();
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
+    dialog_admin->setWindowFlags(Qt::Popup);
     dialog_admin->show();
 
 }
@@ -1153,24 +1117,24 @@ void mainWindow::dialogCreateAdmin()
         QString pass = le_password->text();
         QString pass_confirm = le_password_confirm->text();
 
-        if(old_pass.isEmpty() || pass.isEmpty() || pass_confirm.isEmpty())
+        if (old_pass.isEmpty() || pass.isEmpty() || pass_confirm.isEmpty())
         {
                 return;
         }
 
-        if(pass!=pass_confirm){
+        if (pass!=pass_confirm){
                 return;
         }
                 QSettings setting("elroke","elroke");
                 setting.beginGroup("Admin");
                 QByteArray p = setting.value("pasword").toByteArray();
-                if(QString(p).isEmpty()){
+                if (QString(p).isEmpty()){
                     qDebug()<<"p null";
                     p=QString("elroke").toUtf8();
                     qDebug()<<"p now"<<p;
                 }
 
-                if(old_pass!=QString(p))
+                if (old_pass!=QString(p))
                 {
                     qDebug()<<"old_pass"<<old_pass;
                     qDebug()<<"p "<<p;
@@ -1200,15 +1164,15 @@ void mainWindow::dialogCreateAdmin()
 
      dialog->setLayout(layout_main);
 //     connect(this,&mainWindow::usernameCreated,dialog,&QDialog::close);
-     dialog->setWindowFlags(Qt::FramelessWindowHint);
-     dialog->setParent(this);
+     dialog->setWindowFlags(Qt::Popup);
+//     dialog->setParent(this);
      QPalette palet;
      palet.setColor(QPalette::Base, palette().dark().color());
      palet.setColor(QPalette::Window, Qt::black);
-     palet.setColor(QPalette::Text, palette().light().color());
-     palet.setColor(QPalette::WindowText, palette().light().color());
+     palet.setColor(QPalette::Text, QColor(0,0,0,128));
+     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
      palet.setColor(QPalette::Button, palette().dark().color());
-     palet.setColor(QPalette::ButtonText, palette().light().color());
+     palet.setColor(QPalette::ButtonText, QColor(0,0,0,128));
      dialog->setPalette(palet);
      dialog->adjustSize();
      dialog->setAutoFillBackground(1);
@@ -1218,7 +1182,7 @@ void mainWindow::dialogCreateAdmin()
 
 void mainWindow::dialogLogin()
 {
-    if(dialog_admin!=NULL)
+    if (dialog_admin!=nullptr)
     {
         return;
     }
@@ -1228,7 +1192,7 @@ void mainWindow::dialogLogin()
 
     auto *le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
-    le_password->setFocus();
+
 
     QByteArray pass;
 
@@ -1237,7 +1201,7 @@ void mainWindow::dialogLogin()
     pass = setting.value("password").toByteArray();
     setting.endGroup();
 
-    if(QString(pass).isEmpty())
+    if (QString(pass).isEmpty())
     {
         le_password->setText("elroke");
     }
@@ -1248,7 +1212,7 @@ void mainWindow::dialogLogin()
     connect(button_admin,&QPushButton::pressed,[this,dialog,le_password,pass]()
 
     {
-        if(QString(pass).isEmpty() && le_password->text()=="elroke")
+        if (QString(pass).isEmpty() && le_password->text()=="elroke")
         {
             //open
             dialog->close();
@@ -1257,7 +1221,7 @@ void mainWindow::dialogLogin()
         else
         {
            QByteArray p = QCryptographicHash::hash(le_password->text().toUtf8(), QCryptographicHash::Sha1);
-           if(pass==p)
+           if (pass==p)
            {
                //open
                dialog->close();
@@ -1272,17 +1236,13 @@ void mainWindow::dialogLogin()
     connect(button_about,&QPushButton::pressed,[this]()
     {
         about About;
-        About.setAutoFillBackground(1);
         About.exec();
     });
-
 
     auto *button_close = new QPushButton(tr("Close"), dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
 
-
-      layout_main->addWidget(new QLabel(tr("Password, default \"elroke\""),dialog));
-
+     layout_main->addWidget(new QLabel(tr("Password, default \"elroke\""),dialog));
 
     layout_main->addWidget(le_password);
     layout_main->addWidget(button_admin);
@@ -1291,22 +1251,21 @@ void mainWindow::dialogLogin()
     layout_main->addWidget(button_close);
 
      dialog->setLayout(layout_main);
-     dialog->setParent(this);
-     dialog->setAutoFillBackground(1);
+
      QPalette palet;
      palet.setColor(QPalette::Base, palette().dark().color());
-     palet.setColor(QPalette::Window, Qt::black);
-     palet.setColor(QPalette::Text, palette().light().color());
-     palet.setColor(QPalette::WindowText, palette().light().color());
+     palet.setColor(QPalette::Window, Qt::white);
+     palet.setColor(QPalette::Text, QColor(0,0,0,128));
+     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
      palet.setColor(QPalette::Button, palette().dark().color());
      palet.setColor(QPalette::ButtonText, palette().light().color());
      dialog->setPalette(palet);
 
-     dialog->setFixedWidth(300);
+     dialog->setMinimumSize(300,500);
      dialog->setAttribute(Qt::WA_DeleteOnClose);
-//     le_userName->setFocus();
+     dialog->setWindowFlags( Qt::Popup);
+     le_password->setFocus();
      dialog->show();
-
 }
 
 void mainWindow::showHits()
@@ -1337,7 +1296,7 @@ void mainWindow::moveItemToBottom()
     int row = playlist_widget->currentIndex().row();
 
  //ignore first item
-     if(row==playlist_widget->count()-1){
+     if (row==playlist_widget->count()-1){
          return;
      }
  //copy song. i'm not sure with this way
@@ -1373,13 +1332,13 @@ void mainWindow::updateInterface()
 void mainWindow::setAudioChannelAuto()
 {
 //wait video fully load
-    this_thread::sleep_for(chrono::milliseconds(500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
-        if(channel.contains("LEFT", Qt::CaseInsensitive)){
+        if (channel.contains("LEFT", Qt::CaseInsensitive)){
             video->player()->setAudioChannelLeft();
             button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/left.png"));
         }
-        else if(channel.contains("RIGHT", Qt::CaseInsensitive)){
+        else if (channel.contains("RIGHT", Qt::CaseInsensitive)){
             video->player()->setAudioChannelRight();
             button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/right.png"));
         }
@@ -1390,29 +1349,27 @@ void mainWindow::readSettings()
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     c_font = setting.value("font").toString();
-    if(c_font==NULL) c_font = "Roboto";
+    if (c_font==NULL) c_font = "Roboto";
     background = setting.value("background").toString();
-    if(background==NULL) background = ":/usr/share/elroke/background/butterfly.jpeg";
+    if (background==NULL) background = ":/usr/share/elroke/background/butterfly.jpeg";
     font_size = setting.value("font_size").toInt();
-    if(font_size==0) font_size=16;
+    if (font_size==0) font_size=16;
     language = setting.value("language").toString();
     setting.endGroup();
 }
 
-void mainWindow::d_addtodatabse()
-{
-    //FIXME
-    addtodatabase *atd  = new addtodatabase;
-//    atd->setAutoFillBackground(1);
-//      atd->setAttribute(Qt::WA_DeleteOnClose);
-    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
-    atd->show();
-}
+//void mainWindow::d_addtodatabse()
+//{
+//    //FIXME
+//    addtodatabase *atd  = new addtodatabase;
+//    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
+//    atd->show();
+//}
 
 mainWindow::~mainWindow()
 {
 
     delete video;
-    if(autosave_playlist->isChecked())
+    if (autosave_playlist->isChecked())
         writePlaylist();
 }

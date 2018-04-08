@@ -18,13 +18,10 @@
 #include "addtodatabase.h"
 #include <dbmanager.h>
 #include <QStorageInfo>
-#include <QLabel>
-#include <QHeaderView>
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QDebug>
 #include <QTime>
-#include <QPainter>
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QVariantList>
@@ -32,10 +29,6 @@
 #include <QTabBar>
 #include <QStackedLayout>
 #include <QHeaderView>
-#include <QTimer>
-
-
-
 
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
@@ -103,7 +96,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      view->setSelectionMode(QAbstractItemView::ExtendedSelection);
      view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
      view->setModel(model);
-     view->setColumnHidden(1,1);
+     view->setColumnHidden(1,1);//hide path
      connect(view->selectionModel(),&QItemSelectionModel::selectionChanged,[this]()
      {
         QModelIndexList list =view->selectionModel()->selectedRows();
@@ -137,17 +130,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
      layout_below_view->addWidget(check_subfolder);
      layout_below_view->addStretch();
      layout_below_view->addWidget(button_select_all);
-     //right
+
      QVBoxLayout *layout_list = new QVBoxLayout;
      layout_list->addWidget(label_current_dir);
      layout_list->addWidget(view);
      layout_list->addLayout(layout_below_view);
 
      layout_top->addLayout(layout_list);
-
-    // ----
-
-    QVBoxLayout *layout_splitter = new QVBoxLayout;
+///////////////////////////////////////////// bottom ///////////////////////////////////////////////
+     QVBoxLayout *layout_splitter = new QVBoxLayout;
     auto *check_auto = new QCheckBox(tr("Auto"), this);
     check_auto->setChecked(automatic);
 
@@ -184,7 +175,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     view_choose_pattern->setFixedHeight(view_choose_pattern->fontMetrics().height()+4);
     view_choose_pattern->setDefaultDropAction(Qt::MoveAction);
 
-     QStringList patternList{"Title", "Singer", "Language"," Genre","Audio"};
+     QStringList patternList{"Title", "Singer", "Language", "Genre","Audio"};
      foreach (const QString &val, patternList) {
          auto *item = new QListWidgetItem;
          item->setText(val);
@@ -203,9 +194,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
     connect(view_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
     label_pattern = new QLabel(this);
 
-    layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag and Drop)"), this));
+    layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag)"), this));
     layout_pattern->addWidget(view_choose_pattern);
-    layout_pattern->addWidget(new QLabel("\u25BC\u25B2", this),0,Qt::AlignCenter);
+    layout_pattern->addWidget(new QLabel("Drop here\t\u25BC\u25B2", this));
     layout_pattern->addWidget(view_pattern);
     layout_pattern->addWidget(new QLabel(tr("Pattern :"),this));
     layout_pattern->addWidget(label_pattern);
@@ -348,19 +339,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_button->addWidget(button_start);
    layout_main->addLayout(layout_button);
 
-
-
     QPalette palet;
-    palet.setColor(QPalette::Base, palette().dark().color());
-    palet.setColor(QPalette::Window, Qt::black);
-    palet.setColor(QPalette::Text, Qt::white);
-    palet.setColor(QPalette::WindowText, Qt::white);
+    palet.setColor(QPalette::Base, palette().light().color());
+    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Text, QColor(0,0,0,128));
+    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
-      setLayout(layout_main);
+    setLayout(layout_main);
 
-//    setAutoFillBackground(1);
-//    setWindowFlags(Qt::FramelessWindowHint );
     setWindowState(Qt::WindowFullScreen);
 }
 
@@ -645,6 +632,7 @@ void addtodatabase::getDrive()
             combo_drive->addItem(storage.rootPath());
         }
     }
+    update();
 }
 
 QString addtodatabase::getSplitter(const QString &filename)

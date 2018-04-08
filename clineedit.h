@@ -2,13 +2,13 @@
 #define CLINEEDIT_H
 
 #include <QLineEdit>
-#include <QMouseEvent>
+//#include <QMouseEvent>
 
 class CLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    CLineEdit(QWidget *parent =0 );
+    CLineEdit(QWidget *parent =nullptr );
     ~CLineEdit();
 
 signals :
@@ -17,8 +17,6 @@ signals :
 protected :
     virtual void focusInEvent(QFocusEvent *);
     virtual void focusOutEvent(QFocusEvent *);
-    void paintEvent(QPaintEvent*);
-    void mousePressEvent(QMouseEvent*);
 
 };
 
