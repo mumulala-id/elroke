@@ -708,5 +708,4 @@ void addtodatabase::pattern(){
     }
 
    label_pattern->setText(p.join(splitter));
-
 }

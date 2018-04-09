@@ -627,9 +627,9 @@ void mainWindow::playPlayer()
         QMessageBox message(this);
         message.setIcon(QMessageBox::Information);
         message.setInformativeText(tr("File is not found."));
-        message.setWindowFlags(Qt::FramelessWindowHint);
+        message.setWindowFlags(Qt::Popup);
         message.setStandardButtons(QMessageBox::Close);
-        message.setAutoFillBackground(1);
+//        message.setAutoFillBackground(1);
         message.exec();
         return;
     }

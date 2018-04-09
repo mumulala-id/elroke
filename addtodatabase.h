@@ -55,16 +55,19 @@ private :
     QLabel *label_current_dir;
     QTableView *view;
     QStandardItemModel *model;
+    QLineEdit *le_singer;
+    QLineEdit *le_language;
+    QLineEdit *le_genre;
     QLabel *label_pattern;
     QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
     QStringList supported_video = QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov";
     QComboBox *combo_drive;
-    QString default_singer;
-    QString defafult_language;
-    QString default_genre;
-//    YoutubeDownloader *ydownloader;
+    QString default_singer="UNKNOWN";
+    QString default_language="UNKNOWN";
+    QString default_genre="UNKNWON";
+    QString default_audio="UNKNOWN";
     myListWidget *view_pattern;
 
      bool title_first=true;
