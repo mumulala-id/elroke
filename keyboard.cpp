@@ -65,6 +65,7 @@ Keyboard::Keyboard(QWidget *parent) :
     setMinimumSize(960,96);
     QPalette palette;
     palette.setColor(QPalette::ButtonText,QColor(0,0,0,150));
+    palette.setColor(QPalette::Base,Qt::gray);
     setPalette(palette);
 }
 

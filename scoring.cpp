@@ -19,9 +19,9 @@ Scoring::Scoring(QWidget *parent) : QDialog(parent)
 
     timer = new QTimer(this);
     timer->setSingleShot(1);
-    timer->setInterval(1000);
+    timer->setInterval(500);
     timer_random = new QTimer(this);
-    timer_random->setInterval(50);
+    timer_random->setInterval(10);
 
     player = new Player(this);
     QFile file("/usr/share/elroke/soundfx/applause.mp3");
@@ -34,7 +34,7 @@ Scoring::Scoring(QWidget *parent) : QDialog(parent)
     connect(timer,&QTimer::timeout,timer_random,&QTimer::stop);
     connect(timer_random,&QTimer::timeout,[this]()
     {
-        label->setText(QString::number((qrand()%46)+54));
+        label->setText(QString::number((qrand()%46)+50));
     });
     layout->addWidget(label);
     setLayout(layout);

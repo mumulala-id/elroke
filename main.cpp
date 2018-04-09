@@ -25,25 +25,29 @@
 #include <QStyleFactory>
 #include <QLocale>
 #include <QTranslator>
+#include <QThread>
 #include <QSettings>
+
+class  I : public QThread
+{
+public:
+    static void sleep (unsigned long secs){QThread::sleep(secs);}
+};
+
 int main(int argc, char *argv[])
 {
-    // turn on the DPI support**
     QApplication a(argc, argv);
     QApplication::setStyle("plastique");
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setOrganizationName("mumulala");
     QApplication::setOrganizationDomain("");
     QApplication::setApplicationName("elroke");
     QApplication::setApplicationVersion("0.0.1");
-    QPixmap pic(":/usr/share/elroke//icon/splash.png");
+
+    QPixmap pic(":/usr/share/elroke/icon/logo.png");
     QSplashScreen splash(pic);
-
-   splash.show();
-   a.processEvents();
-   a.thread()->sleep(5);
-
-
+     splash.show();
+    I::sleep(5);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
             qDebug()<<"SQLITE is not installed";
@@ -58,8 +62,6 @@ int main(int argc, char *argv[])
     QString language = setting.value("language").toString();
     setting.endGroup();
 
-//    QString language = QLocale::languageToString(QLocale().system().language());
-    qDebug()<<language;
     QTranslator t;
     if(language!="english"&&language!=NULL)
     {
@@ -67,9 +69,8 @@ int main(int argc, char *argv[])
         a.installTranslator(&t);
      }
 
-//    addtodatabase s;
-//    s.show();
     mainWindow w;
+
     w.showFullScreen();
     splash.finish(&w);
 

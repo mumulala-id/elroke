@@ -45,9 +45,9 @@ void spinnerProgress::paintEvent(QPaintEvent *)
     int startAngle = -270 * 16;
     int spanAngle = value*57.6;
 
-    painter.setRenderHint(QPainter::Antialiasing);
-//    QPen pen(Qt::white);//2,Qt::SolidLine,Qt::SquareCap,Qt::BevelJoin);
-    painter.setPen(Qt::white);
+    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    QPen pen(Qt::white,2,Qt::SolidLine,Qt::SquareCap,Qt::BevelJoin);
+    painter.setPen(pen);
     painter.translate(width() / 2, height() / 2);
     painter.drawArc(-width()/2,-height()/2,width(),height(),startAngle,spanAngle);
     painter.save();

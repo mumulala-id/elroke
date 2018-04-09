@@ -899,7 +899,7 @@ void mainWindow::loadPlaylist(const QString &s)
 QRegion mainWindow::getMaska()
 {
     unsigned short int   free_top_point = spacer->mapToGlobal(spacer->rect().topLeft()).y();
-    unsigned short int   free_bottom_point = spacer->mapToGlobal(spacer->rect().bottomLeft()).y();
+    unsigned short int   free_bottom_point = spacer->mapToGlobal(spacer->rect().bottomLeft()).y()+1;
     QRegion r(0,free_top_point,desktop_width,free_bottom_point-free_top_point, QRegion::Rectangle);
     QRegion desk (0,0, desktop_width, desktop_height, QRegion::Rectangle);
     return desk.subtracted(r);
@@ -1005,6 +1005,7 @@ void mainWindow::videoInstance(){
 void mainWindow::keyBoardInstance()
 {
     keyboard = new Keyboard(this);
+    keyboard->setAutoFillBackground(1);
     keyboard->hide();
 }
 
@@ -1346,13 +1347,6 @@ void mainWindow::readSettings()
     setting.endGroup();
 }
 
-//void mainWindow::d_addtodatabse()
-//{
-//    //FIXME
-//    addtodatabase *atd  = new addtodatabase;
-//    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
-//    atd->show();
-//}
 
 mainWindow::~mainWindow()
 {
