@@ -41,26 +41,26 @@ about::about(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText,Qt::white);
 
-    QVBoxLayout *lo_main = new QVBoxLayout;
+    auto lo_main = new QVBoxLayout;
 
-    QTabBar *tab = new QTabBar(this);
+    auto tab = new QTabBar(this);
     tab->addTab(tr("Description"));
     tab->addTab(tr("License"));
     tab->addTab(tr("Credit"));
     tab->addTab(tr("Donatur"));
 
-    QVBoxLayout *lo_details = new QVBoxLayout;
+    auto lo_details = new QVBoxLayout;
 
-    QLabel *label_appname = new QLabel(this);
+    auto label_appname = new QLabel(this);
 
     label_appname->setText(QApplication::applicationName());
     label_appname->setAlignment(Qt::AlignCenter);
 
-    QLabel *label_version = new QLabel(this);
+    auto label_version = new QLabel(this);
     label_version->setText(QApplication::applicationVersion());
     label_version->setAlignment(Qt::AlignCenter);
 
-    QLabel *description = new QLabel(this);
+    auto description = new QLabel(this);
     description->setText("\tElroke is free and open source apllication for karaoke entertainment. Feel free to use this app for commercial and home use without any fee. But do not forget to  get part for donation to support us. We do not responsible of the contents you used within app");
     description->setWordWrap(true);
 
@@ -69,11 +69,11 @@ about::about(QWidget *parent) :
     lo_details->addStretch();
     lo_details->addWidget(description);
 
-    QWidget *widget_description = new QWidget(this);
+    auto widget_description = new QWidget(this);
     widget_description->setLayout(lo_details);
 
     //license
-    QTextEdit *license_txt = new QTextEdit(this);
+    auto license_txt = new QTextEdit(this);
 
     QFile file(":/usr/share/doc/elroke/copyright");
     file.open(QFile::ReadOnly | QFile::Text);
@@ -88,7 +88,7 @@ about::about(QWidget *parent) :
     license_txt->setReadOnly(1);
 
     //Credit
-    QTextEdit *credit_text = new QTextEdit(this);
+    auto credit_text = new QTextEdit(this);
     credit_text->setText(tr("Thank to")+" :\n"
                          "Qt\n"
                          "VLC\n"
@@ -100,7 +100,7 @@ about::about(QWidget *parent) :
                          "you");
     credit_text->setReadOnly(1);
 
-    QTextEdit * donatur = new QTextEdit (this);
+    auto  donatur = new QTextEdit (this);
 
     donatur->setText(tr("Thank to all contributor, keep Elroke alive)")+ ":\n\n"
                      "John\n"
@@ -115,17 +115,17 @@ about::about(QWidget *parent) :
 
     connect(tab,&QTabBar::currentChanged,stack,&QStackedLayout::setCurrentIndex);
 
-    auto *button_close = new QPushButton(tr("Close"), this);
+    auto button_close = new QPushButton(tr("Close"), this);
     connect(button_close,&QPushButton::pressed,this,&about::close);
 
-    QPushButton *support =new QPushButton(this);
+    auto support =new QPushButton(this);
     support->setIcon(QIcon(":/usr/share/elroke/icon/paypal_donate.png"));
     support->setIconSize(QSize(200,100));
     connect(support,&QPushButton::pressed,[this]()
     {
         QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
     });
-    QHBoxLayout *layout_button = new QHBoxLayout;
+    auto layout_button = new QHBoxLayout;
     layout_button->addWidget(button_close,0,Qt::AlignLeft);
     layout_button->addWidget(support,0,Qt::AlignRight);
 

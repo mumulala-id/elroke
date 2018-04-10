@@ -34,23 +34,23 @@
 addtodatabase::addtodatabase(QWidget *parent) :
     QDialog(parent)
 {
-    QVBoxLayout *layout_main = new QVBoxLayout;
-    QTabBar *tabbar = new QTabBar(this);
+    auto layout_main = new QVBoxLayout;
+    auto tabbar = new QTabBar(this);
     tabbar->addTab(tr("Local"));
     tabbar->addTab(tr("Network"));
 
-    QHBoxLayout *layout_top = new QHBoxLayout;
-    QVBoxLayout *layout_top_left = new QVBoxLayout;
+    auto layout_top = new QHBoxLayout;
+    auto layout_top_left = new QVBoxLayout;
 
     combo_drive = new QComboBox(this);
    //get mounted drive
     getDrive();
 
-    auto *button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
+    auto button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
     connect(button_refresh,&QPushButton::pressed,this,&addtodatabase::getDrive);
 
-    QHBoxLayout *layout_drive = new QHBoxLayout;
+    auto layout_drive = new QHBoxLayout;
     layout_drive->addWidget(combo_drive);
     layout_drive->addWidget(button_refresh);
     layout_drive->addStretch();
@@ -109,7 +109,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      layout_top_left->addWidget(treeview);
      layout_top ->addLayout(layout_top_left);
 
-     auto *check_subfolder = new QCheckBox("include sub folder",this);
+     auto check_subfolder = new QCheckBox("include sub folder",this);
      connect(check_subfolder,&QCheckBox::toggled,[this](bool checked){
         if(checked)
         {
@@ -123,28 +123,28 @@ addtodatabase::addtodatabase(QWidget *parent) :
         }
      });
 
-     auto *button_select_all = new QPushButton(tr("Select All"), this);
+     auto button_select_all = new QPushButton(tr("Select All"), this);
 
      connect(button_select_all,&QPushButton::pressed,view,&QTableView::selectAll);
 
-     QHBoxLayout *layout_below_view = new QHBoxLayout;
+     auto layout_below_view = new QHBoxLayout;
      layout_below_view->addWidget(check_subfolder);
      layout_below_view->addStretch();
      layout_below_view->addWidget(button_select_all);
 
-     QVBoxLayout *layout_list = new QVBoxLayout;
+     auto layout_list = new QVBoxLayout;
      layout_list->addWidget(label_current_dir);
      layout_list->addWidget(view);
      layout_list->addLayout(layout_below_view);
 
      layout_top->addLayout(layout_list);
 ///////////////////////////////////////////// bottom ///////////////////////////////////////////////
-     QVBoxLayout *layout_splitter = new QVBoxLayout;
-    auto *check_auto = new QCheckBox(tr("Auto"), this);
+     auto layout_splitter = new QVBoxLayout;
+    auto check_auto = new QCheckBox(tr("Auto"), this);
     check_auto->setChecked(automatic);
 
-    QHBoxLayout *layout_use_char = new QHBoxLayout;
-    auto *check_split_by= new QCheckBox(tr("Split by"), this);
+    auto layout_use_char = new QHBoxLayout;
+    auto check_split_by= new QCheckBox(tr("Split by"), this);
 
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
@@ -161,13 +161,13 @@ addtodatabase::addtodatabase(QWidget *parent) :
     layout_splitter->addLayout(layout_use_char,0);
     layout_splitter->addStretch();
 
-    auto *grup_splitter = new QGroupBox(tr("Splitter"), this);
+    auto grup_splitter = new QGroupBox(tr("Splitter"), this);
     grup_splitter->setLayout(layout_splitter);
 
 ////////////////////////////////////////// pattern/////////////////////////////////////////////////
-    QVBoxLayout *layout_pattern = new QVBoxLayout;
+    auto layout_pattern = new QVBoxLayout;
 
-    auto *view_choose_pattern = new myListWidget(this);
+    auto view_choose_pattern = new myListWidget(this);
     view_choose_pattern->setFlow(QListView::LeftToRight);
     view_choose_pattern->setDragEnabled(true);
     view_choose_pattern->setDragDropMode(QAbstractItemView::DragDrop);
@@ -178,7 +178,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      QStringList patternList{"Title", "Singer", "Language", "Genre","Audio"};
      foreach (const QString &val, patternList) {
-         auto *item = new QListWidgetItem;
+         auto item = new QListWidgetItem;
          item->setText(val);
          view_choose_pattern->addItem(item);
      }
@@ -203,11 +203,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
     layout_pattern->addWidget(label_pattern);
     layout_pattern->addStretch();
 
-    auto *group_pattern = new QGroupBox(tr("Pattern"), this);
+    auto group_pattern = new QGroupBox(tr("Pattern"), this);
     group_pattern->setLayout(layout_pattern);
     group_pattern->setEnabled(!automatic);
 
-   QGridLayout *layout_additional_item = new QGridLayout;
+   auto layout_additional_item = new QGridLayout;
 
    le_singer = new QLineEdit(this);
    le_singer->setText(default_singer);
@@ -224,15 +224,15 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_additional_item->addWidget(le_genre,2,1);
    layout_additional_item->setVerticalSpacing(0);
 
-   auto *group_metadata = new QGroupBox(tr("Add metadata if not available"));
+   auto group_metadata = new QGroupBox(tr("Add metadata if not available"));
    group_metadata->setLayout(layout_additional_item);
    group_metadata->setEnabled(!automatic);
 
-   QVBoxLayout *layout_audio_channel = new QVBoxLayout;
+   auto layout_audio_channel = new QVBoxLayout;
 
-   auto *check_audio_left = new QCheckBox(tr("Left"), this);
-   auto *check_audio_right = new QCheckBox(tr("Right"), this);
-   auto *check_audio_stereo = new QCheckBox(tr("Stereo"), this);
+   auto check_audio_left = new QCheckBox(tr("Left"), this);
+   auto check_audio_right = new QCheckBox(tr("Right"), this);
+   auto check_audio_stereo = new QCheckBox(tr("Stereo"), this);
 
    connect(check_audio_left,&QCheckBox::toggled,[this,check_audio_right,check_audio_stereo](bool s)
    {
@@ -267,7 +267,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_audio_channel->addWidget(check_audio_stereo);
    layout_audio_channel->addStretch();
 
-   auto *group_audio_channel = new QGroupBox(tr("Audio Channel"), this);
+   auto group_audio_channel = new QGroupBox(tr("Audio Channel"), this);
    group_audio_channel->setLayout(layout_audio_channel);
    group_audio_channel->setEnabled(!automatic);
 
@@ -288,36 +288,36 @@ addtodatabase::addtodatabase(QWidget *parent) :
       group_audio_channel->setEnabled(c);
    });
 
-   QHBoxLayout *layout_bottom = new QHBoxLayout;
+   auto layout_bottom = new QHBoxLayout;
    layout_bottom->addWidget(grup_splitter);
    layout_bottom->addWidget(group_pattern);
    layout_bottom->addWidget(group_metadata);
    layout_bottom->addWidget(group_audio_channel);
 
-   QWidget *widget_top = new QWidget(this);
+   auto widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
 
    QSizePolicy spTop(QSizePolicy::Preferred, QSizePolicy::Preferred);
    spTop.setVerticalStretch(2);
    widget_top->setSizePolicy(spTop);
 
-   QWidget *widget_bottom = new QWidget(this);
+   auto widget_bottom = new QWidget(this);
    widget_bottom->setLayout(layout_bottom);
 
    QSizePolicy spBottom(QSizePolicy::Preferred, QSizePolicy::Preferred);
    spBottom.setVerticalStretch(1);
    widget_bottom->setSizePolicy(spBottom);
 
-   QWidget *local_widget = new QWidget(this);
-   QVBoxLayout *layout_local = new QVBoxLayout;
+   auto local_widget = new QWidget(this);
+   auto layout_local = new QVBoxLayout;
    layout_local->addWidget(widget_top);
    layout_local->addWidget(widget_bottom);
    local_widget->setLayout(layout_local);
 
 //########################network widget############################
-   auto *ydownloader = new YoutubeDownloader(this);
+   auto ydownloader = new YoutubeDownloader(this);
 
-   QStackedLayout *stack = new QStackedLayout;
+   auto stack = new QStackedLayout;
    stack->addWidget(local_widget);
    stack->addWidget(ydownloader);
     connect(tabbar,&QTabBar::currentChanged,stack,&QStackedLayout::setCurrentIndex);
@@ -333,9 +333,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_main->addWidget(tabbar);
    layout_main->addLayout(stack);
 
-   QHBoxLayout *layout_button = new QHBoxLayout;
+   auto layout_button = new QHBoxLayout;
 
-   auto *button_cancel = new QPushButton(tr("Cancel"), this);
+   auto button_cancel = new QPushButton(tr("Cancel"), this);
    connect(button_cancel,&QPushButton::pressed,this,&addtodatabase::close);
 
   button_start = new QPushButton(tr("Start"), this);
@@ -376,11 +376,11 @@ void addtodatabase::getItem()
            QString path = info.absoluteFilePath();
            QString name = info.fileName();
 
-           QStandardItem *item_name = new QStandardItem;
+           auto item_name = new QStandardItem;
            item_name->setText(name);
            model->setItem(row,0,item_name);
 
-           QStandardItem *item_path = new QStandardItem;
+           auto item_path = new QStandardItem;
            item_path->setText(path);
            model->setItem(row,1,item_path);
 
@@ -399,7 +399,7 @@ void addtodatabase::saveToDatabase()
 
     QModelIndexList list =  view->selectionModel()->selectedRows();
 
-    dbmanager *db = new dbmanager(dbmanager::add, this);
+    auto db = new dbmanager(dbmanager::add, this);
     db->connectToDB();
     db->prepare();
 
@@ -703,7 +703,7 @@ void addtodatabase::pattern(){
     QStringList p;
     for(int i=0;i < view_pattern->count();i++)
     {
-        QListWidgetItem *item = view_pattern->item(i);
+        auto item = view_pattern->item(i);
         p<<item->data(Qt::DisplayRole).toString();
     }
 

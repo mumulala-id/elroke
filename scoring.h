@@ -17,13 +17,15 @@ signals:
 public slots:
     void start();
     void finish();
+//protected :
+//    void paintEvent(QPaintEvent*);
 
 private :
     QLabel *label;
     QTimer *timer_random;
     QTimer *timer;
     Player *player;
-public slots:
+
 };
 
 #endif // SCORING_H

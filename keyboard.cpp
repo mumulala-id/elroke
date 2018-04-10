@@ -28,7 +28,7 @@ Keyboard::Keyboard(QWidget *parent) :
 
 {
 
-    QGridLayout *main_layout = new QGridLayout;
+    auto main_layout = new QGridLayout;
 
     QString text = "12345FCDBAEIGHJVWXYZ67890QPTNUOMRSLK";
 
@@ -39,13 +39,13 @@ Keyboard::Keyboard(QWidget *parent) :
         main_layout->addWidget(keyButton[i], row, column);
     }
 
-    auto *space = new QPushButton("\u2423", this);
+    auto space = new QPushButton("\u2423", this);
     space->setFocusPolicy(Qt::NoFocus);
     space->setObjectName("space");
     space->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
     connect(space,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
 
-    auto *backspace = new QPushButton("\u232B", this);
+    auto backspace = new QPushButton("\u232B", this);
     backspace->setObjectName("backspace");
     backspace->setFocusPolicy(Qt::NoFocus);
     backspace->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -69,9 +69,9 @@ Keyboard::Keyboard(QWidget *parent) :
     setPalette(palette);
 }
 
-QPushButton *Keyboard::createButton( const QString &text){
+QPushButton * Keyboard::createButton( const QString &text){
 
-   auto *button = new QPushButton(text, this);
+   auto button = new QPushButton(text, this);
     button->setMaximumSize(QSize(48,48));
 
     QFont font;
@@ -92,7 +92,7 @@ void Keyboard::onButtonClicked(){
          if(!receiver)
              return;
 
-    QPushButton *clickedButton =  qobject_cast<QPushButton *>(sender());
+    auto clickedButton =  qobject_cast<QPushButton *>(sender());
     QString objeck_name = clickedButton->objectName();
     QChar text = objeck_name.at(0);
 

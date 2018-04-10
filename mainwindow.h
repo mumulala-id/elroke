@@ -85,7 +85,6 @@ private :
     ProxyModel *proxy_model;
     CLineEdit *le_search;
     QSlider *slider_vol;
-    QPushButton *button_audio_mute;
     VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;

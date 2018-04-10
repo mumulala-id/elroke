@@ -25,18 +25,16 @@ public slots:
      }
 
      void start(){
-         QList<QImage> imglist;
          foreach (const QString &x, _filename) {
              QImage output(x);
-             output = output.scaled(QSize(160,90), Qt::KeepAspectRatio, Qt::FastTransformation );
-             imglist<<output;
+             output = output.scaled(QSize(160,90), Qt::KeepAspectRatio, Qt::SmoothTransformation );
+             emit finished(output);
          }
-        emit finished( imglist );
      }
 
 signals :
      void error();
-     void finished(QList<QImage>output);
+     void finished(QImage output);
 };
 
 class preferences : public QDialog
@@ -60,14 +58,11 @@ private :
 
 private slots:
     QStringList getLanguageGenre();
-    void handleImage(QList<QImage> imglist);
+    void handleImage(QImage);
     void apply();
     void ok();
     void readSetting();
 
-signals:
-
-public slots:
 };
 
 #endif // PREFERENCES_H

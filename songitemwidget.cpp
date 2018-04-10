@@ -6,8 +6,8 @@
 
 songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
 {
-    QHBoxLayout *main_layout = new QHBoxLayout;
-    QVBoxLayout *sub_main_layout = new QVBoxLayout;
+    auto main_layout = new QHBoxLayout;
+    auto sub_main_layout = new QVBoxLayout;
 
     label_title = new QLabel(this);
 
@@ -21,7 +21,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     sub_main_layout->addWidget(label_title,1,Qt::AlignLeft);
     sub_main_layout->addWidget(label_singer,1,Qt::AlignRight);
 
-    QLabel *label_drag = new QLabel(this);
+    auto label_drag = new QLabel(this);
     label_drag->setPixmap(QPixmap(":/usr/share/elroke/icon/drag.png"));
     label_drag->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
 

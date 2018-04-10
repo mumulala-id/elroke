@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include <QFile>
+#include <QPainter>
 Scoring::Scoring(QWidget *parent) : QDialog(parent)
 {
     auto *layout = new QVBoxLayout;
@@ -42,7 +43,7 @@ Scoring::Scoring(QWidget *parent) : QDialog(parent)
     pal.setColor(QPalette::WindowText,Qt::blue);
     pal.setColor(QPalette::Window,Qt::white);
 
-   setPalette(pal);
+     setPalette(pal);
     hide();
 }
 
@@ -55,8 +56,8 @@ void Scoring::start(){
 
 void Scoring::finish()
 {
-    qDebug()<<"finish";
     hide();
     emit finished();
 
 }
+

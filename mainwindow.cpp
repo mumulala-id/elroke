@@ -63,7 +63,7 @@ void mainWindow::createWidgets(){
     QVBoxLayout *layout_main = new QVBoxLayout;
     QHBoxLayout *layout_top = new QHBoxLayout;
 
-    auto *pb_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"", this);
+    auto pb_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"", this);
     pb_menu->setFlat(1);
     pb_menu->setFocusPolicy(Qt::NoFocus);
     connect(pb_menu,&QPushButton::pressed,this,&mainWindow::dialogLogin);
@@ -71,22 +71,22 @@ void mainWindow::createWidgets(){
     le_search = new CLineEdit(this);
     le_search->setPlaceholderText(tr("SEARCH"));
 
-    auto *button_show_all = new QPushButton(tr("ALL"), this);
+    auto button_show_all = new QPushButton(tr("ALL"), this);
     button_show_all->setFocusPolicy(Qt::NoFocus);
     button_show_all->setFlat(1);
-    auto *button_cat_indonesia = new QPushButton("category1", this);
+    auto button_cat_indonesia = new QPushButton("category1", this);
     button_cat_indonesia->setFlat(1);
     button_cat_indonesia->setFocusPolicy(Qt::NoFocus);
-    auto *button_cat_barat = new QPushButton("category2", this);
+    auto button_cat_barat = new QPushButton("category2", this);
     button_cat_barat->setFlat(1);
     button_cat_barat->setFocusPolicy(Qt::NoFocus);
-    auto *button_cat_rock = new QPushButton("category3", this);
+    auto button_cat_rock = new QPushButton("category3", this);
     button_cat_rock->setFlat(1);
     button_cat_rock->setFocusPolicy(Qt::NoFocus);
-    auto *button_cat_pop = new QPushButton("category4", this);
+    auto button_cat_pop = new QPushButton("category4", this);
     button_cat_pop->setFlat(1);
     button_cat_pop->setFocusPolicy(Qt::NoFocus);
-    auto *button_cat_dangdut = new QPushButton("category5", this);
+    auto button_cat_dangdut = new QPushButton("category5", this);
     button_cat_dangdut->setFlat(1);
     button_cat_dangdut->setFocusPolicy(Qt::NoFocus);
 
@@ -138,12 +138,6 @@ void mainWindow::createWidgets(){
 
     QHBoxLayout *layout_table = new QHBoxLayout;
 
-//    QPalette table_palette;
-////    table_palette.setColor(QPalette::Base, Qt::transparent);
-//    table_palette.setColor(QPalette::Text, QColor(0,0,0,128));
-//    table_palette.setColor(QPalette::Active,Qt::red);
-//    table_palette.setColor(QPalette::Highlight, Qt::blue);
-//    table_palette.setColor(QPalette::HighlightedText, Qt::yellow);
 
     db = new dbmanager(dbmanager::show, this);
     db->connectToDB();
@@ -206,7 +200,7 @@ void mainWindow::createWidgets(){
     spLeft.setHorizontalStretch(3);
     table->setSizePolicy(spLeft);
 
-    auto *layout_playlist = new QVBoxLayout;
+    auto layout_playlist = new QVBoxLayout;
 
     playlist_widget = new ListWidget(this);
     playlist_widget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -219,13 +213,13 @@ void mainWindow::createWidgets(){
 
     connect(playlist_widget,&ListWidget::doubleClicked,this,&mainWindow::playPlayer);
 
-    auto *layout_button_playlist = new QHBoxLayout;
+    auto layout_button_playlist = new QHBoxLayout;
 
-    auto *button_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"",this);
+    auto button_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"",this);
     button_menu->setFlat(1);
     button_menu->setIconSize(QSize(32,32));
 
-    auto *menu_playlist = new QMenu(this);
+    auto menu_playlist = new QMenu(this);
     autosave_playlist = new QAction(tr("Auto save playlist"), this);
     autosave_playlist->setFont(font());
     autosave_playlist->setCheckable(1);
@@ -237,7 +231,7 @@ void mainWindow::createWidgets(){
     auto*save_as = new QAction(tr("Save as"),  this);
     save_as->setFont(font());
     connect(save_as, SIGNAL(triggered(bool)), this, SLOT(dialogSavePlaylist()));
-    auto *load_playlist = new QAction(tr("Load playlist") , this);
+    auto load_playlist = new QAction(tr("Load playlist") , this);
     load_playlist->setFont(font());
     connect(load_playlist, SIGNAL(triggered(bool)),this,SLOT(dialogLoadPlaylist()));
 
@@ -248,19 +242,19 @@ void mainWindow::createWidgets(){
     button_menu->setMenu(menu_playlist);
     button_menu->setFocusPolicy(Qt::NoFocus);
 
-    auto *button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/icon/top.png"),"", this);
+    auto button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/icon/top.png"),"", this);
     button_move_to_top->setFocusPolicy(Qt::NoFocus);
     button_move_to_top->setFlat(1);
     button_move_to_top->setIconSize(QSize(32,32));
     connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
 
-    auto *button_move_to_bottom = new QPushButton(QIcon(":/usr/share/elroke/icon/bottom.png"),"", this);
+    auto button_move_to_bottom = new QPushButton(QIcon(":/usr/share/elroke/icon/bottom.png"),"", this);
     button_move_to_bottom->setFlat(1);
     button_move_to_bottom->setIconSize(QSize(32,32));
     button_move_to_bottom->setFocusPolicy(Qt::NoFocus);
     connect(button_move_to_bottom,SIGNAL(pressed()),this,SLOT(moveItemToBottom()));
 
-    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/delete.png"),"", this);
+    auto button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/delete.png"),"", this);
     button_delete->setFocusPolicy(Qt::NoFocus);
     button_delete->setFlat(1);
     button_delete->setIconSize(QSize(32,32));
@@ -269,7 +263,7 @@ void mainWindow::createWidgets(){
         qDeleteAll(playlist_widget->selectedItems());
     });
 
-    auto *button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/icon/clear.png"),"", this);
+    auto button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/icon/clear.png"),"", this);
     button_clear_playlist->setFocusPolicy(Qt::NoFocus);
     button_clear_playlist->setFlat(1);
     button_clear_playlist->setIconSize(QSize(32,32));
@@ -278,7 +272,7 @@ void mainWindow::createWidgets(){
          playlist_widget->clear();
     });
 
-    auto *button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/icon/lock.png"),"", this);
+    auto button_lock_playlist = new QPushButton(QIcon(":/usr/share/elroke/icon/lock.png"),"", this);
     button_lock_playlist->setFocusPolicy(Qt::NoFocus);
     button_lock_playlist->setCheckable(true);
     button_lock_playlist->setFlat(1);
@@ -292,7 +286,7 @@ void mainWindow::createWidgets(){
              button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/lock.png"));
     });
 
-    auto *widget_control_playlist = new QWidget(this);
+    auto widget_control_playlist = new QWidget(this);
     widget_control_playlist->setAutoFillBackground(1);
 
     layout_button_playlist->addWidget(button_menu);
@@ -315,7 +309,7 @@ void mainWindow::createWidgets(){
     layout_playlist->setMargin(0);
 
     //CREATE WIDGET TO APPLY SIZEPOLICY
-    auto *widget_playlist = new QWidget(this);
+    auto widget_playlist = new QWidget(this);
     widget_playlist->setLayout(layout_playlist);
 
     QSizePolicy spRight(QSizePolicy::Preferred,QSizePolicy::Preferred);
@@ -328,57 +322,44 @@ void mainWindow::createWidgets(){
     layout_table->setSpacing(0);
 
     //CREATE WIDGET TO APPLY SIZEPOLICY(Height)
-    auto *all_table = new QWidget(this);
+    auto all_table = new QWidget(this);
     all_table->setLayout(layout_table);
 
     QSizePolicy spTable (QSizePolicy::Expanding,QSizePolicy::Expanding);
     spTable.setVerticalStretch(2);
     all_table->setSizePolicy(spTable);
 
-     auto *layout_player_control = new QHBoxLayout;
+     auto layout_player_control = new QHBoxLayout;
 
     spinner_progress = new spinnerProgress(this);
-//    circle = new ProgressCircle(this);
-//    circle->setMaximum(100);
-//    circle->setColor(Qt::gray);
     spinner_progress->setFixedSize(64,64);
 
-     auto *btn_next = new QPushButton(this);
-     btn_next->setIcon(QIcon(":/usr/share/elroke/icon/next.png"));
-     btn_next->setFlat(1);
-     btn_next->setIconSize(QSize(64,64));
-     btn_next->setFocusPolicy(Qt::NoFocus);
-     connect(btn_next,SIGNAL(pressed()),this,SLOT(playPlayer()));
+    auto buttonControl = [this](QIcon icon)
+    {
+        auto btn= new QPushButton(this);
+        btn->setIcon(icon);
+        btn->setFlat(1);
+        btn->setIconSize(QSize(64,64));
+        btn->setFocusPolicy(Qt::NoFocus);
+        return btn;
+    };
 
-//     auto *button_stop = new QPushButton(QIcon::fromTheme("stop"),"", this);
-//     button_stop->setFlat(1);
-//     button_stop->setFocusPolicy(Qt::NoFocus);
-//     button_stop->setPalette(btn_pal);
-//     connect(button_stop, SIGNAL(pressed()),video,SLOT(stop()));
+    auto btn_next = buttonControl(QIcon(":/usr/share/elroke/icon/next.png"));
+    connect(btn_next,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
-     auto *button_play_pause = new QPushButton(QIcon(":/usr/share/elroke/icon/play.png"), "", this);
-     button_play_pause->setFlat(1);
-     button_play_pause->setIconSize(QSize(64,64));
-     button_play_pause->setFocusPolicy(Qt::NoFocus);
-     connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPlayer()));
+     auto button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
+//     connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPlayer()));
+     connect(button_play_pause,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
-     auto *button_favorit = new QPushButton(QIcon(":/usr/share/elroke/icon/favorit.png"), "", this);
-      button_favorit->setFlat(1);
-      button_favorit->setIconSize(QSize(64,64));
-      button_favorit->setFocusPolicy(Qt::NoFocus);
-      connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
+     auto button_favorit = buttonControl(QIcon(":/usr/share/elroke/icon/favorit.png"));
+     connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
 
-    button_audio_channel = new QPushButton(this);
-    button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/stereo.png"));
-    button_audio_channel->setIconSize(QSize(64,64));
-    button_audio_channel->setFlat(1);
-    button_audio_channel->setFocusPolicy(Qt::NoFocus);
-    connect(button_audio_channel,SIGNAL(pressed()),this,SLOT(setAudioChannelManual()));
+    button_audio_channel = buttonControl(QIcon(":/usr/share/elroke/icon/stereo.png"));
+//    connect(button_audio_channel,SIGNAL(pressed()),this,SLOT(setAudioChannelManual()));
+    connect(button_audio_channel,&QPushButton::pressed,this,&mainWindow::setAudioChannelManual);
 
-     auto *button_vol_down = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"),"", this);
-     button_vol_down->setFocusPolicy(Qt::NoFocus);
-     button_vol_down->setFlat(1);
-     button_vol_down->setIconSize(QSize(24,24));
+
+     auto button_vol_down = buttonControl(QIcon(":/usr/share/elroke/icon/minus.png"));
      connect(button_vol_down,&QPushButton::pressed,[this]()
      {
          if (video->player()->volume()<5)
@@ -392,10 +373,7 @@ void mainWindow::createWidgets(){
      slider_vol->setFixedWidth(200);
      slider_vol->setFocusPolicy(Qt::NoFocus);
 
-     auto *button_vol_up = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"),"", this);
-     button_vol_up->setFocusPolicy(Qt::NoFocus);
-     button_vol_up->setIconSize(QSize(24,24));
-     button_vol_up->setFlat(1);
+     auto button_vol_up = buttonControl(QIcon(":/usr/share/elroke/icon/plus.png"));
      connect(button_vol_up,&QPushButton::pressed,[this]()
      {
          if (video->player()-> volume()>95)
@@ -404,11 +382,8 @@ void mainWindow::createWidgets(){
           video->player()->setVolume(video->player()->volume()+5);
      });
 
-     button_audio_mute = new QPushButton(QIcon(":/usr/share/elroke/icon/unmute.png"),"", this);
-     button_audio_mute->setFocusPolicy(Qt::NoFocus);
-     button_audio_mute->setIconSize(QSize(64,64));
-     button_audio_mute->setFlat(1);
-     connect(button_audio_mute,&QPushButton::pressed,[this]()
+    auto  button_audio_mute = buttonControl(QIcon(":/usr/share/elroke/icon/unmute.png"));
+     connect(button_audio_mute,&QPushButton::pressed,[this,button_audio_mute]()
      {
          if (!video->player()->isPlaying())
              return;
@@ -440,7 +415,7 @@ void mainWindow::createWidgets(){
      layout_player_control->addWidget(button_audio_mute);
      layout_player_control->setMargin(0);
 
-     QWidget *widget_bottom = new QWidget(this);
+     auto widget_bottom = new QWidget(this);
      QPalette plt;
      plt.setBrush(QPalette::Background, Qt::black);
 
@@ -448,13 +423,6 @@ void mainWindow::createWidgets(){
      widget_bottom->setPalette(plt);
      widget_bottom->setLayout(layout_player_control);
 
-//     QWidget *widget_top = new QWidget(this);
-//     QPalette transparent_palette;
-//     transparent_palette.setBrush(QPalette::Background, QColor("#00796B"));
-
-//     widget_top->setAutoFillBackground(1);
-//     widget_top->setPalette(transparent_palette);
-//     widget_top->setLayout(layout_top);
 
     layout_main->addWidget(widget_top);
     layout_main->addWidget(all_table);
@@ -462,6 +430,7 @@ void mainWindow::createWidgets(){
     //spacer sholud be mask when video playing, keep lyric visible
     spacer = new QWidget(this);
     spacer->adjustSize();
+
     QSizePolicy spSpacer (QSizePolicy::Expanding,QSizePolicy::Expanding);
     spSpacer.setVerticalStretch(1);
 
@@ -476,7 +445,7 @@ void mainWindow::createWidgets(){
 
 void mainWindow::createShortcut(){
 
-    QShortcut *sc_quit = new QShortcut(QKeySequence("Esc"),this);
+    auto sc_quit = new QShortcut(QKeySequence("Esc"),this);
     connect(sc_quit,&QShortcut::activated,qApp,&QApplication::quit);
 
 }
@@ -495,7 +464,7 @@ void mainWindow::addToPlaylist()
    item_song_widget->setSong(song);
 
 
-   QListWidgetItem *item = new QListWidgetItem;
+   auto item = new QListWidgetItem;
    playlist_widget->addItem(item);
    playlist_widget->setItemWidget(item, item_song_widget);
 
@@ -624,12 +593,11 @@ void mainWindow::playPlayer()
     //CHECK IF FILE EXIST
     if (!QFile(file).exists())
     {
-        QMessageBox message(this);
+        QMessageBox message;
         message.setIcon(QMessageBox::Information);
         message.setInformativeText(tr("File is not found."));
         message.setWindowFlags(Qt::Popup);
         message.setStandardButtons(QMessageBox::Close);
-//        message.setAutoFillBackground(1);
         message.exec();
         return;
     }
@@ -656,9 +624,9 @@ void mainWindow::playPlayer()
 
 void mainWindow::dialogNextSong()
 {
-    auto *dialog = new QDialog();
+    auto dialog = new QDialog();
 
-    auto *layout =new QVBoxLayout;
+    auto layout =new QVBoxLayout;
      // this will notify next item in playlist before song end
     QPalette let;
     let.setColor(QPalette::Background,Qt::white);
@@ -667,7 +635,7 @@ void mainWindow::dialogNextSong()
     QFont f;
     f.setPointSize(32);
 
-    QLabel *notif = new QLabel;
+    QLabel *notif = new QLabel(dialog);
     layout->addWidget(notif);
     dialog->setLayout(layout);
 
@@ -679,7 +647,7 @@ void mainWindow::dialogNextSong()
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
     }
 
-    dialog->setWindowFlags(Qt::FramelessWindowHint | Qt::Popup);
+    dialog->setWindowFlags(Qt::Popup);
     dialog->setPalette(let);
     notif->setFont(f);
     dialog->adjustSize();
@@ -695,7 +663,7 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event)
     {
         if (event->type()==QEvent::KeyPress )
         {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+            auto keyEvent = static_cast<QKeyEvent*>(event);
             if (isKeyValid(keyEvent->key()))
             {
                 this->activateWindow();
@@ -725,12 +693,12 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event)
 
 void mainWindow::dialogSavePlaylist()
 {
-    QDialog *dialog_save_playlist = new QDialog;
-    QVBoxLayout *layout_main = new QVBoxLayout;
+    auto dialog_save_playlist = new QDialog;
+    auto layout_main = new QVBoxLayout;
 
-    CLineEdit *le_playlist_name = new CLineEdit(dialog_save_playlist);
+    auto le_playlist_name = new CLineEdit(dialog_save_playlist);
     connect(le_playlist_name,&CLineEdit::focussed,keyboard,&Keyboard::setVisible);
-    QAction *action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", dialog_save_playlist);
+    auto action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", dialog_save_playlist);
     le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
     connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
@@ -739,10 +707,10 @@ void mainWindow::dialogSavePlaylist()
 
     QHBoxLayout *layout_btn = new QHBoxLayout;
 
-    auto *btn_close = new QPushButton("Cancel", dialog_save_playlist);
+    auto btn_close = new QPushButton("Cancel", dialog_save_playlist);
     connect(btn_close,&QPushButton::pressed,dialog_save_playlist,&QDialog::close);
 
-    auto *btn_save = new QPushButton("Save", dialog_save_playlist);
+    auto btn_save = new QPushButton("Save", dialog_save_playlist);
     connect(btn_save,&QPushButton::pressed,dialog_save_playlist,&QDialog::accept);
 
     keyboard->move(QPoint(0,0));
@@ -754,7 +722,7 @@ void mainWindow::dialogSavePlaylist()
     layout_main->addLayout(layout_btn);
     dialog_save_playlist->setLayout(layout_main);
 
-   dialog_save_playlist->setWindowFlags( Qt::FramelessWindowHint | Qt::Popup);
+   dialog_save_playlist->setWindowFlags(Qt::Popup);
    dialog_save_playlist->setAttribute(Qt::WA_DeleteOnClose);
 
    le_playlist_name->setFocus();
@@ -770,7 +738,7 @@ void mainWindow::dialogSavePlaylist()
 
 void mainWindow::dialogLoadPlaylist(){
 
-    auto *dialog_load_playlist = new QDialog;
+    auto dialog_load_playlist = new QDialog;
 //    dialog_load_playlist->setParent(this);
 
     QDirIterator it(app_dir+"/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
@@ -783,19 +751,19 @@ void mainWindow::dialogLoadPlaylist(){
         list_play << info.baseName();
     }
 
-    auto *layout_main = new QVBoxLayout;
+    auto layout_main = new QVBoxLayout;
 
-    auto *_list = new QListWidget(dialog_load_playlist);
+    auto _list = new QListWidget(dialog_load_playlist);
 
     _list->addItems(list_play);
 
     layout_main->addWidget(new QLabel("Load Playlist :", dialog_load_playlist));
 
-    auto *layout_btn = new QHBoxLayout;
-    auto *btn_cancel = new QPushButton("Cancel", dialog_load_playlist);
+    auto layout_btn = new QHBoxLayout;
+    auto btn_cancel = new QPushButton("Cancel", dialog_load_playlist);
     connect(btn_cancel,&QPushButton::pressed,dialog_load_playlist,&QDialog::close);
 
-    auto *btn_load = new QPushButton("Load", dialog_load_playlist);
+    auto btn_load = new QPushButton("Load", dialog_load_playlist);
     connect(btn_load,&QPushButton::pressed,dialog_load_playlist,&QDialog::accept);
 
     layout_btn->addWidget(btn_cancel);
@@ -994,10 +962,11 @@ void mainWindow::videoInstance(){
 
     connect(video->player(),&Player::error,[this]()
     {
-        QMessageBox error_message(this);// = new QMessageBox(this);
+        QMessageBox error_message;
         error_message.setInformativeText("Error playing "+video->player()->getFile());
-        error_message.show();
-        QTimer::singleShot(3000,&error_message,SLOT(deleteLater()));
+        error_message.setWindowFlags(Qt::Popup);
+        error_message.exec();
+        QTimer::singleShot(3000,&error_message,SLOT(close()));
     });
     connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
 }
@@ -1023,7 +992,7 @@ void mainWindow::dialogAdmin()
 
     QVBoxLayout *layout_main = new QVBoxLayout;
 
-    auto *button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
+    auto button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
     connect(button_add_to_database,&QPushButton::pressed,[this]()
     {
     addtodatabase *atd = new addtodatabase;
@@ -1039,7 +1008,7 @@ void mainWindow::dialogAdmin()
     atd->show();
     });
 
-    auto *button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
+    auto button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
         managedb *md = new managedb;
@@ -1048,7 +1017,7 @@ void mainWindow::dialogAdmin()
         md->show();
     });
 
-    auto *button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
+    auto button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
     connect(button_preferences,&QPushButton::pressed,[this]()
     {
         preferences *pref = new preferences;
@@ -1056,13 +1025,13 @@ void mainWindow::dialogAdmin()
         pref->show();
     });
 
-    auto *button_change_password = new QPushButton(tr("CHANGE PASSWORD"), dialog_admin);
+    auto button_change_password = new QPushButton(tr("CHANGE PASSWORD"), dialog_admin);
     connect(button_change_password,&QPushButton::pressed,this,&mainWindow::dialogCreateAdmin);
 
-    auto *button_close = new QPushButton(tr("CLOSE"), dialog_admin);
+    auto button_close = new QPushButton(tr("CLOSE"), dialog_admin);
     connect(button_close,&QPushButton::pressed,dialog_admin,&QDialog::close);
 
-    auto *button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
+    auto button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
     connect(button_exit,&QPushButton::pressed,dialog_admin,&QDialog::close);
     connect(button_exit,&QPushButton::pressed,qApp,&QApplication::quit);
 
@@ -1107,7 +1076,7 @@ void mainWindow::dialogCreateAdmin()
     le_password_confirm->setEchoMode(QLineEdit::Password);
 
     QHBoxLayout *layout_button = new QHBoxLayout;
-    auto *button_create_admin = new QPushButton(tr("Apply"), dialog);
+    auto button_create_admin = new QPushButton(tr("Apply"), dialog);
     connect(button_create_admin,&QPushButton::pressed,[this,dialog,le_old_password,le_password,le_password_confirm]()
     {
 
@@ -1137,7 +1106,7 @@ void mainWindow::dialogCreateAdmin()
                 dialog->close();
     });
 
-    auto *button_close = new QPushButton("Close", dialog);
+    auto button_close = new QPushButton("Close", dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
 
     layout_button->addWidget(button_close);
@@ -1179,7 +1148,7 @@ void mainWindow::dialogLogin()
     QDialog *dialog = new QDialog;
     QVBoxLayout *layout_main = new QVBoxLayout;
 
-    auto *le_password = new CLineEdit(dialog);
+    auto le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
 
 
@@ -1196,7 +1165,7 @@ void mainWindow::dialogLogin()
     }
 
 
-    auto *button_admin = new QPushButton(tr("Administrator"), dialog);
+    auto button_admin = new QPushButton(tr("Administrator"), dialog);
     connect(le_password,&CLineEdit::returnPressed,button_admin,&QPushButton::pressed);
     connect(button_admin,&QPushButton::pressed,[this,dialog,le_password,pass]()
 
@@ -1221,14 +1190,14 @@ void mainWindow::dialogLogin()
     });
 
 
-    auto *button_about = new QPushButton(tr("About"), dialog);
+    auto button_about = new QPushButton(tr("About"), dialog);
     connect(button_about,&QPushButton::pressed,[this]()
     {
         about About;
         About.exec();
     });
 
-    auto *button_close = new QPushButton(tr("Close"), dialog);
+    auto button_close = new QPushButton(tr("Close"), dialog);
     connect(button_close,&QPushButton::pressed,dialog,&QDialog::close);
 
      layout_main->addWidget(new QLabel(tr("Password, default \"elroke\""),dialog));

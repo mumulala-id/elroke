@@ -27,47 +27,53 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     : QWidget(parent)
 {
 
-    QHBoxLayout *main_layout = new QHBoxLayout;
+    auto main_layout = new QHBoxLayout;
     ////////////////////// BROWSER//////////////////////////////////////////
-    QVBoxLayout *layout_browser = new QVBoxLayout;
+    auto layout_browser = new QVBoxLayout;
 
     search_edit = new QLineEdit(this);
-    connect(search_edit,SIGNAL(returnPressed()),this,SLOT(on_search()));
-    QPushButton *button_search  = new QPushButton(tr("Search"), this);
-    connect(button_search,SIGNAL(pressed()),this,SLOT(on_search()));
+    connect(search_edit,&QLineEdit::returnPressed,this,&YoutubeDownloader::on_search);
+    auto button_search  = new QPushButton(tr("Search"), this);
+    connect(button_search,&QPushButton::pressed,this,&YoutubeDownloader::on_search);
 
-    QHBoxLayout *layout_edit = new QHBoxLayout;
+    auto layout_edit = new QHBoxLayout;
     layout_edit->addStretch();
     layout_edit ->addWidget(search_edit);
     layout_edit->addWidget(button_search);
     layout_edit->addStretch();
 
     view = new QWebView(this);
-
-    connect(view,SIGNAL(linkClicked(QUrl)),this,SLOT(on_searchWebView_linkClicked(QUrl)));
+    connect(view,&QWebView::linkClicked,this,&YoutubeDownloader::on_searchWebView_linkClicked);
 
     searchNam = new QNetworkAccessManager();
 
      searchReply = searchNam->get(QNetworkRequest(QUrl("https://www.youtube.com/")));
-     connect(searchReply, SIGNAL(finished()), this, SLOT(processSearchReply()));
+     connect(searchReply,&QNetworkReply::finished,this,&YoutubeDownloader::processSearchReply);
+     connect(searchReply,static_cast<void(QNetworkReply::*)(QNetworkReply::NetworkError)>(&QNetworkReply::error),[this](QNetworkReply::NetworkError err)
+     {
+         qDebug()<<"error"<<err;
+         view->setHtml("<body><p>no internet connection</p></body>");
+     });
 
     layout_browser->addLayout(layout_edit);
     layout_browser->addWidget(view);
 
     //////////////////////////// download control ////////////////////////////////
 
-    QVBoxLayout *layout_control = new QVBoxLayout;
+    auto layout_control = new QVBoxLayout;
 
-    QHBoxLayout *layout_output_path = new QHBoxLayout;
+    auto layout_output_path = new QHBoxLayout;
 
     dir_edit = new QLineEdit(this);
     dir_edit->setText(Dir);
 
-    QPushButton *button_get_path = new QPushButton(tr("Browse"));
-    connect(button_get_path,&QPushButton::pressed,[this](){
-
+    auto button_get_path = new QPushButton(tr("Browse"));
+    connect(button_get_path,&QPushButton::pressed,[this]()
+    {
         Dir = QFileDialog::getExistingDirectory(this, tr("Choose working directory"), QDir::homePath(), QFileDialog::ShowDirsOnly);
-        if(!Dir.isEmpty()){
+
+        if (!Dir.isEmpty())
+        {
         dir_edit->setText(Dir);
         }
     });
@@ -76,10 +82,10 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     layout_output_path->addWidget(dir_edit);
     layout_output_path->addWidget(button_get_path);
 
-    QHBoxLayout *layout_button_addition = new QHBoxLayout;
+    auto layout_button_addition = new QHBoxLayout;
 
-    auto *button_add = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"), "", this);
-    auto *button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"), "", this);
+    auto button_add = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"), "", this);
+    auto button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"), "", this);
 
     layout_button_addition->addWidget(button_add);
     layout_button_addition->addWidget(button_delete);
@@ -107,32 +113,32 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     process->setProgram("youtube-dl");
 
     connect(process,&QProcess::readyReadStandardOutput,[this](){
-        QString output = process->readAllStandardOutput();
+    QString output = process->readAllStandardOutput();
 
-        QRegExp regex("(\\d+).*%");
-        regex.setMinimal(true);
+    QRegExp regex("(\\d+).*%");
+    regex.setMinimal(true);
 
-        QString numb;
-        int pos = 0;
+    QString numb;
+    int pos = 0;
 
-        while ((pos = regex.indexIn(output, pos)) != -1)
-        {
-            numb = regex.cap(0).remove(QChar('%'));
-            pos += regex.matchedLength();
-        }
+    while ((pos = regex.indexIn(output, pos)) != -1)
+    {
+         numb = regex.cap(0).remove(QChar('%'));
+         pos += regex.matchedLength();
+    }
 
-        float cur = numb.toFloat();
+    float cur = numb.toFloat();
 
-        emit progress((int )cur);
+    emit progress(static_cast<int>(cur));
 
     });
 
-    QHBoxLayout *layout_button = new QHBoxLayout;
+    auto layout_button = new QHBoxLayout;
 
-    QPushButton *button_download = new QPushButton(tr("Start"), this);
+    auto button_download = new QPushButton(tr("Start"), this);
     connect(button_download,SIGNAL(pressed()),this,SLOT(beginDownload()));
 
-    QPushButton *button_cancel = new QPushButton(tr("Cancel"), this);
+    auto button_cancel = new QPushButton(tr("Cancel"), this);
 
     layout_button->addWidget(button_cancel);
     layout_button->addWidget(button_download);
@@ -146,38 +152,31 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     main_layout->addLayout(layout_browser);
     main_layout->addLayout(layout_control);
 
-
     setLayout(main_layout);
-
 }
 
-void YoutubeDownloader::on_search(){
-//qDebug()<<"on search";
+void YoutubeDownloader::on_search()
+{
     QString keywords = search_edit->text();
     if (!keywords.isEmpty())
     {
-
         if (searchReply)
-    {
-        searchReply->abort();
-        searchReply->deleteLater();
-    }
+        {
+            searchReply->abort();
+            searchReply->deleteLater();
+        }
         searchReply = searchNam->get(QNetworkRequest(QUrl("https://www.youtube.com/results?search_query=" + keywords.replace(QRegExp("[&\\?%\\s]"), "+"))));
-        connect(searchReply, SIGNAL(finished()), this, SLOT(processSearchReply()));
     }
     else
     {
         searchReply = searchNam->get(QNetworkRequest(QUrl("https://www.youtube.com/")));
-        connect(searchReply, SIGNAL(finished()), this, SLOT(processSearchReply()));
     }
-
-//    connect(searchReply,SIGNAL(error(QNetworkReply::NetworkError)),this,SLOT(errorHandler(QNetworkReply::NetworkError)));
-
+        connect(searchReply,&QNetworkReply::finished,this,&YoutubeDownloader::processSearchReply);
 }
 
 void YoutubeDownloader::processSearchReply(){
 
-    QWebPage *page = new QWebPage();
+    auto page = new QWebPage();
     QString replies = searchReply->readAll();
 
     page->mainFrame()->setHtml(replies);
@@ -244,85 +243,83 @@ void YoutubeDownloader::on_searchWebView_linkClicked(QUrl _url)
 
     searchReply = searchNam->get(QNetworkRequest(url));
     connect(searchReply, &QNetworkReply::finished, [this](){
-        QString reply = searchReply->readAll();
-            QRegExp expression = QRegExp("<meta name=\"title\" content=\"(.*)\"");
-            expression.setMinimal(true);
-            if (expression.indexIn(reply) !=-1)
-            {
-               video_title = QString(expression.cap(1)).replace("&amp;quot;", "\"").replace("&amp;amp;", "&").replace("&#39;", "'").replace("&quot;", "\"").replace("&amp;", "&");
-            }
-            else
-            {
-                video_title = "Can't read video title";
-             }
+    QString reply = searchReply->readAll();
+    QRegExp expression = QRegExp("<meta name=\"title\" content=\"(.*)\"");
+    expression.setMinimal(true);
 
-            emit titleAnalized();
+    if (expression.indexIn(reply) !=-1)
+    {
+       video_title = QString(expression.cap(1)).replace("&amp;quot;", "\"").replace("&amp;amp;", "&").replace("&#39;", "'").replace("&quot;", "\"").replace("&amp;", "&");
+    }  else  {
+        video_title = "Can't read video title";
+    }
+
+    emit titleAnalized();
 
     });
 
     QEventLoop loop;
-    connect(this,SIGNAL(titleAnalized()),&loop,SLOT(quit()));
+    connect(this,&YoutubeDownloader::titleAnalized,&loop,&QEventLoop::quit);
     loop.exec();
 
+    int count = model->rowCount();
+    model->setRowCount(count+1);
 
-        int count = model->rowCount();
-        model->setRowCount(count+1);
+    auto item_title = new QStandardItem;
+    item_title->setText(video_title);
+    model->setItem(count,0, item_title);
 
-        QStandardItem *item_title = new QStandardItem;
-        item_title->setText(video_title);
-        model->setItem(count,0, item_title);
-
-        QStandardItem *item_url  = new QStandardItem;
-        item_url->setText(url);
-        model->setItem(count,1,item_url);
+    auto item_url  = new QStandardItem;
+    item_url->setText(url);
+    model->setItem(count,1,item_url);
 }
 
-void YoutubeDownloader::beginDownload(){
-
-    for(int i =0; i<model->rowCount();i++){
-        if(model->data(model->index(i,2)).toString()!="Succeed"){
+void YoutubeDownloader::beginDownload()
+{
+    for (int i =0; i<model->rowCount();i++){
+        if (model->data(model->index(i,2)).toString()!="Succeed")
+        {
             currentRow =i;
             break;
         }
     }
 
-    connect(process,SIGNAL(finished(int)),this,SLOT(download(int)));
+    connect(process,static_cast<void(QProcess::*)(int)>(&QProcess::finished),this,&YoutubeDownloader::download);
 
     progressbar = new QProgressBar;
     progressbar->setMaximum(100);
-    connect(this,SIGNAL(progress(int)),progressbar,SLOT(setValue(int)));
+    connect(this,&YoutubeDownloader::progress,progressbar,&QProgressBar::setValue);
     download(0);
 }
 
-void YoutubeDownloader::download(int exit){
-
-    if(exit){
-        QStandardItem *item_failed =new QStandardItem;
+void YoutubeDownloader::download(int exit)
+{
+    if (exit)
+    {
+        auto item_failed =new QStandardItem;
         item_failed->setText("Failed");
         item_failed->setTextAlignment(Qt::AlignCenter);
         model->setItem(currentRow-1, 2, item_failed);
     }
-    else{
+    else
+    {
         //download succeed
-        QStandardItem *item_succeed =new QStandardItem;
+        auto item_succeed =new QStandardItem;
         item_succeed->setText("Succeed");
         item_succeed->setTextAlignment(Qt::AlignCenter);
         model->setItem(currentRow-1, 2, item_succeed);
     }
 
-    if(currentRow==model->rowCount()){
-
+    if (currentRow==model->rowCount())
+    {
         //finish
        progressbar->hide();
        emit finished();
-        //BUG, FIX ME
-        return ;
-
+       return ;
     }
 
     tview->selectRow(currentRow);
      tview->setIndexWidget(model->index(currentRow,2), progressbar);
-     qDebug()<<progressbar->parentWidget();
      QString currenUrl = model->data(model->index(currentRow,1)).toString();
      QStringList arguments;
      arguments<<"-f" << "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" << "-o" << Dir + "/%(title)s.%(ext)s" << currenUrl;
@@ -342,7 +339,7 @@ void YoutubeDownloader::download(int exit){
 //    view->update();
 //}
 
-YoutubeDownloader::~YoutubeDownloader(){
+YoutubeDownloader::~YoutubeDownloader()
+{
 
-//    delete progressbar;
 }

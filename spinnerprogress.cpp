@@ -10,7 +10,7 @@ spinnerProgress::spinnerProgress(QWidget *parent)
 {
 
 
-    QTimer *timer = new QTimer(this);
+    auto timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(100);
 
