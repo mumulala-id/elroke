@@ -417,7 +417,7 @@ void mainWindow::createWidgets(){
 
      auto widget_bottom = new QWidget(this);
      QPalette plt;
-     plt.setBrush(QPalette::Background, Qt::black);
+     plt.setBrush(QPalette::Background, QColor(255,255,255,200));
 
       widget_bottom->setAutoFillBackground(1);
      widget_bottom->setPalette(plt);
@@ -957,7 +957,9 @@ void mainWindow::videoInstance(){
 
     connect(video->player(),&Player::positionChanged,this,&mainWindow::updateInterface);
     connect(video->player(),&Player::reachEnded,this,&mainWindow::videoEnds);
+    connect(video->player(),&Player::reachEnded,spinner_progress,&spinnerProgress::stop);
     connect(video->player(),&Player::almostEnded,this,&mainWindow::dialogNextSong);
+    connect(video->player(),&Player::playing,spinner_progress,&spinnerProgress::start);
     connect(video->player(),&Player::playing,this,&mainWindow::setAudioChannelAuto);
 
     connect(video->player(),&Player::error,[this]()

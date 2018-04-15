@@ -25,8 +25,6 @@ spinnerProgress::spinnerProgress(QWidget *parent)
 void spinnerProgress::setValue(uint val)
 {
     value = val;
-    if(value!=0.0)
-        play=true;
 }
 
 void spinnerProgress::start()
@@ -42,22 +40,49 @@ void spinnerProgress::paintEvent(QPaintEvent *)
 {
     QTime time = QTime::currentTime();
     QPainter painter(this);
-    int startAngle = -270 * 16;
-    int spanAngle = value*57.6;
+       QBrush fillBrush = QBrush(Qt::white, Qt::SolidPattern);
+       QPen markPen(Qt::black);
+       QPoint centrePt(this->width() / 2, this->height() / 2);
+       int arcWidth = 8;
+       int radius = (this->width() / 2) - arcWidth;
+       int angleSpan_ = 57.6*value;
+       int startAngle_ = -270 * 16;
 
-    painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
-    QPen pen(Qt::white,2,Qt::SolidLine,Qt::SquareCap,Qt::BevelJoin);
-    painter.setPen(pen);
-    painter.translate(width() / 2, height() / 2);
-    painter.drawArc(-width()/2,-height()/2,width(),height(),startAngle,spanAngle);
-    painter.save();
-    QTransform transform(1,0,0,1,width()/2, height()/2);
-    QPixmap pix(":/usr/share/elroke/icon/disk.png");
-    pix = pix.scaled(width()-8,height()-8,Qt::KeepAspectRatio,Qt::SmoothTransformation);
-    if(play)
-    transform.rotate(90*time.second() );
-    painter.setTransform(transform);
-    painter.drawPixmap(-pix.width()/2, -pix.height()/2,pix);
-    painter.restore();
+       QRect bounds(centrePt.x()-radius, centrePt.y()-radius, (2*radius), (2*radius));
+
+
+       painter.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+       painter.setBrush(Qt::transparent);
+
+       // Draw the circle
+       QPen pen(QColor(0,0,0,80),8,Qt::SolidLine);
+       painter.setPen(pen);
+
+       fillBrush = QBrush(Qt::black, Qt::SolidPattern);
+
+       painter.drawEllipse(centrePt, radius, radius);
+
+
+           //  Draw Arc
+           markPen.setCapStyle(Qt::FlatCap);
+           markPen.setJoinStyle(Qt::RoundJoin);
+           markPen.setStyle(Qt::SolidLine);
+           markPen.setColor(Qt::white);
+           markPen.setWidth(arcWidth);
+           painter.setPen(markPen);
+           painter.drawArc(bounds, startAngle_, angleSpan_);
+           painter.save();
+
+           QTransform transform(1,0,0,1,width()/2, height()/2);
+           QPixmap pix(":/usr/share/elroke/icon/disk.png");
+           pix = pix.scaled(radius*2,radius*2,Qt::KeepAspectRatio,Qt::SmoothTransformation);
+           if(play)
+           transform.rotate(90*time.second() );
+           painter.setTransform(transform);
+           painter.drawPixmap(-pix.width()/2, -pix.height()/2,pix);
+
+           painter.restore();
+
+           painter.end();
 
 }

@@ -70,7 +70,7 @@ bool dbmanager::openDB(){
 bool dbmanager::createTable()
 {
     QSqlQuery query(db);
-    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT)");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT, FAVORITE TEXT)");
 
     if(query.exec()){
         qDebug()<<"table created";
@@ -107,7 +107,7 @@ void dbmanager::rollBack()
 bool dbmanager::insertIntoTable(const QVariantList &data)
 {
     QSqlQuery  query(db);
-    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , GENRE, CHANNEL, PLAYTIMES, PATH, DATE  ) VALUES (:Title, :Singer, :Language, :Genre, :Channel, :Playtimes, :Path , :Date)");
+    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , GENRE, CHANNEL, PLAYTIMES, PATH, DATE, FAVORITE ) VALUES (:Title, :Singer, :Language, :Genre, :Channel, :Playtimes, :Path , :Date, :Favorite)");
 
      query.bindValue(":Title", data[0].toString());
      query.bindValue(":Singer", data[1].toString());
@@ -117,6 +117,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data)
      query.bindValue(":Playtimes", 0);
      query.bindValue(":Path", data[5].toString());
      query.bindValue(":Date", QDate::currentDate().toString("yyyy-MM-dd"));
+     query.bindValue(":Favorite", "NO");
 
      if(!query.exec())
          return false;
@@ -188,6 +189,33 @@ Song* dbmanager::getSong(QString id)
     the_song->setAudioChannel(rec.value(5).toString());
 
     return the_song;
+}
+void dbmanager::setFavorite(const QString &id, bool favorite)
+{
+    QString f;
+    if (favorite)
+    {
+        f = "YES";
+    }  else {
+        f = "NO";
+    }
+
+    QSqlQuery query(db);
+     query.prepare("UPDATE ELROKE123 SET FAVORITE="+f+" WHERE ID = "+id);
+     if (!query.exec())
+    qDebug()<<"Can't set favorite";
+}
+
+bool dbmanager::isFavorite(const QString &id)
+{
+    QSqlQuery query(db);
+    query.prepare("SELECT FAVORITE FROM ELROKE123 WHERE ID = "+id);
+    query.exec();
+
+    QString v =query.record().value(0).toString();
+    if(v == "YES")
+        return true;
+    return false;
 }
 
 dbmanager::~dbmanager()

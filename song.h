@@ -29,7 +29,7 @@ public slots:
    QString getId();
     QString getTitle();
     QString getSinger();
-    QString getLanguage();
+    auto getLanguage();
     QString getCategory();
     QString getPath();
     QString getAudioChannel();
