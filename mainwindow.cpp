@@ -127,7 +127,7 @@ void mainWindow::createWidgets(){
     layout_top->setSpacing(0);
     layout_top->setMargin(0);
 
-    QWidget *widget_top = new QWidget(this);
+    auto widget_top = new QWidget(this);
     QPalette transparent_palette;
     transparent_palette.setBrush(QPalette::Background, QColor("#00796B"));
 
@@ -228,9 +228,10 @@ void mainWindow::createWidgets(){
     if (autosave_playlist->isChecked())
         loadPlaylist();
 
-    auto*save_as = new QAction(tr("Save as"),  this);
+    auto save_as = new QAction(tr("Save as"),  this);
     save_as->setFont(font());
     connect(save_as, SIGNAL(triggered(bool)), this, SLOT(dialogSavePlaylist()));
+
     auto load_playlist = new QAction(tr("Load playlist") , this);
     load_playlist->setFont(font());
     connect(load_playlist, SIGNAL(triggered(bool)),this,SLOT(dialogLoadPlaylist()));
@@ -242,31 +243,27 @@ void mainWindow::createWidgets(){
     button_menu->setMenu(menu_playlist);
     button_menu->setFocusPolicy(Qt::NoFocus);
 
-    auto button_move_to_top = new QPushButton(QIcon(":/usr/share/elroke/icon/top.png"),"", this);
-    button_move_to_top->setFocusPolicy(Qt::NoFocus);
-    button_move_to_top->setFlat(1);
-    button_move_to_top->setIconSize(QSize(32,32));
+    auto playlistButton = [this](QIcon icon){
+        auto button = new QPushButton(this);
+        button->setIcon(icon);
+        button->setIconSize(QSize(32,32));
+        button->setFocusPolicy(Qt::NoFocus);
+        button->setFlat(true);
+        return button;
+    };
+    auto button_move_to_top = playlistButton( QIcon(":/usr/share/elroke/icon/top.png"));
     connect(button_move_to_top,SIGNAL(pressed()),this,SLOT(moveItemToTop()));
 
-    auto button_move_to_bottom = new QPushButton(QIcon(":/usr/share/elroke/icon/bottom.png"),"", this);
-    button_move_to_bottom->setFlat(1);
-    button_move_to_bottom->setIconSize(QSize(32,32));
-    button_move_to_bottom->setFocusPolicy(Qt::NoFocus);
+    auto button_move_to_bottom = playlistButton(QIcon(":/usr/share/elroke/icon/bottom.png"));
     connect(button_move_to_bottom,SIGNAL(pressed()),this,SLOT(moveItemToBottom()));
 
-    auto button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/delete.png"),"", this);
-    button_delete->setFocusPolicy(Qt::NoFocus);
-    button_delete->setFlat(1);
-    button_delete->setIconSize(QSize(32,32));
+    auto button_delete = playlistButton(QIcon(":/usr/share/elroke/icon/delete.png"));
     connect(button_delete,&QPushButton::pressed,[this]()
     {
         qDeleteAll(playlist_widget->selectedItems());
     });
 
-    auto button_clear_playlist = new QPushButton(QIcon(":/usr/share/elroke/icon/clear.png"),"", this);
-    button_clear_playlist->setFocusPolicy(Qt::NoFocus);
-    button_clear_playlist->setFlat(1);
-    button_clear_playlist->setIconSize(QSize(32,32));
+    auto button_clear_playlist = playlistButton(QIcon(":/usr/share/elroke/icon/clear.png"));
     connect(button_clear_playlist,&QPushButton::pressed,[this]()
     {
          playlist_widget->clear();
@@ -281,9 +278,11 @@ void mainWindow::createWidgets(){
     {
         lock_playlist = lock;
         if (lock)
+        {
             button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/unlock.png"));
-        else
+        } else{
              button_lock_playlist->setIcon(QIcon(":/usr/share/elroke/icon/lock.png"));
+        }
     });
 
     auto widget_control_playlist = new QWidget(this);
@@ -339,7 +338,7 @@ void mainWindow::createWidgets(){
         auto btn= new QPushButton(this);
         btn->setIcon(icon);
         btn->setFlat(1);
-        btn->setIconSize(QSize(64,64));
+        btn->setIconSize(QSize(48,48));
         btn->setFocusPolicy(Qt::NoFocus);
         return btn;
     };
@@ -348,14 +347,12 @@ void mainWindow::createWidgets(){
     connect(btn_next,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
      auto button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
-//     connect(button_play_pause, SIGNAL(pressed()),this,SLOT(playPlayer()));
      connect(button_play_pause,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
-     auto button_favorit = buttonControl(QIcon(":/usr/share/elroke/icon/favorit.png"));
+     auto button_favorit = buttonControl(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
      connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
 
-    button_audio_channel = buttonControl(QIcon(":/usr/share/elroke/icon/stereo.png"));
-//    connect(button_audio_channel,SIGNAL(pressed()),this,SLOT(setAudioChannelManual()));
+    button_audio_channel = buttonControl(QIcon(":/usr/share/elroke/icon/vocal_off.png"));
     connect(button_audio_channel,&QPushButton::pressed,this,&mainWindow::setAudioChannelManual);
 
 
@@ -405,14 +402,17 @@ void mainWindow::createWidgets(){
      layout_player_control->addWidget(btn_next);
      layout_player_control->addWidget(button_play_pause);
      layout_player_control->addWidget(button_favorit);
-     layout_player_control->addStretch();
+//     layout_player_control->addStretch();
      layout_player_control->addWidget(button_audio_channel);
+//     layout_player_control->addStretch();
+
+//     layout_player_control->addWidget(slider_vol);
+
      layout_player_control->addStretch();
-     layout_player_control->addWidget(button_vol_down);
-     layout_player_control->addWidget(slider_vol);
-     layout_player_control->addWidget(button_vol_up);
-     layout_player_control->addStretch();
+      layout_player_control->addWidget(button_vol_down);
      layout_player_control->addWidget(button_audio_mute);
+
+        layout_player_control->addWidget(button_vol_up);
      layout_player_control->setMargin(0);
 
      auto widget_bottom = new QWidget(this);
@@ -422,6 +422,7 @@ void mainWindow::createWidgets(){
       widget_bottom->setAutoFillBackground(1);
      widget_bottom->setPalette(plt);
      widget_bottom->setLayout(layout_player_control);
+     widget_bottom->setFixedHeight(72);
 
 
     layout_main->addWidget(widget_top);
@@ -850,11 +851,11 @@ void mainWindow::loadPlaylist(const QString &s)
     while(stuff!=NULL)
     {
 //        int id = stuff.toInt();
-        Song *song =   db->getSong(stuff);
+        auto song =   db->getSong(stuff);
         if (song==nullptr) return;
-        songitemwidget *item_song_widget = new songitemwidget;
+        auto item_song_widget = new songitemwidget;
         item_song_widget->setSong(song);
-        QListWidgetItem *item = new QListWidgetItem;
+        auto item = new QListWidgetItem;
         playlist_widget->addItem(item);
         playlist_widget->setItemWidget(item, item_song_widget);
         //resize itemwidget to songitemwidget
@@ -878,15 +879,15 @@ void mainWindow::setAudioChannelManual()
     switch(video->player()->getAudioChannel()){
     case 1://stereo
         video->player()->setAudioChannelRight();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/right.png"));
+//        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/right.png"));
         break;
     case 3://left
         video->player()->setAudioChannelStereo();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/stereo.png"));
+//        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/stereo.png"));
         break;
     case 4://right
         video->player()->setAudioChannelLeft();
-        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/left.png"));
+//        button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/left.png"));
        break;
     }
 }
@@ -944,9 +945,9 @@ void mainWindow::showKeyboard(bool x)
         //key show on the midle of table
          keyboard->showKeyboard(QPoint(x,y));
         keyboard->show();
-    }
-      else
+    }  else{
             keyboard->hide();
+    }
 }
 
 void mainWindow::videoInstance(){

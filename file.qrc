@@ -13,7 +13,9 @@
         <file>icon/minus.png</file>
         <file>icon/plus.png</file>
         <file>icon/unmute.png</file>
-        <file>icon/favorit.png</file>
+        <file>icon/favorite.png</file>
+        <file>icon/unfavorite.png</file>
+        <file>icon/vocal_off.png</file>
         <file>icon/keyboard.png</file>
         <file>icon/menu.png</file>
         <file>icon/stereo.png</file>
