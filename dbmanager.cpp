@@ -57,14 +57,14 @@ bool dbmanager::restoreDB()
         return false;
 }
 
-bool dbmanager::openDB(){
-
-  if(!db.open())
-  {
+bool dbmanager::openDB()
+{
+    if(!db.open())
+    {
       qDebug()<<"Database not open"<<db.lastError();
       return false;
-  }
-  return true;
+    }
+     return true;
 }
 
 bool dbmanager::createTable()
@@ -72,11 +72,9 @@ bool dbmanager::createTable()
     QSqlQuery query(db);
     query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT, FAVORITE TEXT)");
 
-    if(query.exec()){
-        qDebug()<<"table created";
+    if(query.exec())
         return true;
-    }
-    qDebug()<<"table not created";
+
     return false;
 }
 
@@ -127,7 +125,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data)
 void dbmanager::updatePlayedTime(QString id)
 {
     QSqlQuery query(db);
-    unsigned int value=0;
+    uint value=0;
     query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+id);
 
     if(query.exec())
@@ -136,13 +134,10 @@ void dbmanager::updatePlayedTime(QString id)
         value = query.value(0).toInt()+1;
     }
     query.clear();
-    this->prepare();
     query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+id);
+
     if(!query.exec())
         qDebug()<<"cant update played time";
-    else
-        submit();
-    query.clear();
 }
 
 void dbmanager::updatePath(QString id, QString path)
@@ -150,12 +145,8 @@ void dbmanager::updatePath(QString id, QString path)
     QSqlQuery query(db);
      query.prepare("UPDATE ELROKE123 SET PATH ="+path+" WHERE ID = "+id);
 
-     if(!query.exec()){
+     if(!query.exec())
          qDebug()<<"cant update path";
-     }     else {
-         qDebug()<<"path updated";
-         submit();
-     }
 }
 
 Song* dbmanager::getSong(QString id)
@@ -167,9 +158,7 @@ Song* dbmanager::getSong(QString id)
     if(query.exec())
     {
             while(query.next())
-            {
-                rec = query.record();         
-            }
+               rec = query.record();
     }
 
    if(!query.first())//check valid
@@ -188,31 +177,43 @@ Song* dbmanager::getSong(QString id)
     the_song->setPath(rec.value(7).toString());
     the_song->setAudioChannel(rec.value(5).toString());
 
+    bool fav = QString::compare(rec.value(9).toString(),"YES",Qt::CaseInsensitive)==0;
+    the_song->setFavorite(fav);
+
     return the_song;
 }
-void dbmanager::setFavorite(const QString &id, bool favorite)
+void dbmanager::setFavorite(const QString &id)
 {
-    QString f;
-    if (favorite)
-    {
-        f = "YES";
-    }  else {
-        f = "NO";
-    }
-
     QSqlQuery query(db);
-     query.prepare("UPDATE ELROKE123 SET FAVORITE="+f+" WHERE ID = "+id);
+    QString f;
+    if (isFavorite(id))
+    {
+        f = "NO";
+    }  else {
+        f = "YES";
+    }
+     query.prepare("UPDATE ELROKE123 SET FAVORITE =? WHERE ID = "+id);
+     query.addBindValue(f);
      if (!query.exec())
-    qDebug()<<"Can't set favorite";
+     {
+         qDebug()<<"Can't set favorite";
+         qDebug()<<db.lastError();
+     }  else    {
+         qDebug()<<"update favorite";
+     }
 }
 
 bool dbmanager::isFavorite(const QString &id)
 {
     QSqlQuery query(db);
     query.prepare("SELECT FAVORITE FROM ELROKE123 WHERE ID = "+id);
-    query.exec();
 
+    if(!query.exec())
+        return false;
+
+    query.first();
     QString v =query.record().value(0).toString();
+
     if(v == "YES")
         return true;
     return false;

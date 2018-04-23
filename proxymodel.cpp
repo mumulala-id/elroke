@@ -92,6 +92,14 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
         }
 
     }
+    else if(md == ProxyModel::favorite)
+    {
+        QModelIndex ind = sourceModel()->index(source_row,9,source_parent);
+        QString x = sourceModel()->data(ind).toString();
+
+        return QString::compare(x,"YES",Qt::CaseInsensitive)==0;
+
+    }
     return true;
 }
 
@@ -110,6 +118,7 @@ QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int ro
             case 6 : return tr("PLAYTIMES"); break;
             case 7 : return tr("PATH"); break;
             case 8 : return tr("DATE"); break;
+            case 9 : return tr("FAVORITE"); break;
             default:
                 return QString(tr("COLUMN %1").arg(section+1));
                 break;
@@ -183,4 +192,10 @@ void ProxyModel::toBeFixed(){
     md=ProxyModel::tobefixed;
     invalidateFilter();
 
+}
+
+void ProxyModel::filterFavorite()
+{
+    md = ProxyModel::favorite;
+    invalidateFilter();
 }

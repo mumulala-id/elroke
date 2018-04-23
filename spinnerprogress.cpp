@@ -77,7 +77,7 @@ void spinnerProgress::paintEvent(QPaintEvent *)
            QPixmap pix(":/usr/share/elroke/icon/disk.png");
            pix = pix.scaled(radius*2,radius*2,Qt::KeepAspectRatio,Qt::SmoothTransformation);
            if(play)
-           transform.rotate(90*time.second() );
+           transform.rotate(30*time.second() );
            painter.setTransform(transform);
            painter.drawPixmap(-pix.width()/2, -pix.height()/2,pix);
 

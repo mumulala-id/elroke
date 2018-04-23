@@ -84,3 +84,7 @@ unsigned int Song::getPlayTimes()
 {
     return playtimes;
 }
+
+void Song::setFavorite(bool f){
+    favorite = f;
+}

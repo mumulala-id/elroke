@@ -33,7 +33,7 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
-#include <QSlider>
+//#include <QSlider>
 #include <QKeyEvent>
 #include <QDesktopWidget>
 #include <QSqlTableModel>
@@ -84,7 +84,7 @@ private :
     QTableView *table;
     ProxyModel *proxy_model;
     CLineEdit *le_search;
-    QSlider *slider_vol;
+//    QSlider *slider_vol;
     VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;
@@ -114,6 +114,7 @@ private :
     QString language;
    unsigned short  int font_size;
    Scoring *scoring;
+   QPushButton *buttonFavorite;
 
 private slots:
     void dialogAdmin();
@@ -147,7 +148,9 @@ private slots:
     void videoEnds();
     void showHits();
     void moveItemToBottom();
-    void updateInterface();
+    void handleFavorite();
+
+//    void updateInterface();
     void readSettings();
 //    void d_addtodatabse();
 

@@ -606,6 +606,7 @@ void managedb::updateList()
 
 managedb::~managedb()
 {
+    db->closeDB();
 }
 
 void managedb::writeTextStream(const QString &file, QList<QString>set){

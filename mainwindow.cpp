@@ -34,8 +34,8 @@
 #include <QShortcut>
 #include <QTime>
 #include <QMessageBox>
-#include <thread>
-#include <chrono>
+//#include <thread>
+//#include <chrono>
 #include <QCryptographicHash>
 #include <QSettings>
 //using namespace std;
@@ -74,6 +74,18 @@ void mainWindow::createWidgets(){
     auto button_show_all = new QPushButton(tr("ALL"), this);
     button_show_all->setFocusPolicy(Qt::NoFocus);
     button_show_all->setFlat(1);
+    connect(button_show_all,&QPushButton::pressed,[this]()
+    {
+        proxy_model->search("");
+    });
+    auto button_fav = new QPushButton(tr("Favorite"),this);
+    button_fav->setFocusPolicy(Qt::NoFocus);
+    button_fav->setFlat(1);
+
+    connect(button_fav,&QPushButton::pressed,[this]()
+    {
+        proxy_model->filterFavorite();
+    });
     auto button_cat_indonesia = new QPushButton("category1", this);
     button_cat_indonesia->setFlat(1);
     button_cat_indonesia->setFocusPolicy(Qt::NoFocus);
@@ -104,9 +116,9 @@ void mainWindow::createWidgets(){
     button_cat_pop->setPalette(secon);
     button_cat_dangdut->setPalette(secon);
 //show clock
-    QLabel *clock = new QLabel(this);
+    auto clock = new QLabel(this);
     clock->setText(QTime::currentTime().toString("hh:mm"));
-    QTimer *timer = new QTimer(this);
+    auto timer = new QTimer(this);
     connect(timer,&QTimer::timeout,[clock]()
     {
           clock->setText(QTime::currentTime().toString("hh:mm"));
@@ -117,6 +129,7 @@ void mainWindow::createWidgets(){
     layout_top->addWidget(le_search);
     layout_top->addStretch();
     layout_top->addWidget(button_show_all);
+    layout_top->addWidget(button_fav);
     layout_top->addWidget(button_cat_indonesia);
     layout_top->addWidget(button_cat_barat);
     layout_top->addWidget(button_cat_rock);
@@ -136,7 +149,7 @@ void mainWindow::createWidgets(){
     widget_top->setLayout(layout_top);
 
 
-    QHBoxLayout *layout_table = new QHBoxLayout;
+   auto layout_table = new QHBoxLayout;
 
 
     db = new dbmanager(dbmanager::show, this);
@@ -147,6 +160,10 @@ void mainWindow::createWidgets(){
     sql_model->setTable("ELROKE123");
     sql_model->select();
 
+    while (sql_model->canFetchMore()) {
+        sql_model->fetchMore();
+    }
+
     proxy_model = new ProxyModel( this);
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
@@ -155,9 +172,7 @@ void mainWindow::createWidgets(){
     table = new QTableView(this);
     table->setModel(proxy_model);
 
-     while (sql_model->canFetchMore()) {
-         sql_model->fetchMore();
-     }
+
 //    sql_model->setSort(2,Qt::DescendingOrder);
     table->verticalHeader()->hide();
     table->setShowGrid(0);
@@ -171,6 +186,7 @@ void mainWindow::createWidgets(){
     table->hideColumn(6);
     table->hideColumn(7);
     table->hideColumn(8);
+    table->hideColumn(9);
 //    table->horizontalHeader()->setSectionsClickable(false);
     table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
     table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
@@ -194,7 +210,6 @@ void mainWindow::createWidgets(){
     connect(table,&QTableView::doubleClicked,this,&mainWindow::addToPlaylist);
     connect(le_search,&CLineEdit::focussed,this,&mainWindow::showKeyboard);
     connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
-//    connect(button_show_all,SIGNAL(pressed()),proxy_model,SLOT(reset()));
 
     QSizePolicy spLeft(QSizePolicy::Preferred, QSizePolicy::Preferred);
     spLeft.setHorizontalStretch(3);
@@ -349,8 +364,15 @@ void mainWindow::createWidgets(){
      auto button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
      connect(button_play_pause,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
-     auto button_favorit = buttonControl(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
-     connect(button_favorit,SIGNAL(pressed()),this,SLOT(showHits()));
+     buttonFavorite = buttonControl(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
+     connect(buttonFavorite,&QPushButton::pressed,[this](){
+
+         QString id{video->song()->getId()};
+         if(id.isEmpty())
+             return;
+         db->setFavorite(id);
+         handleFavorite();
+     });
 
     button_audio_channel = buttonControl(QIcon(":/usr/share/elroke/icon/vocal_off.png"));
     connect(button_audio_channel,&QPushButton::pressed,this,&mainWindow::setAudioChannelManual);
@@ -360,23 +382,22 @@ void mainWindow::createWidgets(){
      connect(button_vol_down,&QPushButton::pressed,[this]()
      {
          if (video->player()->volume()<5)
+         {
               video->player()->setVolume(0);
-         else
-         video->player()->setVolume(video->player()->volume()-5);
+         }  else {
+              video->player()->setVolume(video->player()->volume()-5);
+         }
      });
-
-     slider_vol = new QSlider(Qt::Horizontal, this);
-     slider_vol->setRange(0, 100);
-     slider_vol->setFixedWidth(200);
-     slider_vol->setFocusPolicy(Qt::NoFocus);
 
      auto button_vol_up = buttonControl(QIcon(":/usr/share/elroke/icon/plus.png"));
      connect(button_vol_up,&QPushButton::pressed,[this]()
      {
          if (video->player()-> volume()>95)
+         {
              video->player()->setVolume(100);
-         else
+         } else {
           video->player()->setVolume(video->player()->volume()+5);
+         }
      });
 
     auto  button_audio_mute = buttonControl(QIcon(":/usr/share/elroke/icon/unmute.png"));
@@ -400,18 +421,17 @@ void mainWindow::createWidgets(){
      layout_player_control->addWidget( spinner_progress);
      layout_player_control->addStretch();
      layout_player_control->addWidget(btn_next);
+     layout_player_control->addSpacing(48);
      layout_player_control->addWidget(button_play_pause);
-     layout_player_control->addWidget(button_favorit);
-//     layout_player_control->addStretch();
+     layout_player_control->addSpacing(48);
      layout_player_control->addWidget(button_audio_channel);
-//     layout_player_control->addStretch();
-
-//     layout_player_control->addWidget(slider_vol);
-
+      layout_player_control->addSpacing(48);
+      layout_player_control->addWidget(buttonFavorite);
      layout_player_control->addStretch();
       layout_player_control->addWidget(button_vol_down);
+      layout_player_control->addSpacing(0);
      layout_player_control->addWidget(button_audio_mute);
-
+     layout_player_control->addSpacing(0);
         layout_player_control->addWidget(button_vol_up);
      layout_player_control->setMargin(0);
 
@@ -543,9 +563,9 @@ void mainWindow::moveItemToTop()
         item->setAudioChannel(item_current->song()->getAudioChannel());
         item->setPlaytimes(item_current->song()->getPlayTimes());
 
-        QListWidgetItem *item_new = new QListWidgetItem;
+        auto item_new = new QListWidgetItem;
 
-        songitemwidget *item_song_widget = new songitemwidget;
+        auto item_song_widget = new songitemwidget;
         item_song_widget->setSong(item);
 
         playlist_widget->insertItem(0,item_new);
@@ -574,8 +594,11 @@ void mainWindow::playPlayer()
 {
     if (playlist_widget->count()==0)
     {
-        video->close();
-        clearMask();
+        if(video->player()->isPlaying())
+        {            //if user pres  next button
+            video->close();
+            clearMask();
+        }
         return;
     }
 
@@ -603,11 +626,10 @@ void mainWindow::playPlayer()
         return;
     }
 
-    video->player()->setFile(file);
-    video->setData(title, singer);
+    video->setData(item_widget->song());
     video->play();
 
-    //update playtimes
+    handleFavorite();
     db->updatePlayedTime(id);
 
     //lock playlist
@@ -699,9 +721,9 @@ void mainWindow::dialogSavePlaylist()
 
     auto le_playlist_name = new CLineEdit(dialog_save_playlist);
     connect(le_playlist_name,&CLineEdit::focussed,keyboard,&Keyboard::setVisible);
-    auto action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", dialog_save_playlist);
-    le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
-    connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
+//    auto action_delete = new QAction(QIcon(":/usr/share/elroke/icon/backspace.png"), "", dialog_save_playlist);
+//    le_playlist_name->addAction(action_delete, QLineEdit::TrailingPosition);
+//    connect(action_delete,&QAction::triggered,le_playlist_name,&QLineEdit::backspace);
 
     layout_main->addWidget(new QLabel("Save Playlist As :", dialog_save_playlist));
     layout_main->addWidget(le_playlist_name);
@@ -777,7 +799,6 @@ void mainWindow::dialogLoadPlaylist(){
     dialog_load_playlist->setLayout(layout_main);
 
     dialog_load_playlist->setWindowFlags(Qt::FramelessWindowHint);
-//    dialog_load_playlist->setAutoFillBackground(1);
     dialog_load_playlist->setAttribute(Qt::WA_DeleteOnClose);
     dialog_load_playlist->setMinimumSize(300,200);
 
@@ -892,37 +913,6 @@ void mainWindow::setAudioChannelManual()
     }
 }
 
-//void mainWindow::tableRule()
-//{
-//    //rebuild rule after sql_model->clear();
-//    //is there better way to update table?
-//    qDebug()<<"tableRule()";
-//    sql_model->setTable("ELROKE123");
-//    sql_model->select();
-//    sql_model->setSort(1,Qt::AscendingOrder);
-//    qDebug()<<"tableRule()v";
-//    table->verticalHeader()->hide();
-//    table->setShowGrid(0);
-//    table->setSelectionBehavior(QAbstractItemView::SelectRows);
-//    table->setSelectionMode(QAbstractItemView::SingleSelection);
-//    table->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//     qDebug()<<"tableRule()c";
-//    table->hideColumn(0);
-//    table->hideColumn(3);
-//    table->hideColumn(4);
-//    table->hideColumn(5);
-//    table->hideColumn(6);
-//    table->hideColumn(7);
-//    table->hideColumn(8);
-//    table->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Stretch);
-//    table->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Stretch);
-//    table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
-//    table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
-//    table->horizontalHeader()->setHighlightSections(0);
-//    table->setItemDelegate(new NoFocusDelegate());
-//     qDebug()<<"tableRule()z";
-//}
-
 bool mainWindow::isKeyValid(int key)
 {
     QList <int> validKey;
@@ -956,7 +946,9 @@ void mainWindow::videoInstance(){
     video->hide();
     video->installEventFilter(this);
 
-    connect(video->player(),&Player::positionChanged,this,&mainWindow::updateInterface);
+    connect(video->player(),&Player::positionChanged,[this](){
+        spinner_progress->setValue(video->player()->position());
+    });
     connect(video->player(),&Player::reachEnded,this,&mainWindow::videoEnds);
     connect(video->player(),&Player::reachEnded,spinner_progress,&spinnerProgress::stop);
     connect(video->player(),&Player::almostEnded,this,&mainWindow::dialogNextSong);
@@ -971,7 +963,7 @@ void mainWindow::videoInstance(){
         error_message.exec();
         QTimer::singleShot(3000,&error_message,SLOT(close()));
     });
-    connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
+//    connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
 }
 
 void mainWindow::keyBoardInstance()
@@ -1016,7 +1008,13 @@ void mainWindow::dialogAdmin()
     {
         managedb *md = new managedb;
         md->setAttribute(Qt::WA_DeleteOnClose);
-        connect(md, SIGNAL(finished(int)),sql_model,SLOT(select()));
+        connect(md, &managedb::finished,[this](){
+            sql_model->select();
+            while(sql_model->canFetchMore())
+            {
+                sql_model->fetchMore();
+            }
+        });
         md->show();
     });
 
@@ -1284,25 +1282,21 @@ void mainWindow::moveItemToBottom()
          qDeleteAll(playlist_widget->selectedItems());
          playlist_widget->setCurrentRow(playlist_widget->count()-1);
 }
-void mainWindow::updateInterface()
-{
-    spinner_progress->setValue(video->player()->position());
-    slider_vol->setSliderPosition(video->player()->volume());
-}
 
 void mainWindow::setAudioChannelAuto()
 {
-//wait video fully load
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
-        if (channel.contains("LEFT", Qt::CaseInsensitive)){
+//wait video fully load but gui freeze, fix me
+//    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    QTimer::singleShot(500,[this](){
+        if (channel.compare("LEFT",Qt::CaseInsensitive)==0){
             video->player()->setAudioChannelLeft();
-            button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/left.png"));
         }
-        else if (channel.contains("RIGHT", Qt::CaseInsensitive)){
+        else if (channel.compare("RIGHT",Qt::CaseInsensitive)==0){
             video->player()->setAudioChannelRight();
-            button_audio_channel->setIcon(QIcon(":/usr/share/elroke/icon/right.png"));
         }
+    });
+
+
 }
 
 void mainWindow::readSettings()
@@ -1310,15 +1304,29 @@ void mainWindow::readSettings()
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     c_font = setting.value("font").toString();
-    if (c_font==NULL) c_font = "Roboto";
+    if (c_font==NULL)
+        c_font = "Roboto";
     background = setting.value("background").toString();
-    if (background==NULL) background = ":/usr/share/elroke/background/butterfly.jpeg";
+    if (background==NULL)
+        background = ":/usr/share/elroke/background/butterfly.jpeg";
     font_size = setting.value("font_size").toInt();
-    if (font_size==0) font_size=16;
+    if (font_size==0)
+        font_size=16;
     language = setting.value("language").toString();
     setting.endGroup();
 }
 
+void mainWindow::handleFavorite(){
+
+    if(db->isFavorite(video->song()->getId()))
+    {
+        buttonFavorite->setIcon(QIcon(":/usr/share/elroke/icon/favorite.png"));
+
+    } else {
+        buttonFavorite->setIcon(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
+    }
+
+}
 
 mainWindow::~mainWindow()
 {

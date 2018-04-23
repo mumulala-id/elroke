@@ -7,6 +7,7 @@
 #include <QPropertyAnimation>
 #include <QApplication>
 #include <QLabel>
+#include <song.h>
 
 class VideoWidget : public QWidget
 {
@@ -16,8 +17,8 @@ public:
     ~VideoWidget();
 private :
     Player *_player;
-    QString _totle;
-    QString _singer;
+//    QString _title;
+//    QString _singer;
     QDesktopWidget *desktop = QApplication::desktop();
     unsigned short int desktop_width = desktop->width();
     unsigned short int desktop_height = desktop->height();
@@ -25,11 +26,13 @@ private :
     QLabel *label_singer;
     QPropertyAnimation *title_animaton;
     QPropertyAnimation *singer_animation;
+    Song *_song;
 
 public :
     Player *player()const{return _player;};
     void play();
-    void setData(QString title,QString singer);
+    void setData(Song *);
+    Song *song()const{return _song;};
 };
 
 #endif // VIDEOWIDGET_H

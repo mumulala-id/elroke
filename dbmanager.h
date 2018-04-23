@@ -35,7 +35,7 @@ public slots:
     void updatePlayedTime(QString id);
     void updatePath(QString id, QString path);
     Song *getSong(QString id);
-    void setFavorite(const QString &id, bool favorite);
+    void setFavorite(const QString &id);
     bool isFavorite(const QString &id);
 
 private slots:

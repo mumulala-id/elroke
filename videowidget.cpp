@@ -24,6 +24,8 @@ VideoWidget::VideoWidget(QWidget *parent):
     title_animaton = new QPropertyAnimation(label_title, "geometry", this);
     title_animaton->setDuration(500);
 
+    _song = new Song(this);
+
     QPalette let;
     let.setColor(QPalette::Background,Qt::gray);
     let.setColor(QPalette::Foreground,Qt::black);
@@ -61,11 +63,13 @@ void VideoWidget::play()
 
 }
 
-void VideoWidget::setData(QString title, QString singer){
-      label_title->setText(title);
+void VideoWidget::setData(Song *song){
+    _song = song;
+      label_title->setText(song->getTitle());
        label_title->adjustSize();
-        label_singer->setText(singer);
+        label_singer->setText(song->getSinger());
          label_singer->adjustSize();
+         _player->setFile(song->getPath());
 
 }
 
