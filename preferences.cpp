@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include "liststringfileparser.h"
+#include <QTabBar>
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
@@ -88,6 +89,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(background_view,&QListView::clicked,[this,background_view](const QModelIndex &index)
    {
        selected_background = background_view->model()->data(index,Qt::UserRole).toString();
+       qDebug()<<selected_background;
     });
 
     auto button_add = new QPushButton(QIcon::fromTheme("add"),"", this);
@@ -143,11 +145,35 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     });
 
     auto group_theme = new QGroupBox(tr("Themes"), this);
+
+    auto layout_theme = new QHBoxLayout;
+
+
+    auto theme1 =new  themewidget(this);
+    theme1->setFixedSize(48,48);
+    auto theme2 = new themewidget(this);
+    auto theme3 = new themewidget(this);
+
+    layout_theme->addWidget(theme1);
+    layout_theme->addWidget(theme2);
+    layout_theme->addWidget(theme3);
+
+
+    group_theme->setLayout(layout_theme);
+//    QListWidget *list_theme = new QListWidget(this);
+
+//    list_theme->ad
+
+
+
+
+
     auto group_menu = new QGroupBox(tr("Menu"), this);
 
+    auto layout_menu_main = new QVBoxLayout;
     auto layout_menu = new QHBoxLayout;
 
-    QListWidget* list_menu_all = new QListWidget(this);
+    auto list_menu_all = new QListWidget(this);
     auto layout_move_button = new QVBoxLayout;
 
     auto button_right = new QPushButton(QIcon::fromTheme("go-next"),"",this);
@@ -163,7 +189,25 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_menu->addWidget(list_menu_all,0,Qt::AlignVCenter);
     layout_menu->addLayout(layout_move_button);
     layout_menu->addWidget(list_menu_selected,0,Qt::AlignVCenter);
-    group_menu->setLayout(layout_menu);
+
+    auto tabbar = new QTabBar(this);
+    tabbar->setTabsClosable(true);
+
+//    auto layout_menu_config = new QHBoxLayout;
+
+    for(int i =0;i<7;i++){
+//    auto bbb = new QPushButton("test"+QString::number(i),this);
+//    layout_menu_config->addWidget(bbb);
+        tabbar->addTab(QString::number(i));
+    }
+
+    layout_menu_main->addWidget(tabbar);
+
+        layout_menu_main->addLayout(layout_menu);
+
+
+
+    group_menu->setLayout(layout_menu_main);
 
     list_menu_all->addItems(getLanguageGenre());
 
@@ -237,7 +281,8 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     main_layout->addLayout(layout_button);
     main_layout->addLayout(stack);
     setLayout(main_layout);
-    setWindowFlags(Qt::Popup);
+    setWindowFlags(Qt::FramelessWindowHint);
+//    setModal(true);
 }
 
 QStringList preferences::getLanguageGenre()
@@ -250,14 +295,15 @@ QStringList preferences::getLanguageGenre()
 
 void preferences::apply()
 {
+    qDebug()<<"apply";
     QDir dir(QDir::homePath()+"/.config/autostart");
     QFile file(dir.path()+"/elroke.desktop");
    if(startup)
    {
-       if(file.exists())
-       {
-           return;
-       }
+//       if(file.exists())
+//       {
+//           return;
+//       }
        if(!dir.exists())
        {
           QDir().mkdir(dir.path());
@@ -282,10 +328,12 @@ void preferences::apply()
    {
        file.remove();
    }
+//   qDebug()<<"uyuyutut";
 
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     setting.setValue("font",selected_font);
+//    qDebug()<<selected_background;
     setting.setValue("background", selected_background);
     setting.setValue("font_size", font_size);
     setting.setValue("startup", startup);

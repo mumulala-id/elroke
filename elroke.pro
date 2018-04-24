@@ -29,7 +29,8 @@ HEADERS  += mainwindow.h \
     videowidget.h \
     spinnerprogress.h \
     scoring.h \
-    editdatabse.h
+    editdatabse.h \
+    themewidget.h
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -47,7 +48,8 @@ SOURCES += main.cpp\
     videowidget.cpp \
     spinnerprogress.cpp \
     scoring.cpp \
-    editdatabase.cpp
+    editdatabase.cpp \
+    themewidget.cpp
 
 
 TRANSLATIONS = file/languages/elroke_id.ts

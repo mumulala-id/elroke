@@ -99,7 +99,7 @@ private :
     QDesktopWidget *desktop = QApplication::desktop();
     unsigned short int desktop_width = desktop->width();
     unsigned short  int desktop_height = desktop->height();
-    QString channel;
+//    QString channel;
     bool lock_playlist=false;
     Keyboard *keyboard;
     dbmanager *db;

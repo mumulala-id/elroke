@@ -10,6 +10,7 @@
 #include <QListWidgetItem>
 #include <QStandardItemModel>
 #include <QLabel>
+#include <themewidget.h>
 
 class resizer : public QObject
 {

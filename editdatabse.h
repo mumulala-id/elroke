@@ -35,7 +35,7 @@ private :
     CLineEdit *le_search;
     VideoWidget *video;
     QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    bool anyChange=false;
+    bool anyChange = false;
 
 private slots:
     void swapItem(int, int);
@@ -52,7 +52,6 @@ private slots:
     void swapLanguageCategory();
     void deleteItem();
     void save();
-    void selectedCount();
     void onListWidgetClicked(QListWidgetItem *);
     void updateList();
     void writeTextStream(const QString &file, QList<QString>set);

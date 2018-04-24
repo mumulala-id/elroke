@@ -90,6 +90,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      model = new QStandardItemModel;
      model->setColumnCount(2);
+     model->setHorizontalHeaderLabels(QStringList()<<"NAME"<<"PATH");
 
      view = new QTableView(this);
      view->setEditTriggers(QTableView::NoEditTriggers);
@@ -98,11 +99,12 @@ addtodatabase::addtodatabase(QWidget *parent) :
      view->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
      view->setModel(model);
      view->setColumnHidden(1,1);//hide path
+//     view->seth
      connect(view->selectionModel(),&QItemSelectionModel::selectionChanged,[this]()
      {
         QModelIndexList list =view->selectionModel()->selectedRows();
-        if(list.count()>1)
-            button_start->setEnabled(1);
+        if(list.count()>0)
+            button_start->setEnabled(true);
      });
 
      layout_top_left->addLayout(layout_drive);

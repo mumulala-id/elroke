@@ -19,7 +19,7 @@ class myListWidget :  public QListWidget
 {
     Q_OBJECT
 public :
-    myListWidget(QWidget *parent=0) :
+    myListWidget(QWidget *parent=nullptr) :
         QListWidget(parent){}
 
 signals :

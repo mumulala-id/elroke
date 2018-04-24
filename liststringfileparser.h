@@ -11,7 +11,6 @@ class listStringFileParser
 public:
     static QList<QString> parse( const QString &file )
     {
-
         QFile f(file);
         QList<QString>list;
 
@@ -22,21 +21,18 @@ public:
         }
 
         if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
-        {
-            qDebug()<<"cant read singer";
-        }
+               qDebug()<<"cant read singer";
 
         QTextStream stream(&f);
-
         QString line = stream.readLine();
-        while(line!=NULL)
+        while(!stream.atEnd())
         {
             list<<line;
             line=stream.readLine();
         }
 
         qSort(list.begin(), list.end());
-            return list;
+        return list;
     }
 };
 

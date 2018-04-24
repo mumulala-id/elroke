@@ -126,7 +126,7 @@ about::about(QWidget *parent) :
         QDesktopServices::openUrl(QUrl("https://paypal.me/mukharom"));
     });
     auto layout_button = new QHBoxLayout;
-    layout_button->addWidget(button_close,0,Qt::AlignLeft);
+    layout_button->addWidget(button_close,0, Qt::AlignLeft | Qt::AlignBottom);
     layout_button->addWidget(support,0,Qt::AlignRight);
 
     lo_main->addWidget(tab,0,Qt::AlignCenter);

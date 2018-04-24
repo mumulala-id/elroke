@@ -8,7 +8,7 @@ class about : public QDialog
 {
     Q_OBJECT
 public:
-   explicit  about(QWidget *parent=0);
+   explicit  about(QWidget *parent=nullptr);
 
 private :
     QStackedLayout *stack;

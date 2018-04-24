@@ -87,11 +87,10 @@ managedb::managedb(QWidget *parent) :
     auto button_play = new QPushButton("\u25B6", this);
     connect(button_play,&QPushButton::pressed,[this]()
     {
-      uint row= proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
-    QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
-    video->player()->setFile(file);
-    video->player()->play();
-
+        uint row= proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
+        QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
+        video->player()->setFile(file);
+        video->player()->play();
     });
     auto button_stop = new QPushButton("\u25A0", this);
     connect(button_stop,&QPushButton::pressed,video->player(),&Player::stop);
@@ -109,7 +108,7 @@ managedb::managedb(QWidget *parent) :
     lo_top->addWidget(grup_genre);
     lo_top->addWidget(grup_folder);
     lo_top->addWidget(grup_video);
-    lo_top->setMargin(0);
+//    lo_top->setMargin(0);
     lo_top->setSpacing(0);
 
     /// bottom area ---------------------------------------------------------------------
@@ -253,10 +252,7 @@ managedb::managedb(QWidget *parent) :
 
 //right bottom
     auto lo_search = new QHBoxLayout;
-//    combo_search = new QComboBox(this);
-//    combo_search->addItem(tr("Title"));
-//    combo_search->addItem(tr("Singer"));
-//    connect(combo_search,static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),this,&managedb::comboSearchChange);
+
 
     le_search = new CLineEdit(this);
     le_search->setMaximumWidth(300);
@@ -302,15 +298,16 @@ managedb::managedb(QWidget *parent) :
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
-    connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,this,&managedb::selectedCount);
+    connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,[this](){
+        QModelIndexList list = table->selectionModel()->selectedRows();
+        selected_count_label->setText(QString::number(list.count()));
+    });
     connect(table,&QTableView::doubleClicked,[this](QModelIndex index)
     {
-
           uint row =  proxy_model->mapToSource( index).row();
                      QString file = sql_model->data(sql_model->index(row,7), Qt::DisplayRole).toString();
                      video->player()->setFile(file);
                      video->player()->play();
-
     });
 
     auto lo_bottom_right = new QVBoxLayout;
@@ -340,7 +337,7 @@ managedb::managedb(QWidget *parent) :
     widget_bottom_right->setSizePolicy(spRight);
 
     lo_bottom->addWidget(widget_bottom_right);
-    lo_bottom->setMargin(0);
+//    lo_bottom->setMargin(0);
 
     auto top = new QWidget(this);
     QSizePolicy spTop (QSizePolicy::Preferred,QSizePolicy::Preferred);
@@ -369,8 +366,8 @@ managedb::managedb(QWidget *parent) :
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
 
-    setWindowFlags(Qt::FramelessWindowHint);
-    setWindowState(Qt::WindowFullScreen);
+//    setWindowFlags(Qt::FramelessWindowHint);
+//    setWindowState(Qt::WindowFullScreen);
 
 }
 
@@ -630,13 +627,7 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
          f.close();
 }
 
-void managedb::selectedCount()
-{
-    QModelIndexList list = table->selectionModel()->selectedRows();
-    selected_count_label->setText(QString::number(list.count()));
 
-
-}
 
 //void managedb::comboSearchChange(int i){
 //    QVariantList list;

@@ -54,8 +54,6 @@ signals :
     void titleAnalized();
     void progress(int);
 
-
-
 };
 
 #endif // YOUTUBEDOWNLOADER_H
