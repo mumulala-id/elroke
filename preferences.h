@@ -11,6 +11,7 @@
 #include <QStandardItemModel>
 #include <QLabel>
 #include <themewidget.h>
+#include <QListWidget>
 
 class resizer : public QObject
 {
@@ -51,12 +52,13 @@ private :
     QCheckBox *check_startapp;
     QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QStringList bg_list ;
+    QStringList shortcut_item;
     QThread *thread_resizer;
     QStandardItemModel *model ;
     resizer *img_resizer;
     bool startup=false;
     QString language;
-
+    QListWidget *list_menu_selected;
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);

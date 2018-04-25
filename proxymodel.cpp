@@ -21,6 +21,16 @@ void ProxyModel::search(QString s){
 
 }
 
+void ProxyModel::filterByLanguageGenre(const QString &text){
+
+    md = ProxyModel::languageGenre;
+    text_search = text;
+    invalidateFilter();
+
+
+
+}
+
 void ProxyModel::searchByColumn(int column, const QString &text)
 {
     md = ProxyModel::column;
@@ -98,6 +108,18 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
         QString x = sourceModel()->data(ind).toString();
 
         return QString::compare(x,"YES",Qt::CaseInsensitive)==0;
+
+    }
+    else if(md == ProxyModel::languageGenre)
+    {
+
+        QModelIndex inedx_lang = sourceModel()->index(source_row,3,source_parent);
+        QString lang = sourceModel()->data(inedx_lang).toString();
+
+        QModelIndex inedx_genre = sourceModel()->index(source_row,4,source_parent);
+        QString genre = sourceModel()->data(inedx_genre).toString();
+
+      return QString::compare(text_search, lang,Qt::CaseInsensitive)==0 || QString::compare(text_search,genre,Qt::CaseInsensitive)==0;
 
     }
     return true;

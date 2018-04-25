@@ -12,7 +12,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include "liststringfileparser.h"
-#include <QTabBar>
+//#include <QTabBar>
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
@@ -89,7 +89,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(background_view,&QListView::clicked,[this,background_view](const QModelIndex &index)
    {
        selected_background = background_view->model()->data(index,Qt::UserRole).toString();
-       qDebug()<<selected_background;
     });
 
     auto button_add = new QPushButton(QIcon::fromTheme("add"),"", this);
@@ -113,7 +112,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
         startup = d;
     });
 
-
     auto group_font = new QGroupBox(tr("Font"), this);
 
     auto layout_font = new QVBoxLayout;
@@ -121,7 +119,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     auto combo_font = new QFontComboBox(this);
 
     if(!selected_font.isEmpty())
-        combo_font->setCurrentText(selected_font);
+    combo_font->setCurrentText(selected_font);
     connect(combo_font,static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::activated),[this](const QString &s_font)
     {
         selected_font = s_font;
@@ -185,38 +183,26 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_move_button->addWidget(button_left);
     layout_move_button->addStretch();
 
-    auto list_menu_selected = new QListWidget(this);
+    list_menu_selected = new QListWidget(this);
+    list_menu_selected->addItems(shortcut_item);
+
     layout_menu->addWidget(list_menu_all,0,Qt::AlignVCenter);
     layout_menu->addLayout(layout_move_button);
     layout_menu->addWidget(list_menu_selected,0,Qt::AlignVCenter);
 
-    auto tabbar = new QTabBar(this);
-    tabbar->setTabsClosable(true);
 
-//    auto layout_menu_config = new QHBoxLayout;
-
-    for(int i =0;i<7;i++){
-//    auto bbb = new QPushButton("test"+QString::number(i),this);
-//    layout_menu_config->addWidget(bbb);
-        tabbar->addTab(QString::number(i));
-    }
-
-    layout_menu_main->addWidget(tabbar);
-
-        layout_menu_main->addLayout(layout_menu);
-
-
+    layout_menu_main->addLayout(layout_menu);
 
     group_menu->setLayout(layout_menu_main);
 
     list_menu_all->addItems(getLanguageGenre());
 
-    connect(button_right,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
+    connect(button_right,&QPushButton::clicked,[this,list_menu_all]()
     {
        list_menu_selected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
     });
 
-    connect(button_left,&QPushButton::clicked,[list_menu_all,list_menu_selected]()
+    connect(button_left,&QPushButton::clicked,[this,list_menu_all]()
     {
        list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
     });
@@ -281,7 +267,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     main_layout->addLayout(layout_button);
     main_layout->addLayout(stack);
     setLayout(main_layout);
-    setWindowFlags(Qt::FramelessWindowHint);
+//    setWindowFlags(Qt::FramelessWindowHint);
 //    setModal(true);
 }
 
@@ -290,6 +276,12 @@ QStringList preferences::getLanguageGenre()
     QStringList list ;
     list<< listStringFileParser::parse(app_dir+"/meta/language");
     list<<listStringFileParser::parse(app_dir+"/meta/category");
+
+    for(int i=0;i<shortcut_item.size();i++)
+    {
+        list.removeAll(shortcut_item.at(i));
+    }
+
     return list;
 }
 
@@ -300,10 +292,6 @@ void preferences::apply()
     QFile file(dir.path()+"/elroke.desktop");
    if(startup)
    {
-//       if(file.exists())
-//       {
-//           return;
-//       }
        if(!dir.exists())
        {
           QDir().mkdir(dir.path());
@@ -328,16 +316,21 @@ void preferences::apply()
    {
        file.remove();
    }
-//   qDebug()<<"uyuyutut";
 
-    QSettings setting("elroke","elroke");
+shortcut_item.clear();
+  for(int i=0;i<list_menu_selected->count();i++){
+      shortcut_item<< list_menu_selected->item(i)->text();
+
+  }
+
+   QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     setting.setValue("font",selected_font);
-//    qDebug()<<selected_background;
     setting.setValue("background", selected_background);
     setting.setValue("font_size", font_size);
     setting.setValue("startup", startup);
     setting.setValue("language", language);
+    setting.setValue("menu", QVariant::fromValue(shortcut_item));
     setting.endGroup();
 }
 void preferences::ok()
@@ -355,6 +348,7 @@ void preferences::readSetting()
     font_size = setting.value("font_size").toInt();
     startup = setting.value("startup").toBool();
     language = setting.value("language").toString();
+    shortcut_item = setting.value("menu").toStringList();
     setting.endGroup();
 }
 

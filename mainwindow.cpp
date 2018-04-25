@@ -66,6 +66,7 @@ void mainWindow::createWidgets()
     connect(pb_menu,&QPushButton::pressed,this,&mainWindow::dialogLogin);
 
     le_search = new CLineEdit(this);
+//    le_search->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
     le_search->setPlaceholderText(tr("SEARCH"));
 
     QPalette button_cat_palette;
@@ -94,15 +95,17 @@ void mainWindow::createWidgets()
         proxy_model->filterFavorite();
     });
 
-    auto button_cat_indonesia = cat_button("JAZZ");
+    layout_top->addWidget(pb_menu);
+    layout_top->addWidget(le_search);
+    layout_top->addStretch();
+    layout_top->addWidget(button_show_all);
+    layout_top->addWidget(button_fav);
 
-    auto button_cat_barat = cat_button("WESTERN");
-
-    auto button_cat_rock = cat_button("ROCK");
-
-    auto button_cat_pop = cat_button("POP");
-
-    auto button_cat_dangdut = cat_button("TRADITIONAL");
+    for(int i=0;i<shortcut_item.size();i++){
+        auto btn = cat_button(shortcut_item.at(i));
+        layout_top->addWidget(btn);
+        connect(btn,&QPushButton::pressed,this,&mainWindow::filterLanguageGenre);
+    }
 
 //show clock
     auto clock = new QLabel(this);
@@ -114,16 +117,6 @@ void mainWindow::createWidgets()
     });
     timer->start(60000);
 
-    layout_top->addWidget(pb_menu);
-    layout_top->addWidget(le_search);
-    layout_top->addStretch();
-    layout_top->addWidget(button_show_all);
-    layout_top->addWidget(button_fav);
-    layout_top->addWidget(button_cat_indonesia);
-    layout_top->addWidget(button_cat_barat);
-    layout_top->addWidget(button_cat_rock);
-    layout_top->addWidget(button_cat_pop);
-    layout_top->addWidget(button_cat_dangdut);
     layout_top->addStretch();
     layout_top->addWidget(clock);
     layout_top->setSpacing(2);
@@ -345,13 +338,18 @@ void mainWindow::createWidgets()
     auto btn_next = buttonControl(QIcon(":/usr/share/elroke/icon/next.png"));
     connect(btn_next,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
-     auto button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
+     button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
      connect(button_play_pause,&QPushButton::pressed,[this]()
      {
-         if(video->player()->isPlaying())
+         if(video->player()->isPlaying()){
              video->player()->pause();
-         else if(video->player()->isPausing())
+             button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/play.png"));
+         }
+
+         else if(video->player()->isPausing()){
              video->player()->play();
+             button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/pause.png"));
+         }
 
      });
 
@@ -587,7 +585,7 @@ void mainWindow::playPlayer()
 {
     if (playlist_widget->count()==0)
     {
-        if(video->player()->isPlaying())
+        if(!video->player()->isPlaying())
         {            //if user pres  next button
             video->close();
             clearMask();
@@ -941,8 +939,15 @@ void mainWindow::videoInstance(){
     connect(video->player(),&Player::reachEnded,this,&mainWindow::videoEnds);
     connect(video->player(),&Player::reachEnded,spinner_progress,&spinnerProgress::stop);
     connect(video->player(),&Player::almostEnded,this,&mainWindow::dialogNextSong);
-    connect(video->player(),&Player::playing,spinner_progress,&spinnerProgress::start);
+//    connect(video->player(),&Player::playing,spinner_progress,&spinnerProgress::start);
     connect(video->player(),&Player::playing,this,&mainWindow::setAudioChannelAuto);
+
+    connect(video->player(),&Player::playing,[this](){
+//                setAudioChannelAuto();
+        spinner_progress->start();
+
+        button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/pause.png"));;
+    });
 
     connect(video->player(),&Player::error,[this]()
     {
@@ -992,13 +997,14 @@ void mainWindow::dialogAdmin()
         }
     });
     atd->setModal(true);
-    atd->show();
+            atd->setParent(dialog_admin, Qt::Dialog|Qt::FramelessWindowHint);
+    atd->showFullScreen();
     });
 
     auto button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
-        managedb *md = new managedb;
+        auto md = new managedb;
         md->setAttribute(Qt::WA_DeleteOnClose);
         connect(md, &managedb::finished,[this](){
             sql_model->select();
@@ -1007,8 +1013,8 @@ void mainWindow::dialogAdmin()
                 sql_model->fetchMore();
             }
         });
-//        md->setModal(true);
-        md->show();
+        md->setModal(true);
+md->showFullScreen();
 //        managedb md;
 //        md.exec();
     });
@@ -1016,10 +1022,11 @@ void mainWindow::dialogAdmin()
     auto button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
     connect(button_preferences,&QPushButton::pressed,[this]()
     {
-        auto pref = new preferences;
+        auto pref = new preferences();
         pref->setAttribute(Qt::WA_DeleteOnClose);
-        pref->setModal(true);
-        pref->show();
+        pref->setSizeGripEnabled(true);
+        pref->setParent(dialog_admin, Qt::Dialog|Qt::FramelessWindowHint);
+        pref->exec();
     });
 
     auto button_change_password = new QPushButton(tr("CHANGE PASSWORD"), dialog_admin);
@@ -1048,30 +1055,28 @@ void mainWindow::dialogAdmin()
     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, Qt::white);
-
     dialog_admin->setPalette(palet);
-
 
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
     dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
     dialog_admin->setModal(true);
-      dialog_admin->adjustSize();
+    dialog_admin->adjustSize();
     dialog_admin->show();
 
 }
 
 void mainWindow::dialogCreateAdmin()
 {
-   auto dialog = new QDialog;
+    auto dialog = new QDialog;
     auto layout_main = new QVBoxLayout;
 
-   auto le_old_password= new CLineEdit(dialog);
+    auto le_old_password= new CLineEdit(dialog);
     le_old_password->setEchoMode(QLineEdit::Password);
 
-  auto  le_password = new CLineEdit(dialog);
+    auto  le_password = new CLineEdit(dialog);
     le_password->setEchoMode(QLineEdit::Password);
 
-   auto le_password_confirm = new CLineEdit(dialog);
+    auto le_password_confirm = new CLineEdit(dialog);
     le_password_confirm->setEchoMode(QLineEdit::Password);
 
     QHBoxLayout *layout_button = new QHBoxLayout;
@@ -1085,7 +1090,6 @@ void mainWindow::dialogCreateAdmin()
 
         if (old_pass.isEmpty() || pass.isEmpty() || pass_confirm.isEmpty())
              return;
-
 
         if (pass!=pass_confirm)
              return;
@@ -1112,7 +1116,6 @@ void mainWindow::dialogCreateAdmin()
 
     layout_main->addWidget(new QLabel(tr("Old Password"),dialog));
     layout_main->addWidget(le_old_password);
-
     layout_main->addWidget(new QLabel(tr("New Password"),dialog));
     layout_main->addWidget(le_password);
     layout_main->addWidget(new QLabel(tr("Confirm New password"),dialog));
@@ -1120,8 +1123,6 @@ void mainWindow::dialogCreateAdmin()
     layout_main->addStretch();
     layout_main->addLayout(layout_button);
 
-     dialog->setLayout(layout_main);
-     dialog->setWindowFlags(Qt::FramelessWindowHint);
 
      QPalette palet;
      palet.setColor(QPalette::Base, Qt::white);
@@ -1131,6 +1132,10 @@ void mainWindow::dialogCreateAdmin()
      palet.setColor(QPalette::Button, palette().dark().color());
      palet.setColor(QPalette::ButtonText, QColor(0,0,0,128));
      dialog->setPalette(palet);
+
+     dialog->setLayout(layout_main);
+//     dialog->setWindowFlags(Qt::FramelessWindowHint);
+            dialog->setParent(dialog_admin, Qt::Dialog|Qt::FramelessWindowHint);
      dialog->adjustSize();
      dialog->setAttribute(Qt::WA_DeleteOnClose);
      dialog->exec();
@@ -1300,6 +1305,9 @@ void mainWindow::readSettings()
     if (font_size==0)
         font_size=16;
     language = setting.value("language").toString();
+    shortcut_item = setting.value("menu").toStringList();
+    if(shortcut_item.isEmpty())
+        shortcut_item = QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL";
     setting.endGroup();
 }
 
@@ -1320,4 +1328,11 @@ mainWindow::~mainWindow()
     delete video;
     if (autosave_playlist->isChecked())
         writePlaylist();
+}
+
+void mainWindow::filterLanguageGenre(){
+    QPushButton *b = qobject_cast<QPushButton*>(sender());
+    proxy_model->filterByLanguageGenre(b->text());
+
+
 }

@@ -16,6 +16,7 @@
     along with ElRoke.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include "addtodatabase.h"
+#include <liststringfileparser.h>
 #include <dbmanager.h>
 #include <QStorageInfo>
 #include <QGridLayout>
@@ -218,23 +219,25 @@ addtodatabase::addtodatabase(QWidget *parent) :
    le_genre = new QLineEdit(this);
    le_genre->setText(default_genre);
 
-   layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
-   layout_additional_item->addWidget(le_singer,0,1);
-   layout_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
-   layout_additional_item->addWidget(le_language,1,1);
-   layout_additional_item->addWidget(new QLabel(tr("Genre"), this),2,0);
-   layout_additional_item->addWidget(le_genre,2,1);
-   layout_additional_item->setVerticalSpacing(0);
+   auto check_audio_left = new QCheckBox(tr("Left"), this);
+   auto check_audio_right = new QCheckBox(tr("Right"), this);
+   auto check_audio_stereo = new QCheckBox(tr("Stereo"), this);
+
+    layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
+    layout_additional_item->addWidget(le_singer,0,1,1,3);
+    layout_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
+    layout_additional_item->addWidget(le_language,1,1,1,3);
+    layout_additional_item->addWidget(new QLabel(tr("Genre"), this),2,0);
+    layout_additional_item->addWidget(le_genre,2,1,1,3);
+    layout_additional_item->addWidget(new QLabel(tr("Audio"), this),3,0);
+    layout_additional_item->addWidget(check_audio_left,3,1);
+    layout_additional_item->addWidget(check_audio_right, 3,2);
+    layout_additional_item->addWidget(check_audio_stereo,3,3);
+    layout_additional_item->setVerticalSpacing(0);
 
    auto group_metadata = new QGroupBox(tr("Add metadata if not available"));
    group_metadata->setLayout(layout_additional_item);
    group_metadata->setEnabled(!automatic);
-
-   auto layout_audio_channel = new QVBoxLayout;
-
-   auto check_audio_left = new QCheckBox(tr("Left"), this);
-   auto check_audio_right = new QCheckBox(tr("Right"), this);
-   auto check_audio_stereo = new QCheckBox(tr("Stereo"), this);
 
    connect(check_audio_left,&QCheckBox::toggled,[this,check_audio_right,check_audio_stereo](bool s)
    {
@@ -264,37 +267,27 @@ addtodatabase::addtodatabase(QWidget *parent) :
        }
    });
 
-   layout_audio_channel->addWidget(check_audio_left);
-   layout_audio_channel->addWidget(check_audio_right);
-   layout_audio_channel->addWidget(check_audio_stereo);
-   layout_audio_channel->addStretch();
-
-   auto group_audio_channel = new QGroupBox(tr("Audio Channel"), this);
-   group_audio_channel->setLayout(layout_audio_channel);
-   group_audio_channel->setEnabled(!automatic);
-
-   connect(check_auto,&QCheckBox::toggled,[this,check_split_by,group_pattern,group_metadata,group_audio_channel](bool a)
+   connect(check_auto,&QCheckBox::toggled,[this,check_split_by,group_pattern,group_metadata](bool a)
    {
        automatic = a;
        check_split_by->setChecked(!a);
        group_pattern->setEnabled(!a);
        group_metadata->setEnabled(!a);
-       group_audio_channel->setEnabled(!a);
    });
-   connect(check_split_by,&QCheckBox::toggled,[this, check_auto,group_pattern,group_metadata,group_audio_channel](bool c)
+   connect(check_split_by,&QCheckBox::toggled,[this, check_auto,group_pattern,group_metadata](bool c)
    {
        automatic = !c;
       check_auto->setChecked(!c);
       group_pattern->setEnabled(c);
       group_metadata->setEnabled(c);
-      group_audio_channel->setEnabled(c);
    });
 
    auto layout_bottom = new QHBoxLayout;
+   layout_bottom->addStretch();
    layout_bottom->addWidget(grup_splitter);
    layout_bottom->addWidget(group_pattern);
    layout_bottom->addWidget(group_metadata);
-   layout_bottom->addWidget(group_audio_channel);
+   layout_bottom->addStretch();
 
    auto widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);
@@ -357,8 +350,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
     setLayout(layout_main);
+//    resize(800,600);
 
-    setWindowState(Qt::WindowFullScreen);
+//    setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::getItem()
@@ -637,6 +631,9 @@ void addtodatabase::writeTextStream(const QString &file, QSet<QString>set)
 
     if(!info.dir().exists())
         QDir().mkdir(info.path());
+
+    QStringList exist = listStringFileParser::parse(file);
+    set = set+exist.toSet();
 
     QFile f(file);
         

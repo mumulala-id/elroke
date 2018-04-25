@@ -41,6 +41,7 @@ managedb::managedb(QWidget *parent) :
    list_singer = new QListWidget(this);
    list_singer->addItems(listStringFileParser::parse(app_dir+"/meta/singer"));
    connect(list_singer,&QListWidget::itemClicked,this,&managedb::onListWidgetClicked);
+
    auto lo_grup_singer = new QVBoxLayout;
     lo_grup_singer->addWidget(list_singer);
     grup_singer->setLayout(lo_grup_singer);
@@ -108,7 +109,6 @@ managedb::managedb(QWidget *parent) :
     lo_top->addWidget(grup_genre);
     lo_top->addWidget(grup_folder);
     lo_top->addWidget(grup_video);
-//    lo_top->setMargin(0);
     lo_top->setSpacing(0);
 
     /// bottom area ---------------------------------------------------------------------
@@ -253,7 +253,6 @@ managedb::managedb(QWidget *parent) :
 //right bottom
     auto lo_search = new QHBoxLayout;
 
-
     le_search = new CLineEdit(this);
     le_search->setMaximumWidth(300);
     le_search->setPlaceholderText(tr("SEARCH"));
@@ -272,7 +271,6 @@ managedb::managedb(QWidget *parent) :
 
     auto reset = new QPushButton(tr("Show All"), this);
     connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
-
 
     auto to_be_fixed = new QPushButton(tr("To Be Fixed"), this);
     connect(to_be_fixed,&QPushButton::pressed,proxy_model,&ProxyModel::toBeFixed);
@@ -355,7 +353,7 @@ managedb::managedb(QWidget *parent) :
     lo_main->addWidget(top);
     lo_main->addWidget(bottom);
 //    lo_main->setMargin(0);
-    setLayout(lo_main);
+
 
     QPalette palet;
     palet.setColor(QPalette::Base, Qt::white);
@@ -365,10 +363,8 @@ managedb::managedb(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
-
-    setWindowFlags(Qt::FramelessWindowHint);
-    setWindowState(Qt::WindowFullScreen);
-
+     setLayout(lo_main);
+     resize(800,600);
 }
 
 void managedb::swapTitleSinger()

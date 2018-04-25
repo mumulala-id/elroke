@@ -10,7 +10,7 @@ class ProxyModel : public QSortFilterProxyModel
     QMap<int, Qt::Alignment>alignMap;
 
 public:
-      enum mode{column,smart,fixed,tobefixed,favorite};
+      enum mode{column,smart,fixed,tobefixed,favorite,languageGenre};
       enum role{sortRole=Qt::UserRole};
 
     explicit ProxyModel(QObject* parent = nullptr);
@@ -27,6 +27,7 @@ public slots:
   void setAlignment(unsigned int, Qt::Alignment);
   void toBeFixed();
   void filterFavorite();
+  void filterByLanguageGenre(const QString &);
   void reset();
 
 private slots:

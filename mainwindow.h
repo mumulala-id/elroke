@@ -84,7 +84,7 @@ private :
     QTableView *table;
     ProxyModel *proxy_model;
     CLineEdit *le_search;
-//    QSlider *slider_vol;
+    QStringList shortcut_item;
     VideoWidget *video;
     QSqlTableModel *sql_model;
     ListWidget *playlist_widget;
@@ -107,6 +107,7 @@ private :
     Player *effect_player;
     QWidget *spacer;
     QPushButton *button_audio_channel;
+    QPushButton * button_play_pause;
     bool main_window_visible=false;
     QAction *autosave_playlist;
     QPointer <QDialog> dialog_admin=nullptr;
@@ -149,6 +150,7 @@ private slots:
     void showHits();
     void moveItemToBottom();
     void handleFavorite();
+    void filterLanguageGenre();
 
 //    void updateInterface();
     void readSettings();
