@@ -32,6 +32,7 @@ public :
     Player *player()const{return _player;};
     void play();
     void setData(Song *);
+    void setFullscreenMode();
     Song *song()const{return _song;};
 };
 

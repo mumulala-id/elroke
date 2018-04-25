@@ -452,14 +452,12 @@ void addtodatabase::saveToDatabase()
         uint short genrePos = p.indexOf("Genre");
         uint short audioPos = p.indexOf("Audio");
 
-
-
         foreach (QModelIndex index, list)
         {
             path = model->data(model->index(index.row(),1)).toString();
-
             info.setFile(path);
             filename = info.completeBaseName();
+            folder = info.absolutePath();
 
            if(filename.contains(splitter))
            {
@@ -509,6 +507,7 @@ void addtodatabase::saveToDatabase()
         set_language.insert(language.toUpper());
         set_genre.insert(genre.toUpper());
         set_folder.insert(folder);
+
 
         data.append(title);
         data.append(singer);

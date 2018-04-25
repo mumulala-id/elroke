@@ -270,9 +270,11 @@ void mainWindow::createWidgets()
 
     auto button_lock_playlist = playlistButton(QIcon(":/usr/share/elroke/icon/lock.png"));
     button_lock_playlist->setCheckable(true);
-
     connect(button_lock_playlist,&QPushButton::clicked,[this, button_lock_playlist](bool lock)
     {
+        if(playlist_widget->count()==0)
+            return;
+
         lock_playlist = lock;
         if (lock)
         {
@@ -344,7 +346,14 @@ void mainWindow::createWidgets()
     connect(btn_next,&QPushButton::pressed,this,&mainWindow::playPlayer);
 
      auto button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
-     connect(button_play_pause,&QPushButton::pressed,this,&mainWindow::playPlayer);
+     connect(button_play_pause,&QPushButton::pressed,[this]()
+     {
+         if(video->player()->isPlaying())
+             video->player()->pause();
+         else if(video->player()->isPausing())
+             video->player()->play();
+
+     });
 
      buttonFavorite = buttonControl(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
      connect(buttonFavorite,&QPushButton::pressed,[this](){
@@ -563,7 +572,7 @@ void mainWindow::moveItemToTop()
 void mainWindow::setBackground()
 {
     QPixmap bg(background);
-    bg = bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    bg = bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
 
     QPalette pal;
     pal.setColor(QPalette::Window,Qt::black);
@@ -922,6 +931,7 @@ void mainWindow::showKeyboard(bool x)
 void mainWindow::videoInstance(){
     //video player
     video = new VideoWidget;
+    video->setFullscreenMode();
     video->hide();
     video->installEventFilter(this);
 
@@ -962,7 +972,8 @@ void mainWindow::fontSetup()
 
 void mainWindow::dialogAdmin()
 {
-    dialog_admin = new QDialog();
+    dialog_admin = new QDialog(this);
+    dialog_admin->setAutoFillBackground(true);
 
     auto layout_main = new QVBoxLayout;
 
@@ -987,19 +998,19 @@ void mainWindow::dialogAdmin()
     auto button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
-//        managedb *md = new managedb;
-//        md->setAttribute(Qt::WA_DeleteOnClose);
-//        connect(md, &managedb::finished,[this](){
-//            sql_model->select();
-//            while(sql_model->canFetchMore())
-//            {
-//                sql_model->fetchMore();
-//            }
-//        });
+        managedb *md = new managedb;
+        md->setAttribute(Qt::WA_DeleteOnClose);
+        connect(md, &managedb::finished,[this](){
+            sql_model->select();
+            while(sql_model->canFetchMore())
+            {
+                sql_model->fetchMore();
+            }
+        });
 //        md->setModal(true);
-//        md->show();
-        managedb md;
-        md.exec();
+        md->show();
+//        managedb md;
+//        md.exec();
     });
 
     auto button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
@@ -1040,10 +1051,11 @@ void mainWindow::dialogAdmin()
 
     dialog_admin->setPalette(palet);
 
-    dialog_admin->adjustSize();
+
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
     dialog_admin->setWindowFlags(Qt::FramelessWindowHint);
     dialog_admin->setModal(true);
+      dialog_admin->adjustSize();
     dialog_admin->show();
 
 }

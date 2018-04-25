@@ -25,10 +25,11 @@ public:
 
         QTextStream stream(&f);
         QString line = stream.readLine();
-        while(!stream.atEnd())
+        while(!line.isEmpty())
         {
             list<<line;
             line=stream.readLine();
+            qDebug()<<line;
         }
 
         qSort(list.begin(), list.end());

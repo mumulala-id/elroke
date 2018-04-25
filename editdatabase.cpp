@@ -354,7 +354,7 @@ managedb::managedb(QWidget *parent) :
 
     lo_main->addWidget(top);
     lo_main->addWidget(bottom);
-    lo_main->setMargin(0);
+//    lo_main->setMargin(0);
     setLayout(lo_main);
 
     QPalette palet;
@@ -366,8 +366,8 @@ managedb::managedb(QWidget *parent) :
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
 
-//    setWindowFlags(Qt::FramelessWindowHint);
-//    setWindowState(Qt::WindowFullScreen);
+    setWindowFlags(Qt::FramelessWindowHint);
+    setWindowState(Qt::WindowFullScreen);
 
 }
 
@@ -662,16 +662,13 @@ void managedb::jumpTo(QString t)
 void managedb::renameFile()
 {
     QModelIndexList list = table->selectionModel()->selectedRows();
+    auto the_string = [this](QModelIndex index,int col){
 
-
-        auto the_string = [this](QModelIndex index,int col){
-
-            int r =  proxy_model->mapToSource( index).row();
-            return sql_model->index(r,col).data().toString();
+     int r =  proxy_model->mapToSource( index).row();
+     return sql_model->index(r,col).data().toString();
     };
         foreach (QModelIndex i, list)
         {
-
             uint row = proxy_model->mapToSource(i).row();
             QString id = the_string(i,0);
             QString title  = the_string(i, 1);
@@ -704,8 +701,6 @@ void managedb::renameFile()
             QFile f(file);
             f.rename(file, path+"/"+filename+"."+ext);
        }
-
-
 }
 
 void managedb::undo()
