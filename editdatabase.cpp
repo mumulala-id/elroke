@@ -290,7 +290,7 @@ managedb::managedb(QWidget *parent) :
     lo_search->addStretch();
 
     table->setModel(proxy_model);
-    table->verticalHeader()->hide();
+//    table->verticalHeader()->hide();
     table->resizeColumnsToContents();
     table->setSelectionBehavior(QAbstractItemView::SelectRows);
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
@@ -537,13 +537,15 @@ void managedb::onListWidgetClicked(QListWidgetItem * item)
         column=3;
     else if(obj==list_genre)
         column=4;
-    else if(obj==list_folder)
+
+     proxy_model->fixSearchByColumn(column, text);
+  if(obj==list_folder)
     {
             column=7;
             proxy_model->searchByColumn(column, text);
     }
 
-    proxy_model->fixSearchByColumn(column, text);
+
     setCursor(Qt::ArrowCursor);
 }
 

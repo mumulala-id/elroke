@@ -134,7 +134,7 @@ private slots:
     void setAudioChannelAuto();
     void addToPlaylist();
     void playPlayer();
-    void getCategory();
+//    void getCategory();
     void dialogSavePlaylist();
     void writePlaylist();
     void writePlaylist(const QString &);//write func

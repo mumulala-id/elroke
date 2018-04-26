@@ -26,9 +26,6 @@ void ProxyModel::filterByLanguageGenre(const QString &text){
     md = ProxyModel::languageGenre;
     text_search = text;
     invalidateFilter();
-
-
-
 }
 
 void ProxyModel::searchByColumn(int column, const QString &text)

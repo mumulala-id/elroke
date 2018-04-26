@@ -50,7 +50,7 @@ mainWindow::mainWindow(QWidget *parent)
     createShortcut();
     setBackground();
 
-    getCategory();
+//    getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
 }
 
@@ -59,10 +59,13 @@ void mainWindow::createWidgets()
     resize(desktop_width, desktop_height);
     auto layout_main = new QVBoxLayout;
    auto layout_top = new QHBoxLayout;
+   QPalette transparent_button;
+   transparent_button.setColor(QPalette::Button,Qt::transparent);
 
     auto pb_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"", this);
     pb_menu->setFlat(1);
     pb_menu->setFocusPolicy(Qt::NoFocus);
+    pb_menu->setPalette(transparent_button);
     connect(pb_menu,&QPushButton::pressed,this,&mainWindow::dialogLogin);
 
     le_search = new CLineEdit(this);
@@ -92,12 +95,16 @@ void mainWindow::createWidgets()
     auto button_fav = cat_button(tr("Favorite"));
     connect(button_fav,&QPushButton::pressed,[this]()
     {
+        sql_model->select();
+        while (sql_model->canFetchMore()) {
+            sql_model->fetchMore();
+        }
         proxy_model->filterFavorite();
     });
 
     layout_top->addWidget(pb_menu);
     layout_top->addWidget(le_search);
-    layout_top->addStretch();
+    layout_top->addSpacing(60);
     layout_top->addWidget(button_show_all);
     layout_top->addWidget(button_fav);
 
@@ -117,8 +124,8 @@ void mainWindow::createWidgets()
     });
     timer->start(60000);
 
-    layout_top->addStretch();
-    layout_top->addWidget(clock);
+//    layout_top->addStretch();
+    layout_top->addWidget(clock,1,Qt::AlignRight);
     layout_top->setSpacing(2);
     layout_top->setMargin(0);
 
@@ -209,12 +216,13 @@ void mainWindow::createWidgets()
 
     auto layout_button_playlist = new QHBoxLayout;
 
-    auto playlistButton = [this](QIcon icon){
+    auto playlistButton = [this,transparent_button](QIcon icon){
         auto button = new QPushButton(this);
         button->setIcon(icon);
         button->setIconSize(QSize(32,32));
         button->setFocusPolicy(Qt::NoFocus);
         button->setFlat(true);
+        button->setPalette(transparent_button);
         return button;
     };
 
@@ -325,13 +333,14 @@ void mainWindow::createWidgets()
     spinner_progress = new spinnerProgress(this);
     spinner_progress->setFixedSize(64,64);
 
-    auto buttonControl = [this](QIcon icon)
+    auto buttonControl = [this,transparent_button](QIcon icon)
     {
         auto btn= new QPushButton(this);
         btn->setIcon(icon);
         btn->setFlat(1);
         btn->setIconSize(QSize(48,48));
         btn->setFocusPolicy(Qt::NoFocus);
+        btn->setPalette(transparent_button);
         return btn;
     };
 
@@ -341,6 +350,7 @@ void mainWindow::createWidgets()
      button_play_pause = buttonControl(QIcon(":/usr/share/elroke/icon/play.png"));
      connect(button_play_pause,&QPushButton::pressed,[this]()
      {
+
          if(video->player()->isPlaying()){
              video->player()->pause();
              button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/play.png"));
@@ -349,6 +359,9 @@ void mainWindow::createWidgets()
          else if(video->player()->isPausing()){
              video->player()->play();
              button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/pause.png"));
+         }
+         else{
+             playPlayer();
          }
 
      });
@@ -407,32 +420,31 @@ void mainWindow::createWidgets()
          }
      });
 
-        layout_player_control->addWidget( spinner_progress);
-        layout_player_control->addStretch();
-        layout_player_control->addWidget(btn_next);
-        layout_player_control->addSpacing(48);
-        layout_player_control->addWidget(button_play_pause);
-        layout_player_control->addSpacing(48);
-        layout_player_control->addWidget(button_audio_channel);
-        layout_player_control->addSpacing(48);
-        layout_player_control->addWidget(buttonFavorite);
-        layout_player_control->addStretch();
-        layout_player_control->addWidget(button_vol_down);
-        layout_player_control->addSpacing(0);
-        layout_player_control->addWidget(button_audio_mute);
-        layout_player_control->addSpacing(0);
-        layout_player_control->addWidget(button_vol_up);
-        layout_player_control->setMargin(0);
+    layout_player_control->addWidget( spinner_progress);
+    layout_player_control->addStretch();
+    layout_player_control->addWidget(btn_next);
+    layout_player_control->addSpacing(48);
+    layout_player_control->addWidget(button_play_pause);
+    layout_player_control->addSpacing(48);
+    layout_player_control->addWidget(button_audio_channel);
+    layout_player_control->addSpacing(48);
+    layout_player_control->addWidget(buttonFavorite);
+    layout_player_control->addStretch();
+    layout_player_control->addWidget(button_vol_down);
+    layout_player_control->addSpacing(0);
+    layout_player_control->addWidget(button_audio_mute);
+    layout_player_control->addSpacing(0);
+    layout_player_control->addWidget(button_vol_up);
+    layout_player_control->setMargin(0);
 
-     auto widget_bottom = new QWidget(this);
-     QPalette plt;
-     plt.setBrush(QPalette::Background, QColor(255,255,255,200));
+    auto widget_bottom = new QWidget(this);
+    QPalette plt;
+    plt.setBrush(QPalette::Background, QColor(255,255,255,200));
 
-      widget_bottom->setAutoFillBackground(1);
-     widget_bottom->setPalette(plt);
-     widget_bottom->setLayout(layout_player_control);
-     widget_bottom->setFixedHeight(72);
-
+    widget_bottom->setAutoFillBackground(1);
+    widget_bottom->setPalette(plt);
+    widget_bottom->setLayout(layout_player_control);
+    widget_bottom->setFixedHeight(72);
 
     layout_main->addWidget(widget_top);
     layout_main->addWidget(all_table);
@@ -458,29 +470,28 @@ void mainWindow::createShortcut()
     auto sc_quit = new QShortcut(QKeySequence("Esc"),this);
     connect(sc_quit,&QShortcut::activated,qApp,&QApplication::quit);
 }
-void mainWindow::getCategory()
-{
-    QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
-}
+//void mainWindow::getCategory()
+//{
+//    QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
+//}
 
 void mainWindow::addToPlaylist()
 {
     int row =  proxy_model->mapToSource( table->selectionModel()->currentIndex()).row();
-   QString id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toString();
+    QString id = sql_model->data(sql_model->index(row,0),Qt::DisplayRole).toString();
 
-   Song *song =   db->getSong(id);
-   songitemwidget *item_song_widget = new songitemwidget;
-   item_song_widget->setSong(song);
+    Song *song =   db->getSong(id);
+    songitemwidget *item_song_widget = new songitemwidget;
+    item_song_widget->setSong(song);
 
+    auto item = new QListWidgetItem;
+    playlist_widget->addItem(item);
+    playlist_widget->setItemWidget(item, item_song_widget);
 
-   auto item = new QListWidgetItem;
-   playlist_widget->addItem(item);
-   playlist_widget->setItemWidget(item, item_song_widget);
+    //resize itemwidget to songitemwidget
+    item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
 
-//resize itemwidget to songitemwidget
-   item->setSizeHint(QSize(playlist_widget->width()-qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent), item_song_widget->height()));
-
-   playlist_widget->setCurrentRow(playlist_widget->count()-1);
+    playlist_widget->setCurrentRow(playlist_widget->count()-1);
 }
 
 void mainWindow::keyPressEvent(QKeyEvent *event)
@@ -1014,9 +1025,8 @@ void mainWindow::dialogAdmin()
             }
         });
         md->setModal(true);
-md->showFullScreen();
-//        managedb md;
-//        md.exec();
+    md->showFullScreen();
+
     });
 
     auto button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
@@ -1083,7 +1093,6 @@ void mainWindow::dialogCreateAdmin()
     auto button_create_admin = new QPushButton(tr("Apply"), dialog);
     connect(button_create_admin,&QPushButton::pressed,[this,dialog,le_old_password,le_password,le_password_confirm]()
     {
-
         QString old_pass = le_old_password->text();
         QString pass = le_password->text();
         QString pass_confirm = le_password_confirm->text();
@@ -1135,7 +1144,7 @@ void mainWindow::dialogCreateAdmin()
 
      dialog->setLayout(layout_main);
 //     dialog->setWindowFlags(Qt::FramelessWindowHint);
-            dialog->setParent(dialog_admin, Qt::Dialog|Qt::FramelessWindowHint);
+    dialog->setParent(dialog_admin, Qt::Dialog|Qt::FramelessWindowHint);
      dialog->adjustSize();
      dialog->setAttribute(Qt::WA_DeleteOnClose);
      dialog->exec();
@@ -1163,6 +1172,12 @@ void mainWindow::dialogLogin()
         le_password->setText("elroke");
 
     auto button_admin = new QPushButton(tr("Administrator"), dialog);
+
+    QPalette pal_btn;
+    pal_btn.setColor(QPalette::Button,QColor("#E91E63"));
+    pal_btn.setColor(QPalette::ButtonText,Qt::white);
+    button_admin->setPalette(pal_btn);
+
     connect(le_password,&CLineEdit::returnPressed,button_admin,&QPushButton::pressed);
     connect(button_admin,&QPushButton::pressed,[this,dialog,le_password,pass]()
     {

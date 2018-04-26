@@ -283,7 +283,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    });
 
    auto layout_bottom = new QHBoxLayout;
-   layout_bottom->addStretch();
+//   layout_bottom->addStretch();
    layout_bottom->addWidget(grup_splitter);
    layout_bottom->addWidget(group_pattern);
    layout_bottom->addWidget(group_metadata);
