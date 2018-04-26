@@ -33,7 +33,6 @@
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QStyledItemDelegate>
-//#include <QSlider>
 #include <QKeyEvent>
 #include <QDesktopWidget>
 #include <QSqlTableModel>
@@ -80,7 +79,6 @@ public:
     ~mainWindow();
 
 private :
-    QComboBox *combo_cat;
     QTableView *table;
     ProxyModel *proxy_model;
     CLineEdit *le_search;
@@ -90,16 +88,10 @@ private :
     ListWidget *playlist_widget;
     spinnerProgress *spinner_progress;
     QString  app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-    QString category1;
-    QString category2;
-    QString category3;
-    QString category4;
-    QString category5;
     QString background;
     QDesktopWidget *desktop = QApplication::desktop();
     unsigned short int desktop_width = desktop->width();
     unsigned short  int desktop_height = desktop->height();
-//    QString channel;
     bool lock_playlist=false;
     Keyboard *keyboard;
     dbmanager *db;
@@ -134,7 +126,6 @@ private slots:
     void setAudioChannelAuto();
     void addToPlaylist();
     void playPlayer();
-//    void getCategory();
     void dialogSavePlaylist();
     void writePlaylist();
     void writePlaylist(const QString &);//write func
@@ -151,10 +142,7 @@ private slots:
     void moveItemToBottom();
     void handleFavorite();
     void filterLanguageGenre();
-
-//    void updateInterface();
     void readSettings();
-//    void d_addtodatabse();
 
 protected :
     void keyPressEvent(QKeyEvent *event);

@@ -12,7 +12,6 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include "liststringfileparser.h"
-//#include <QTabBar>
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
@@ -49,7 +48,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_button->addWidget(button_apply);
     layout_button->addWidget(button_cancel);
 
-    stack = new QStackedLayout;
+   auto stack = new QStackedLayout;
 
     auto layout_background = new QVBoxLayout;
 
@@ -241,8 +240,8 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     stack->addWidget(group_background);
 
     //create connection
-    auto con = [this](QPushButton* b,int x){
-        connect(b,&QPushButton::pressed,[this,x]()
+    auto con = [stack](QPushButton* b,int x){
+        connect(b,&QPushButton::pressed,[stack,x]()
         {
             stack->setCurrentIndex(x);
         });

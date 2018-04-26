@@ -32,9 +32,9 @@ public slots:
     void closeDB();
     void rollBack();
     bool insertIntoTable(const QVariantList & );
-    void updatePlayedTime(QString id);
-    void updatePath(QString id, QString path);
-    Song *getSong(QString id);
+    void updatePlayedTime(const QString &id);
+    void updatePath(const QString &id, const QString &path);
+    Song *getSong(const QString &id);
     void setFavorite(const QString &id);
     bool isFavorite(const QString &id);
 

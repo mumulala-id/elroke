@@ -27,6 +27,7 @@
 #include <QHeaderView>
 #include <QSizePolicy>
 #include <QSqlError>
+#include <QComboBox>
 #include <QMessageBox>
 #include <QtAlgorithms> // for qSort()
 
@@ -135,56 +136,141 @@ managedb::managedb(QWidget *parent) :
     auto frame_left_bottom = new QFrame;
 
     auto glo_button = new QGridLayout;
+//column:::: title 1, singer 2, language 3, genre 4, audio 5
+    auto button_title_singer = new QPushButton(tr("Title")+"  \u21C6 "+tr("Singer"), this);
+    connect(button_title_singer, &QPushButton::pressed,[this]()
+    {
+        swapItem(1,2);
+        anyChange = true;
 
-    auto button_title_singer = new QPushButton(tr("Title <--> Singer"), this);
-    connect(button_title_singer, &QPushButton::pressed, this, &managedb::swapTitleSinger);
+    });
 
-    auto button_singer_language = new QPushButton(tr("Singer <--> Language"), this);
-    connect(button_singer_language,&QPushButton::pressed,this,&managedb::swapSingerLanguage);
+    auto button_singer_language = new QPushButton(tr("Singer")+" \u21C6 "+tr("Language"), this);
+    connect(button_singer_language,&QPushButton::pressed,[this]()
+    {
+        swapItem(2,3);
+        anyChange = true;
 
-    auto button_title_language = new QPushButton(tr("Title <--> Language"), this);
-    connect(button_title_language, &QPushButton::pressed,this,&managedb::swapTitleLanguage);
+    });
 
-    auto button_singer_category = new QPushButton(tr("Singer <--> Category"),this);
-    connect(button_singer_category,&QPushButton::pressed,this,&managedb::swapSingerCategory);
+    auto button_title_language = new QPushButton(tr("Title")+" \u21C6 "+tr("Language"), this);
+    connect(button_title_language, &QPushButton::pressed,[this]()
+    {
+        swapItem(1,3);
+        anyChange = true;
 
-    auto button_title_category = new QPushButton(tr("Title <--> Category"), this);
-    connect(button_title_category,&QPushButton::pressed,this,&managedb::swapTitleCategory);
+    });
 
-    auto button_language_category = new QPushButton(tr("Language <--> Category"), this);
-    connect(button_language_category,&QPushButton::pressed,this,&managedb::swapLanguageCategory);
+    auto button_singer_category = new QPushButton(tr("Singer")+" \u21C6  "+tr("Genre"),this);
+    connect(button_singer_category,&QPushButton::pressed,[this]()
+    {
+        swapItem(2,4);
+        anyChange = true;
 
-    auto button_set_title = new QPushButton(tr("Set Title"), this);
-    connect(button_set_title,&QPushButton::pressed,this,&managedb::setTitle);
+    });
 
-    le_set_title = new CLineEdit(this);
+    auto button_title_category = new QPushButton(tr("Title")+" \u21C6 "+tr("Genre"), this);
+    connect(button_title_category,&QPushButton::pressed,[this]()
+    {
+        swapItem(1,4);
+        anyChange = true;
+
+    });
+
+    auto button_language_category = new QPushButton(tr("Language")+" \u21C6 "+tr("Genre"), this);
+    connect(button_language_category,&QPushButton::pressed,[this]()
+    {
+        swapItem(3,4);
+        anyChange = true;
+
+    });
+    auto button_title_audio  = new QPushButton(tr("Title")+" \u21C6 "+tr("Audio"), this);
+    connect(button_title_audio,&QPushButton::pressed,[this]()
+    {
+        swapItem(1,5);
+        anyChange = true;
+
+    });
+
+    auto button_singer_audio = new QPushButton(tr("SInger")+" \u21C6 "+tr("Audio"),this);
+    connect(button_singer_audio,&QPushButton::pressed,[this]()
+    {
+        swapItem(2,5);
+        anyChange = true;
+
+    });
+
+    auto button_language_audio = new QPushButton(tr("Language")+" \u21C6 "+tr("Audio"),this);
+    connect(button_language_audio,&QPushButton::pressed,[this]()
+    {
+        swapItem(3,5);
+        anyChange = true;
+
+    });
+
+    auto button_genre_audio = new QPushButton(tr("Genre")+" \u21C6 "+tr("Audio"), this);
+    connect(button_genre_audio,&QPushButton::pressed,[this]()
+    {
+        swapItem(4,5);
+        anyChange = true;
+
+    });
+
+   auto  le_set_title = new QLineEdit(this);
     le_set_title->setPlaceholderText(tr("Title"));
 
-    auto button_set_singer = new QPushButton(tr("Set Singer"), this);
-    connect(button_set_singer,&QPushButton::pressed,this,&managedb::setSinger);
+    auto button_set_title = new QPushButton(tr("Set Title"), this);
+    connect(button_set_title,&QPushButton::pressed,[this,le_set_title]()
+    {
+        if(!le_set_title->text().isEmpty())
+        setitem(le_set_title->text(), 1);
+        anyChange=true;
+    });
 
-    le_set_singer = new CLineEdit(this);
+   auto le_set_singer = new QLineEdit(this);
     le_set_singer->setPlaceholderText(tr("Singer"));
 
-    auto button_set_language = new QPushButton(tr("Set Language"), this);
-    connect(button_set_language,&QPushButton::pressed,this,&managedb::setLanguage);
+    auto button_set_singer = new QPushButton(tr("Set Singer"), this);
+    connect(button_set_singer,&QPushButton::pressed,[this,le_set_singer]()
+    {
+        if(!le_set_singer->text().isEmpty())
+        setitem(le_set_singer->text(), 2);
+        anyChange=true;
+    });
 
-    le_set_language = new CLineEdit(this);
+  auto  le_set_language = new QLineEdit(this);
     le_set_language->setPlaceholderText(tr("Language"));
 
-    auto button_set_category = new QPushButton(tr("Set Category"), this);
-    connect(button_set_category,&QPushButton::pressed,this,&managedb::setCategory);
+    auto button_set_language = new QPushButton(tr("Set Language"), this);
+    connect(button_set_language,&QPushButton::pressed,[this,le_set_language]()
+    {
+        if(!le_set_language->text().isEmpty())
+        setitem(le_set_language->text(), 3);
+        anyChange=true;
+    });
 
-    le_set_category = new CLineEdit(this);
+   auto le_set_category = new QLineEdit(this);
     le_set_category->setPlaceholderText(tr("Genre"));
 
-    combo_audio_channel = new QComboBox(this);
+    auto button_set_category = new QPushButton(tr("Set Category"), this);
+    connect(button_set_category,&QPushButton::pressed,[this, le_set_category]()
+    {
+        if(!le_set_category->text().isEmpty())
+        setitem(le_set_category->text(), 4);
+        anyChange=true;
+    });
+
+    auto combo_audio_channel = new QComboBox(this);
     combo_audio_channel->addItem("LEFT");
     combo_audio_channel->addItem("RIGHT");
     combo_audio_channel->addItem("STEREO");
 
     auto button_set_audio_channel = new QPushButton(tr("Set Audio Channel"));
-    connect(button_set_audio_channel,&QPushButton::pressed,this,&managedb::setAudioChannel);
+    connect(button_set_audio_channel,&QPushButton::pressed,[this, combo_audio_channel]()
+    {
+        setitem(combo_audio_channel->currentText(),5);
+        anyChange=true;
+    });
 
     table = new QTableView(this);
 
@@ -225,22 +311,29 @@ managedb::managedb(QWidget *parent) :
     glo_button->addWidget(button_singer_category,1,1);
     glo_button->addWidget(button_title_category,2,0);
     glo_button->addWidget(button_language_category,2,1);
-    glo_button->addWidget(button_set_title,3,1);
-    glo_button->addWidget(le_set_title,3,0);
-    glo_button->addWidget(button_set_singer,4,1);
-    glo_button->addWidget(le_set_singer,4,0);
-    glo_button->addWidget(button_set_language,5,1);
-    glo_button->addWidget(le_set_language,5,0);
-    glo_button->addWidget(button_set_category,6,1);
-    glo_button->addWidget(le_set_category,6,0);
-    glo_button->addWidget(combo_audio_channel,7,0);
-    glo_button->addWidget(button_set_audio_channel,7,1);
-    glo_button->addWidget(button_selectall,8,1);
-    glo_button->addWidget(button_delete_selected,8,0);
-    glo_button->addWidget(button_save,9,0);
-    glo_button->addWidget(button_unselect,9,1);
-    glo_button->addWidget(button_close,10,0);
-    glo_button->addWidget(button_undo,10,1);
+    glo_button->addWidget(button_title_audio,3,0);
+    glo_button->addWidget(button_singer_audio,3,1);
+    glo_button->addWidget(button_language_audio,4,0);
+    glo_button->addWidget(button_genre_audio,4,1);
+    glo_button->addWidget(le_set_title,5,0);
+
+
+    glo_button->addWidget(button_set_title,5,1);
+
+    glo_button->addWidget(button_set_singer,6,1);
+    glo_button->addWidget(le_set_singer,6,0);
+    glo_button->addWidget(button_set_language,7,1);
+    glo_button->addWidget(le_set_language,7,0);
+    glo_button->addWidget(button_set_category,8,1);
+    glo_button->addWidget(le_set_category,8,0);
+    glo_button->addWidget(combo_audio_channel,9,0);
+    glo_button->addWidget(button_set_audio_channel,9,1);
+    glo_button->addWidget(button_selectall,10,1);
+    glo_button->addWidget(button_delete_selected,10,0);
+    glo_button->addWidget(button_save,11,0);
+    glo_button->addWidget(button_unselect,11,1);
+    glo_button->addWidget(button_close,12,0);
+    glo_button->addWidget(button_undo,12,1);
     glo_button->setMargin(0);
     frame_left_bottom->setLayout(glo_button);
 
@@ -253,15 +346,15 @@ managedb::managedb(QWidget *parent) :
 //right bottom
     auto lo_search = new QHBoxLayout;
 
-    le_search = new CLineEdit(this);
+    le_search = new QLineEdit(this);
     le_search->setMaximumWidth(300);
     le_search->setPlaceholderText(tr("SEARCH"));
-    connect(le_search,&CLineEdit::textChanged,proxy_model,&ProxyModel::search);
+    connect(le_search,&QLineEdit::textChanged,proxy_model,&ProxyModel::search);
 
-    auto le_jump = new CLineEdit(this);
+    auto le_jump = new QLineEdit(this);
     le_jump->setFixedWidth(100);
     le_jump->setValidator(new QIntValidator(this));
-    connect(le_jump,&CLineEdit::textChanged,this,&managedb::jumpTo);
+    connect(le_jump,&QLineEdit::textChanged,this,&managedb::jumpTo);
 
     auto scroll_top = new QPushButton(tr("Top"), this);
     connect(scroll_top,&QPushButton::pressed,table,&QTableView::scrollToTop);
@@ -363,17 +456,11 @@ managedb::managedb(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
-     setLayout(lo_main);
-     resize(800,600);
+    setLayout(lo_main);
+
 }
 
-void managedb::swapTitleSinger()
-{
-    swapItem(1,2);
-    anyChange=true;
-}
-
-void managedb::swapItem(int column1, int column2)
+void managedb::swapItem(const int column1, const int column2)
 {
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
 
@@ -387,36 +474,7 @@ void managedb::swapItem(int column1, int column2)
     }
 }
 
-void managedb::swapSingerLanguage()
-{
-    swapItem(2,3);
-    anyChange=true;
-}
-
-void managedb::swapTitleLanguage()
-{
-   swapItem(1,3);
-   anyChange=true;
-}
-void managedb::swapSingerCategory()
-{
-   swapItem(2,4);
-   anyChange=true;
-}
-
-void managedb::swapTitleCategory()
-{
-    swapItem(1,4);
-    anyChange=true;
-}
-
-void managedb::swapLanguageCategory()
-{
-    swapItem(3,4);
-    anyChange=true;
-}
-
-void managedb::setitem(QString text, int column)
+void managedb::setitem(const QString &text, const int column)
 {
     QModelIndexList list_selected = table->selectionModel()->selectedRows();
     unsigned short  int r=0;
@@ -429,39 +487,6 @@ void managedb::setitem(QString text, int column)
    QModelIndex index = table->indexAt(QPoint(0,0));
    if(!index.isValid())
        proxy_model->reset();
-}
-
-void managedb::setTitle()
-{
-    if(!le_set_title->text().isEmpty())
-    setitem(le_set_title->text(), 1);
-    anyChange=true;
-}
-
-void managedb::setSinger()
-{
-    if(!le_set_singer->text().isEmpty())
-    setitem(le_set_singer->text(), 2);
-    anyChange=true;
-}
-
-void managedb::setLanguage()
-{
-    if(!le_set_language->text().isEmpty())
-    setitem(le_set_language->text(), 3);
-    anyChange=true;
-}
-void managedb::setCategory(){
-
-    if(!le_set_category->text().isEmpty())
-    setitem(le_set_category->text(), 4);
-    anyChange=true;
-}
-
-void managedb::setAudioChannel()
-{
-    setitem(combo_audio_channel->currentText(),5);
-    anyChange=true;
 }
 
 void managedb::deleteItem()
@@ -539,14 +564,13 @@ void managedb::onListWidgetClicked(QListWidgetItem * item)
         column=4;
 
      proxy_model->fixSearchByColumn(column, text);
-  if(obj==list_folder)
-    {
-            column=7;
-            proxy_model->searchByColumn(column, text);
-    }
+      if(obj==list_folder)
+        {
+                column=7;
+                proxy_model->searchByColumn(column, text);
+        }
 
-
-    setCursor(Qt::ArrowCursor);
+      setCursor(Qt::ArrowCursor);
 }
 
 void managedb::updateList()
@@ -625,36 +649,12 @@ void managedb::writeTextStream(const QString &file, QList<QString>set){
          f.close();
 }
 
-
-
-//void managedb::comboSearchChange(int i){
-//    QVariantList list;
-//    list.append(i);
-//    QString text = le_search->text();
-//    if(text==NULL)
-//        return;
-
-//    list.append(text);
-
-////    emit toSearch(list);
-//}
-
-void managedb::receiverSearch(QString s){
-
-    QVariantList list;
-    list.append(combo_search->currentIndex());
-    list.append(s);
-
-//    emit toSearch(list);
-}
-
 void managedb::jumpTo(QString t)
 {
     bool a;
     int x = t.toInt(&a);
     if(a)
     table->scrollTo( table->model()->index(x-1,0), QAbstractItemView::PositionAtTop);
-
 }
 
 void managedb::renameFile()

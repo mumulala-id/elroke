@@ -171,6 +171,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     auto layout_pattern = new QVBoxLayout;
 
     auto view_choose_pattern = new myListWidget(this);
+    view_choose_pattern->setObjectName("sender");
     view_choose_pattern->setFlow(QListView::LeftToRight);
     view_choose_pattern->setDragEnabled(true);
     view_choose_pattern->setDragDropMode(QAbstractItemView::DragDrop);
@@ -187,6 +188,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      }
 
     view_pattern = new myListWidget(this);
+    view_pattern->setObjectName("receiver");
     view_pattern->setFlow(QListView::LeftToRight);
     view_pattern->setDragEnabled(true);
     view_pattern->setDragDropMode(QAbstractItemView::DragDrop);
@@ -197,6 +199,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
     connect(view_choose_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
     connect(view_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
     label_pattern = new QLabel(this);
+    QPalette p = label_pattern->palette();
+    p.setColor(QPalette::WindowText,Qt::red);
+    label_pattern->setPalette(p);
 
     layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag)"), this));
     layout_pattern->addWidget(view_choose_pattern);
@@ -502,7 +507,6 @@ void addtodatabase::saveToDatabase()
         set_genre.insert(genre.toUpper());
         set_folder.insert(folder);
 
-
         data.append(title);
         data.append(singer);
         data.append(language);
@@ -514,7 +518,6 @@ void addtodatabase::saveToDatabase()
         data.clear();
 
         }
-
     }
     else//automatic
     {
@@ -595,7 +598,6 @@ void addtodatabase::saveToDatabase()
 
             sql_ok =  db->insertIntoTable(data);
             data.clear();
-
         }
     }
 
@@ -619,9 +621,7 @@ void addtodatabase::saveToDatabase()
     writeTextStream(data_dir+"/meta/path", set_folder);
 
      setCursor(Qt::ArrowCursor);
-
-      accept();
-
+     accept();
  }
 
 void addtodatabase::writeTextStream(const QString &file, QSet<QString>set)
@@ -698,12 +698,25 @@ QString addtodatabase::getSplitter(const QString &filename)
 }
 
 void addtodatabase::pattern(){
-    QStringList p;
-    for(int i=0;i < view_pattern->count();i++)
-    {
-        auto item = view_pattern->item(i);
-        p<<item->data(Qt::DisplayRole).toString();
-    }
+   QString obj = sender()->objectName();
+   QStringList p;
+        for(int i=0; i < view_pattern->count();i++)
+        {
+            auto item = view_pattern->item(i);
+            p<<item->data(Qt::DisplayRole).toString();
+        }
+    if(obj == "sender"){
+        myListWidget *sdr = qobject_cast<myListWidget*>(sender());
+        QStringList ori ;
+        for(int i=0; i < sdr->count();i++)
+        {
+            auto item = sdr->item(i);
+             ori<<item->data(Qt::DisplayRole).toString();
+        }
 
+        foreach (QString s, ori ) {
+            p.removeAll(s);
+        }
+    }
    label_pattern->setText(p.join(splitter));
 }

@@ -66,7 +66,7 @@ private :
     QComboBox *combo_drive;
     QString default_singer="UNKNOWN";
     QString default_language="UNKNOWN";
-    QString default_genre="UNKNWON";
+    QString default_genre="UNKNOWN";
     QString default_audio="UNKNOWN";
     myListWidget *view_pattern;
 

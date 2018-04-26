@@ -46,7 +46,7 @@ public:
     explicit preferences(QWidget *parent = nullptr);
     ~preferences();
 private :
-    QStackedLayout *stack;
+//    QStackedLayout *stack;
     QString selected_font,selected_background;
     unsigned short  int font_size;
     QCheckBox *check_startapp;

@@ -132,8 +132,8 @@ QVariant ProxyModel::headerData(int section, Qt::Orientation orientation, int ro
             case 1: return tr("TITLE"); break;
             case 2: return tr("SINGER"); break;
             case 3: return tr("LANGUAGE"); break;
-            case 4: return tr("CATEGORY"); break;
-            case 5 : return tr("CHANNEL"); break;
+            case 4: return tr("GENRE"); break;
+            case 5 : return tr("AUDIO"); break;
             case 6 : return tr("PLAYTIMES"); break;
             case 7 : return tr("PATH"); break;
             case 8 : return tr("DATE"); break;

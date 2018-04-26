@@ -1025,6 +1025,7 @@ void mainWindow::dialogAdmin()
             }
         });
         md->setModal(true);
+//        md->setParent(dialog_admin);
     md->showFullScreen();
 
     });
@@ -1334,20 +1335,18 @@ void mainWindow::handleFavorite(){
     } else {
         buttonFavorite->setIcon(QIcon(":/usr/share/elroke/icon/unfavorite.png"));
     }
-
 }
 
 mainWindow::~mainWindow()
 {
-
     delete video;
+    if(playlist_widget->count()>0){
     if (autosave_playlist->isChecked())
         writePlaylist();
+    }
 }
 
 void mainWindow::filterLanguageGenre(){
     QPushButton *b = qobject_cast<QPushButton*>(sender());
     proxy_model->filterByLanguageGenre(b->text());
-
-
 }

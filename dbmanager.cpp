@@ -70,7 +70,7 @@ bool dbmanager::openDB()
 bool dbmanager::createTable()
 {
     QSqlQuery query(db);
-    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT , DATE TEXT, FAVORITE TEXT)");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT NOT NULL , DATE TEXT, FAVORITE TEXT, UNIQUE (PATH))");
 
     if(query.exec())
         return true;
@@ -122,7 +122,7 @@ bool dbmanager::insertIntoTable(const QVariantList &data)
      return true;
 }
 
-void dbmanager::updatePlayedTime(QString id)
+void dbmanager::updatePlayedTime(const QString &id)
 {
     QSqlQuery query(db);
     uint value=0;
@@ -140,7 +140,7 @@ void dbmanager::updatePlayedTime(QString id)
         qDebug()<<"cant update played time";
 }
 
-void dbmanager::updatePath(QString id, QString path)
+void dbmanager::updatePath(const QString &id, const QString &path)
 {
     QSqlQuery query(db);
      query.prepare("UPDATE ELROKE123 SET PATH ="+path+" WHERE ID = "+id);
@@ -149,7 +149,7 @@ void dbmanager::updatePath(QString id, QString path)
          qDebug()<<"cant update path";
 }
 
-Song* dbmanager::getSong(QString id)
+Song* dbmanager::getSong(const QString &id)
 {
     QSqlQuery query(db); 
     QSqlRecord rec;
