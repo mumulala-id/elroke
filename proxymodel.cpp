@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QVariant>
 
+
 ProxyModel::ProxyModel(QObject *parent): QSortFilterProxyModel(parent),
     text_search("")
 {
@@ -119,6 +120,13 @@ bool ProxyModel::filterAcceptsRow(int source_row, const QModelIndex &source_pare
       return QString::compare(text_search, lang,Qt::CaseInsensitive)==0 || QString::compare(text_search,genre,Qt::CaseInsensitive)==0;
 
     }
+
+    else if(md == ProxyModel::Date){
+        QModelIndex index= sourceModel()->index(source_row,8,source_parent);
+        QString s_date =sourceModel()->data(index).toString();
+        QDate date = QDate::fromString(s_date,"yyyy-MM-dd");
+        return dateInRange(date);
+    }
     return true;
 }
 
@@ -160,8 +168,6 @@ QVariant ProxyModel::data(const QModelIndex &index, int role) const
         }
 
     }
-    if(role==sortRole)
-        return QVariant().toInt();
 
     return QSortFilterProxyModel::data(index, role);
 }
@@ -179,28 +185,6 @@ void ProxyModel::clearAlign()
     alignMap.clear();
 }
 
-bool ProxyModel::lessThan(const QModelIndex &left,
-                                      const QModelIndex &right) const
-{
-    QVariant leftData = sourceModel()->data(left);
-    QVariant rightData = sourceModel()->data(right);
-
-    if (leftData.type() == QVariant::Int)
-    {
-           return leftData.toInt() < rightData.toInt();
-    }
-    else{
-        QString leftString = leftData.toString();
-//               if(left.column() == 1 && emailPattern.indexIn(leftString) != -1)
-//                   leftString = emailPattern.cap(1);
-
-               QString rightString = rightData.toString();
-//               if(right.column() == 1 && emailPattern.indexIn(rightString) != -1)
-//                   rightString = emailPattern.cap(1);
-
-               return leftString < rightString;
-    }
-}
 void ProxyModel::reset(){
 //    _colom =  0;
 //    text_search ="";
@@ -216,5 +200,22 @@ void ProxyModel::toBeFixed(){
 void ProxyModel::filterFavorite()
 {
     md = ProxyModel::favorite;
+    invalidateFilter();
+}
+
+void ProxyModel::setLimitMonth(int month){
+
+    QDate d = QDate::currentDate();
+    limit_date = d.addMonths(-month);
+}
+
+bool ProxyModel::dateInRange(QDate d) const
+{
+    return (d > limit_date && d < QDate::currentDate());
+}
+
+void ProxyModel::filterByDate()
+{
+    md=ProxyModel::Date;
     invalidateFilter();
 }

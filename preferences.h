@@ -46,7 +46,6 @@ public:
     explicit preferences(QWidget *parent = nullptr);
     ~preferences();
 private :
-//    QStackedLayout *stack;
     QString selected_font,selected_background;
     unsigned short  int font_size;
     QCheckBox *check_startapp;
@@ -59,6 +58,8 @@ private :
     bool startup=false;
     QString language;
     QListWidget *list_menu_selected;
+    uint newEntriesLimit;
+    QSpinBox *spin_limit_month_newEntries ;
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);

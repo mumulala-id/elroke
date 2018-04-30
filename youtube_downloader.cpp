@@ -14,7 +14,9 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebElement>
+#include <QApplication>
 #include <QDebug>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QLabel>
 #include <QFileDialog>
@@ -22,6 +24,7 @@
 #include <QHeaderView>
 #include <QProgressBar>
 #include <QEventLoop>
+#include <memory>
 
 YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     : QWidget(parent)
@@ -43,7 +46,7 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     layout_edit->addStretch();
 
     view = new QWebView(this);
-    connect(view,&QWebView::linkClicked,this,&YoutubeDownloader::on_searchWebView_linkClicked);
+    connect(view,&QWebView::linkClicked,this,&YoutubeDownloader::create_item);
 
     searchNam = new QNetworkAccessManager();
 
@@ -82,16 +85,6 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     layout_output_path->addWidget(dir_edit);
     layout_output_path->addWidget(button_get_path);
 
-    auto layout_button_addition = new QHBoxLayout;
-
-    auto button_add = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"), "", this);
-    auto button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"), "", this);
-
-    layout_button_addition->addWidget(button_add);
-    layout_button_addition->addWidget(button_delete);
-    layout_button_addition->addStretch();
-    layout_button_addition->setMargin(0);
-    layout_button_addition->setSpacing(0);
 
    //table
     tview = new QTableView(this);
@@ -104,9 +97,24 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     model->setHorizontalHeaderLabels(QStringList()<<tr("Title")<<tr("Link")<<tr("Status"));
     tview->setModel(model);
 
+
+
+    auto layout_button_addition = new QHBoxLayout;
+
+    auto button_add = new QPushButton(QIcon(":/usr/share/elroke/icon/plus.png"), "", this);
+   connect(button_add,&QPushButton::pressed,this,&YoutubeDownloader::addByUrl);
+
+    auto button_delete = new QPushButton(QIcon(":/usr/share/elroke/icon/minus.png"), "", this);
     connect(button_delete,&QPushButton::pressed,[this](){
        model->removeRow(tview->currentIndex().row());
     });
+
+    layout_button_addition->addWidget(button_add);
+    layout_button_addition->addWidget(button_delete);
+    layout_button_addition->addStretch();
+    layout_button_addition->setMargin(0);
+    layout_button_addition->setSpacing(0);
+
 
     process  = new QProcess(this);
     process->setProcessChannelMode(QProcess::MergedChannels);
@@ -115,7 +123,7 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     connect(process,&QProcess::readyReadStandardOutput,[this](){
     QString output = process->readAllStandardOutput();
 
-    QRegExp regex("(\\d+).*%");
+    QRegExp regex("(\\d+).\\d%");
     regex.setMinimal(true);
 
     QString numb;
@@ -123,13 +131,11 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
 
     while ((pos = regex.indexIn(output, pos)) != -1)
     {
-         numb = regex.cap(0).remove(QChar('%'));
+         numb = regex.cap(1);
          pos += regex.matchedLength();
     }
 
-    float cur = numb.toFloat();
-
-    emit progress(static_cast<int>(cur));
+    emit progress(numb.toInt());
 
     });
 
@@ -139,13 +145,15 @@ YoutubeDownloader::YoutubeDownloader(QWidget *parent)
     connect(button_download,SIGNAL(pressed()),this,SLOT(beginDownload()));
 
     auto button_cancel = new QPushButton(tr("Cancel"), this);
+    connect(button_cancel,&QPushButton::pressed,process,&QProcess::kill);
 
     layout_button->addWidget(button_cancel);
     layout_button->addWidget(button_download);
 
     layout_control->addLayout(layout_output_path);
-    layout_control->addLayout(layout_button_addition);
+
     layout_control->addWidget(tview);
+    layout_control->addLayout(layout_button_addition);
     layout_control->addLayout(layout_button);
     layout_control->setSpacing(0);
 
@@ -185,7 +193,7 @@ void YoutubeDownloader::processSearchReply(){
 
     QWebElementCollection entries = page->mainFrame()->findAllElements(".yt-lockup");
 
-    int limit = 30;
+    int limit = 20;
     if (searchReply->url().toString() == "https://www.youtube.com") {
         limit = 8;
     }
@@ -200,18 +208,14 @@ void YoutubeDownloader::processSearchReply(){
         QString duration = entry.findFirst(".video-time").toPlainText();
         QString thumbnail = entry.findFirst(".yt-thumb img").attribute("data-thumb");
         if (thumbnail.isEmpty())
-        {
             thumbnail = entry.findFirst(".yt-thumb img").attribute("src");
-        }
+
         if (thumbnail.startsWith("//"))
-        {
-            thumbnail.prepend("https:");
-        }
+             thumbnail.prepend("https:");
 
         QString link = entry.findFirst("a.spf-link").attribute("href", "");
-        if (!link.startsWith("/watch")) {
+        if (!link.startsWith("/watch"))
             continue;
-        }
 
         searchHtml.append("<a href=\"https://www.youtube.com" + link + "\" class=\"entry\">");
         searchHtml.append("<span class=\"title\">" + entry.findFirst("h3 a.spf-link").toPlainText() + "</span>");
@@ -231,10 +235,9 @@ void YoutubeDownloader::processSearchReply(){
 
 }
 
-void YoutubeDownloader::on_searchWebView_linkClicked(QUrl _url)
+void YoutubeDownloader::create_item(QUrl _url)
 {
     url = _url.toString();
-
     if (searchReply)
     {
         searchReply->abort();
@@ -330,14 +333,70 @@ void YoutubeDownloader::download(int exit)
     currentRow++;
 }
 
-//void YoutubeDownloader::errorHandler(QNetworkReply::NetworkError err){
+void YoutubeDownloader::urlCheck(const QString &url){
+    if(url.isEmpty())
+        return;
+    auto proc = new QProcess(this);
 
-//    QString error = searchReply->errorString();
-//qDebug()<<error;
-////view->
-//    view->setHtml("<body>test</body>");
-//    view->update();
-//}
+    QStringList arg;
+    proc->setProgram("youtube-dl");
+    arg <<"-j"<<url;
+    proc->setArguments(arg);
+
+    connect(proc,static_cast<void(QProcess::*)(int)>(&QProcess::finished),[this,proc,url](int c){
+    if(c==0){
+       create_item(QUrl::fromUserInput(url));
+       emit urlChecked(true);
+    }
+    else if(c==1){
+        emit urlChecked(false);
+    }
+    proc->deleteLater();
+    });
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    proc->start();
+    proc->waitForFinished();
+    QApplication::restoreOverrideCursor();
+}
+void YoutubeDownloader::addByUrl(){
+
+    auto dialog = new QDialog(this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+//    auto label
+    auto ledit = new QLineEdit(dialog);
+
+    connect(this,&YoutubeDownloader::urlChecked,[this,dialog](bool valid){
+        if(valid){
+            dialog->close();
+        } else{
+            qDebug()<<valid;
+           QMessageBox msg;
+           msg.setWindowFlags(Qt::Popup);
+           msg.setInformativeText("Unsupported URL");
+           msg.exec();
+        }
+    });
+
+    auto layout_button = new QHBoxLayout;
+    auto button_add = new QPushButton(tr("Add"), dialog);
+    connect(button_add,&QPushButton::pressed,[this, ledit]()
+    {
+        urlCheck(ledit->text());
+    });
+
+    auto button_cancel = new QPushButton(tr("Cancel"), dialog);
+    connect(button_cancel,&QPushButton::pressed,dialog,&QDialog::close);
+    layout_button->addWidget(button_cancel);
+    layout_button->addWidget(button_add);
+
+    auto layout_dialog= new QVBoxLayout;
+    layout_dialog->addWidget(new QLabel("Add URL",dialog));
+    layout_dialog->addWidget(ledit);
+    layout_dialog->addLayout(layout_button);
+    dialog->setLayout(layout_dialog);
+    dialog->setModal(true);
+    dialog->show();
+}
 
 YoutubeDownloader::~YoutubeDownloader()
 {

@@ -108,6 +108,7 @@ private :
    unsigned short  int font_size;
    Scoring *scoring;
    QPushButton *buttonFavorite;
+   uint newEntriesLimit;
 
 private slots:
     void dialogAdmin();

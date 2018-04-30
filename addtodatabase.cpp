@@ -308,10 +308,19 @@ addtodatabase::addtodatabase(QWidget *parent) :
    spBottom.setVerticalStretch(1);
    widget_bottom->setSizePolicy(spBottom);
 
+   auto layout_button = new QHBoxLayout;
+   auto button_cancel = new QPushButton(tr("Cancel"), this);
+   connect(button_cancel,&QPushButton::pressed,this,&addtodatabase::close);
+
+  button_start = new QPushButton(tr("Start"), this);
+  button_start->setEnabled(0);
+  connect(button_start,&QPushButton::pressed,this,&addtodatabase::saveToDatabase);
+
    auto local_widget = new QWidget(this);
    auto layout_local = new QVBoxLayout;
    layout_local->addWidget(widget_top);
    layout_local->addWidget(widget_bottom);
+   layout_local->addLayout(layout_button);
    local_widget->setLayout(layout_local);
 
 //########################network widget############################
@@ -333,19 +342,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_main->addWidget(tabbar);
    layout_main->addLayout(stack);
 
-   auto layout_button = new QHBoxLayout;
-
-   auto button_cancel = new QPushButton(tr("Cancel"), this);
-   connect(button_cancel,&QPushButton::pressed,this,&addtodatabase::close);
-
-  button_start = new QPushButton(tr("Start"), this);
-  button_start->setEnabled(0);
-  connect(button_start,&QPushButton::pressed,this,&addtodatabase::saveToDatabase);
-
    layout_button->addStretch();
    layout_button->addWidget(button_cancel);
    layout_button->addWidget(button_start);
-   layout_main->addLayout(layout_button);
 
     QPalette palet;
     palet.setColor(QPalette::Base, palette().light().color());
@@ -355,9 +354,6 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::Button, palette().dark().color());
     setPalette(palet);
     setLayout(layout_main);
-//    resize(800,600);
-
-//    setWindowState(Qt::WindowFullScreen);
 }
 
 void addtodatabase::getItem()

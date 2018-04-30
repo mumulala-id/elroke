@@ -50,7 +50,6 @@ mainWindow::mainWindow(QWidget *parent)
     createShortcut();
     setBackground();
 
-//    getCategory();
     setWindowFlags(Qt::FramelessWindowHint);
 }
 
@@ -73,7 +72,7 @@ void mainWindow::createWidgets()
     le_search->setPlaceholderText(tr("SEARCH"));
 
     QPalette button_cat_palette;
-    button_cat_palette.setColor(QPalette::Button, QColor("#80cbc4"));
+    button_cat_palette.setColor(QPalette::Button, QColor("#4DB6AC"));
    button_cat_palette.setColor(QPalette::ButtonText,Qt::white);
 
     auto cat_button = [this,button_cat_palette](const QString &title){
@@ -91,8 +90,9 @@ void mainWindow::createWidgets()
     {
         proxy_model->search("");
     });
+    auto button_hits = cat_button(tr("HITS"));
 
-    auto button_fav = cat_button(tr("Favorite"));
+    auto button_fav = cat_button(tr("FAVORITE"));
     connect(button_fav,&QPushButton::pressed,[this]()
     {
         sql_model->select();
@@ -102,11 +102,19 @@ void mainWindow::createWidgets()
         proxy_model->filterFavorite();
     });
 
+    auto button_newEntries = cat_button(tr("NEW ENTRIES"));
+    connect(button_newEntries ,&QPushButton::pressed,[this]()
+    {
+        proxy_model->filterByDate();
+    });
+
     layout_top->addWidget(pb_menu);
     layout_top->addWidget(le_search);
     layout_top->addSpacing(60);
     layout_top->addWidget(button_show_all);
+    layout_top->addWidget(button_hits);
     layout_top->addWidget(button_fav);
+    layout_top->addWidget(button_newEntries );
 
     for(int i=0;i<shortcut_item.size();i++){
         auto btn = cat_button(shortcut_item.at(i));
@@ -155,6 +163,7 @@ void mainWindow::createWidgets()
     proxy_model->setSourceModel(sql_model);
     proxy_model->setAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
     proxy_model->setAlignment(2, Qt::AlignRight | Qt::AlignVCenter);
+    proxy_model->setLimitMonth(newEntriesLimit);
 
     table = new QTableView(this);
     table->setModel(proxy_model);
@@ -1324,6 +1333,8 @@ void mainWindow::readSettings()
     shortcut_item = setting.value("menu").toStringList();
     if(shortcut_item.isEmpty())
         shortcut_item = QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL";
+    if(newEntriesLimit==0)
+        newEntriesLimit=3;
     setting.endGroup();
 }
 

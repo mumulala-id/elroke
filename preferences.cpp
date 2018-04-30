@@ -3,7 +3,6 @@
 #include <QPushButton>
 #include <QFontComboBox>
 #include <QGroupBox>
-#include <QDialogButtonBox>
 #include <QDebug>
 #include <QFileDialog>
 #include <QListWidget>
@@ -11,6 +10,7 @@
 #include <QDirIterator>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QMessageBox>
 #include "liststringfileparser.h"
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
@@ -157,13 +157,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
 
     group_theme->setLayout(layout_theme);
-//    QListWidget *list_theme = new QListWidget(this);
-
-//    list_theme->ad
-
-
-
-
 
     auto group_menu = new QGroupBox(tr("Menu"), this);
 
@@ -230,6 +223,15 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_language->addWidget(combo_language);
     layout_system->addLayout(layout_language);
 
+    auto layout_limit = new QHBoxLayout;
+    spin_limit_month_newEntries = new QSpinBox(this);
+    spin_limit_month_newEntries->setRange(1,12);
+    spin_limit_month_newEntries->setValue(newEntriesLimit);
+
+    layout_limit->addWidget(new QLabel("Month Limit New Entries", this));
+    layout_limit->addWidget(spin_limit_month_newEntries);
+
+    layout_system->addLayout(layout_limit);
     layout_system->addStretch();
     group_system->setLayout(layout_system);
 
@@ -266,8 +268,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     main_layout->addLayout(layout_button);
     main_layout->addLayout(stack);
     setLayout(main_layout);
-//    setWindowFlags(Qt::FramelessWindowHint);
-//    setModal(true);
+
 }
 
 QStringList preferences::getLanguageGenre()
@@ -286,7 +287,7 @@ QStringList preferences::getLanguageGenre()
 
 void preferences::apply()
 {
-    qDebug()<<"apply";
+
     QDir dir(QDir::homePath()+"/.config/autostart");
     QFile file(dir.path()+"/elroke.desktop");
    if(startup)
@@ -330,10 +331,14 @@ shortcut_item.clear();
     setting.setValue("startup", startup);
     setting.setValue("language", language);
     setting.setValue("menu", QVariant::fromValue(shortcut_item));
+    setting.setValue("limit", spin_limit_month_newEntries->value());
     setting.endGroup();
 }
 void preferences::ok()
 {
+    QMessageBox msg(this);
+    msg.setInformativeText(tr("All change will be applied after app restarted."));
+    msg.exec();
     apply();
     accept();
 }
@@ -348,6 +353,9 @@ void preferences::readSetting()
     startup = setting.value("startup").toBool();
     language = setting.value("language").toString();
     shortcut_item = setting.value("menu").toStringList();
+    newEntriesLimit = setting.value("limit").toInt();
+    if(newEntriesLimit==0)
+        newEntriesLimit=3;
     setting.endGroup();
 }
 

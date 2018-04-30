@@ -3,6 +3,7 @@
 
 #include <QSortFilterProxyModel>
 #include <QMap>
+#include <QDate>
 
 class ProxyModel : public QSortFilterProxyModel
 {
@@ -10,8 +11,7 @@ class ProxyModel : public QSortFilterProxyModel
     QMap<int, Qt::Alignment>alignMap;
 
 public:
-      enum mode{column,smart,fixed,tobefixed,favorite,languageGenre};
-      enum role{sortRole=Qt::UserRole};
+      enum mode{column,smart,fixed,tobefixed,favorite,languageGenre,Date};
 
     explicit ProxyModel(QObject* parent = nullptr);
     explicit ProxyModel(mode, QObject *parent=nullptr);
@@ -28,18 +28,22 @@ public slots:
   void toBeFixed();
   void filterFavorite();
   void filterByLanguageGenre(const QString &);
+  void setLimitMonth(int month);
+  void filterByDate();
   void reset();
 
 private slots:
   void clearAlign();
+  bool dateInRange(QDate) const;
 
 private:
     QString text_search;
     unsigned short int _colom=0;
     mode md;
+    QDate limit_date;
 
-protected :
-    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
+//protected :
+//    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override;
 
 };
 
