@@ -59,11 +59,11 @@ int main(int argc, char *argv[])
 
     QSettings setting("elroke", "elroke");
     setting.beginGroup("Preferences");
-    QString language = setting.value("language").toString();
+    int language = setting.value("language").toInt();
     setting.endGroup();
 
     QTranslator t;
-    if(language!="english"&&language!=NULL)
+    if(language!=0)
     {
         t.load(":/usr/share/elroke/languages/elroke_id.qm");
         a.installTranslator(&t);

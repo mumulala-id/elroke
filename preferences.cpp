@@ -11,6 +11,9 @@
 #include <QFileInfo>
 #include <QTextStream>
 #include <QMessageBox>
+#include <QApplication>
+#include <QProcess>
+#include <QRadioButton>
 #include "liststringfileparser.h"
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
@@ -143,17 +146,62 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     auto group_theme = new QGroupBox(tr("Themes"), this);
 
-    auto layout_theme = new QHBoxLayout;
+    auto layout_theme = new QVBoxLayout;
 
+    auto theme1 =new  ThemeWidget(this);
+    auto theme2 = new ThemeWidget(this);
+    theme2->setPrimaryColor("#FF9800");
+    theme2->setSecondaryColor("#FFD180");
+    theme2->setBackgroundColor("#FFFFFF");
+    theme2->setTextColor(QColor(0,0,0));
+    auto theme3 = new ThemeWidget(this);
+    theme3->setPrimaryColor("#E91E63");
+    theme3->setSecondaryColor("#FF80AB");
 
-    auto theme1 =new  themewidget(this);
-    theme1->setFixedSize(48,48);
-    auto theme2 = new themewidget(this);
-    auto theme3 = new themewidget(this);
+    auto theme4 = new ThemeWidget(this);
+    theme4->setPrimaryColor("#000000");
+    theme4->setSecondaryColor("#212121");
+    theme4->setTextColor("#FFFFFF");
+    theme4->setBackgroundColor("#424242");
 
-    layout_theme->addWidget(theme1);
-    layout_theme->addWidget(theme2);
-    layout_theme->addWidget(theme3);
+     list_theme = new QListWidget(this);
+    list_theme->setFlow(QListView::LeftToRight);
+    list_theme->setFixedHeight(78);
+    list_theme->setSpacing(10);
+//    list_theme->set
+
+    auto item = new QListWidgetItem;
+    list_theme->addItem(item);
+    list_theme->setItemWidget(item, theme1);
+    item->setSizeHint(theme1->size());
+
+    auto item1 = new QListWidgetItem;
+    list_theme->addItem(item1);
+    list_theme->setItemWidget(item1, theme2);
+    item1->setSizeHint(theme2->size());
+
+    auto item2 = new QListWidgetItem;
+    list_theme->addItem(item2);
+    list_theme->setItemWidget(item2, theme3);
+    item2->setSizeHint(theme3->size());
+
+    auto item3 = new QListWidgetItem;
+    list_theme->addItem(item3);
+    list_theme->setItemWidget(item3, theme4);
+    item3->setSizeHint(theme4->size());
+
+    auto layout_colormode = new QHBoxLayout;
+
+    auto radio_light = new QRadioButton(tr("Light"),this);
+    auto radio_dark = new QRadioButton(tr("Dark"),this);
+
+    layout_colormode->addWidget(radio_light);
+    layout_colormode->addWidget(radio_dark);
+
+    layout_theme->addLayout(layout_colormode);
+    layout_theme->addWidget(list_theme);
+
+    layout_theme->addStretch();
 
 
     group_theme->setLayout(layout_theme);
@@ -205,17 +253,11 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     auto combo_language = new QComboBox(this);
     combo_language->addItem("English");
     combo_language->addItem("Bahasa Indonesia");
+    combo_language->setCurrentIndex(language_index);
     connect(combo_language,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[this](int index)
     {
-        switch (index) {
-        case 0:
-            language = "english";
-            break;
-        case 1:
-            language = "indonesian";
-        default:
-            break;
-        }
+       language_index=index;
+
     });
 
     auto layout_language = new QHBoxLayout;
@@ -323,23 +365,40 @@ shortcut_item.clear();
 
   }
 
+  auto themeWIdget =qobject_cast<ThemeWidget*>( list_theme->itemWidget(list_theme->currentItem()));
+//  QStringList theme = themeWIdget->theme().toStringList();
+  QVariantList theme = themeWIdget->theme().toList();
+//  QVariant c;
+//  c.setValue(theme);
+
    QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     setting.setValue("font",selected_font);
     setting.setValue("background", selected_background);
     setting.setValue("font_size", font_size);
     setting.setValue("startup", startup);
-    setting.setValue("language", language);
+    setting.setValue("language", language_index);
     setting.setValue("menu", QVariant::fromValue(shortcut_item));
     setting.setValue("limit", spin_limit_month_newEntries->value());
+    setting.setValue("theme",theme);
     setting.endGroup();
 }
 void preferences::ok()
 {
+
+    apply();
     QMessageBox msg(this);
     msg.setInformativeText(tr("All change will be applied after app restarted."));
+    msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
+    msg.addButton(tr("RESTART"), QMessageBox::AcceptRole);
+    connect(&msg,&QMessageBox::accepted,[this](){
+        qApp->quit();
+        QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+
+    });
+    msg.setWindowFlag(Qt::FramelessWindowHint);
     msg.exec();
-    apply();
+
     accept();
 }
 
@@ -351,7 +410,7 @@ void preferences::readSetting()
     selected_background = setting.value("background").toString();
     font_size = setting.value("font_size").toInt();
     startup = setting.value("startup").toBool();
-    language = setting.value("language").toString();
+    language_index = setting.value("language").toInt();
     shortcut_item = setting.value("menu").toStringList();
     newEntriesLimit = setting.value("limit").toInt();
     if(newEntriesLimit==0)

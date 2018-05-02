@@ -30,7 +30,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     main_layout->setSpacing(4);
     QPalette pal;
     pal.setColor(QPalette::Text,QColor(0,0,0,128));
-    pal.setBrush(QPalette::HighlightedText,Qt::red);
+    pal.setBrush(QPalette::HighlightedText,Qt::yellow);
     setPalette(pal);
     setLayout(main_layout);
 }

@@ -42,9 +42,11 @@ signals :
 class preferences : public QDialog
 {
     Q_OBJECT
+    Q_ENUMS(Language)
 public:
     explicit preferences(QWidget *parent = nullptr);
     ~preferences();
+//    enum Language{English=0,Indonesian=1};
 private :
     QString selected_font,selected_background;
     unsigned short  int font_size;
@@ -56,10 +58,13 @@ private :
     QStandardItemModel *model ;
     resizer *img_resizer;
     bool startup=false;
-    QString language;
+//    QString language;
+    unsigned int short language_index;
     QListWidget *list_menu_selected;
+    QListWidget *list_theme;
     uint newEntriesLimit;
     QSpinBox *spin_limit_month_newEntries ;
+//    Language lang;
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);

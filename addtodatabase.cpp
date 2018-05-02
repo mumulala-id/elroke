@@ -143,11 +143,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
      layout_top->addLayout(layout_list);
 ///////////////////////////////////////////// bottom ///////////////////////////////////////////////
      auto layout_splitter = new QVBoxLayout;
-    auto check_auto = new QCheckBox(tr("Auto"), this);
-    check_auto->setChecked(automatic);
+    auto radio_auto = new QRadioButton(tr("Auto"), this);
+    radio_auto->setChecked(automatic);
 
     auto layout_use_char = new QHBoxLayout;
-    auto check_split_by= new QCheckBox(tr("Split by"), this);
+    auto radio_split_by= new QRadioButton(tr("Split by"), this);
 
     le_splitter = new QLineEdit(this);
     le_splitter->setFixedWidth(30);
@@ -157,10 +157,10 @@ addtodatabase::addtodatabase(QWidget *parent) :
         splitter = text;
     });
 
-    layout_use_char->addWidget(check_split_by);
+    layout_use_char->addWidget(radio_split_by);
     layout_use_char->addWidget(le_splitter);
     layout_use_char->addStretch();
-    layout_splitter->addWidget(check_auto);
+    layout_splitter->addWidget(radio_auto);
     layout_splitter->addLayout(layout_use_char,0);
     layout_splitter->addStretch();
 
@@ -215,7 +215,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     group_pattern->setLayout(layout_pattern);
     group_pattern->setEnabled(!automatic);
 
-   auto layout_additional_item = new QGridLayout;
+   auto layout_additional_item = new QVBoxLayout;
 
    le_singer = new QLineEdit(this);
    le_singer->setText(default_singer);
@@ -224,65 +224,65 @@ addtodatabase::addtodatabase(QWidget *parent) :
    le_genre = new QLineEdit(this);
    le_genre->setText(default_genre);
 
-   auto check_audio_left = new QCheckBox(tr("Left"), this);
-   auto check_audio_right = new QCheckBox(tr("Right"), this);
-   auto check_audio_stereo = new QCheckBox(tr("Stereo"), this);
+   auto radio_audio_left = new QRadioButton(tr("Left"), this);
+   auto radio_audio_right = new QRadioButton(tr("Right"), this);
+   auto radio_audio_stereo = new QRadioButton(tr("Stereo"), this);
 
-    layout_additional_item->addWidget( new QLabel(tr("Singer")),0,0);
-    layout_additional_item->addWidget(le_singer,0,1,1,3);
-    layout_additional_item->addWidget(new QLabel(tr("Language"), this), 1,0);
-    layout_additional_item->addWidget(le_language,1,1,1,3);
-    layout_additional_item->addWidget(new QLabel(tr("Genre"), this),2,0);
-    layout_additional_item->addWidget(le_genre,2,1,1,3);
-    layout_additional_item->addWidget(new QLabel(tr("Audio"), this),3,0);
-    layout_additional_item->addWidget(check_audio_left,3,1);
-    layout_additional_item->addWidget(check_audio_right, 3,2);
-    layout_additional_item->addWidget(check_audio_stereo,3,3);
-    layout_additional_item->setVerticalSpacing(0);
+   auto item = [this](QWidget *a,QWidget *b){
+
+       a->setFixedWidth(140);
+       auto l = new QHBoxLayout;
+      l->addWidget(a);
+       l->addWidget(b);
+
+       auto widget = new QWidget(this);
+       widget->setLayout(l);
+       return widget;
+
+   };
+
+    layout_additional_item->addWidget(item(new QLabel(tr("Singer"),this), le_singer));
+    layout_additional_item->addWidget(item(new QLabel(tr("Language"), this), le_language));
+    layout_additional_item->addWidget(item(new QLabel(tr("Genre"), this),le_genre));
+
+    auto layout_audio = new QHBoxLayout;
+    layout_audio->addWidget(new QLabel("Audio",this));
+    layout_audio->addWidget(radio_audio_left);
+    layout_audio->addWidget(radio_audio_right);
+    layout_audio->addWidget(radio_audio_stereo);
+    layout_additional_item->addLayout(layout_audio);
 
    auto group_metadata = new QGroupBox(tr("Add metadata if not available"));
    group_metadata->setLayout(layout_additional_item);
    group_metadata->setEnabled(!automatic);
 
-   connect(check_audio_left,&QCheckBox::toggled,[this,check_audio_right,check_audio_stereo](bool s)
+   connect(radio_audio_left,&QCheckBox::toggled,[this]()
    {
-       if(s){
-       check_audio_right->setChecked(!s);
-       check_audio_stereo->setChecked(!s);
         default_audio = "LEFT";
-       }
-
    });
 
-   connect(check_audio_right,&QCheckBox::toggled,[this,check_audio_left,check_audio_stereo](bool e)
+   connect(radio_audio_right,&QCheckBox::toggled,[this]()
    {
-       if(e){
-       check_audio_left->setChecked(!e);
-       check_audio_stereo->setChecked(!e);
+
        default_audio = "RIGHT";
-       }
+
    });
 
-   connect(check_audio_stereo,&QCheckBox::toggled,[this,check_audio_left,check_audio_right](bool x)
+   connect(radio_audio_stereo,&QCheckBox::toggled,[this]()
    {
-       if(x){
-       check_audio_left->setChecked(!x);
-       check_audio_right->setChecked(!x);
        default_audio="STEREO";
-       }
+
    });
 
-   connect(check_auto,&QCheckBox::toggled,[this,check_split_by,group_pattern,group_metadata](bool a)
+   connect(radio_auto,&QCheckBox::toggled,[this,radio_split_by,group_pattern,group_metadata](bool a)
    {
        automatic = a;
-       check_split_by->setChecked(!a);
        group_pattern->setEnabled(!a);
        group_metadata->setEnabled(!a);
    });
-   connect(check_split_by,&QCheckBox::toggled,[this, check_auto,group_pattern,group_metadata](bool c)
+   connect(radio_split_by,&QCheckBox::toggled,[this, radio_auto,group_pattern,group_metadata](bool c)
    {
        automatic = !c;
-      check_auto->setChecked(!c);
       group_pattern->setEnabled(c);
       group_metadata->setEnabled(c);
    });
@@ -292,7 +292,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    layout_bottom->addWidget(grup_splitter);
    layout_bottom->addWidget(group_pattern);
    layout_bottom->addWidget(group_metadata);
-   layout_bottom->addStretch();
+//   layout_bottom->addStretch();
 
    auto widget_top = new QWidget(this);
    widget_top->setLayout(layout_top);

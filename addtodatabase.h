@@ -15,6 +15,7 @@
 #include <QLabel>
 #include "youtube_downloader.h"
 #include <QDragMoveEvent>
+#include <QRadioButton>
 class myListWidget :  public QListWidget
 {
     Q_OBJECT

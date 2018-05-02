@@ -30,10 +30,27 @@ Keyboard::Keyboard(QWidget *parent) :
 
     auto main_layout = new QGridLayout;
 
+    auto button = [this](const QString &text){
+        auto btn = new QPushButton(text, this);
+        btn->setMaximumSize(QSize(48,48));
+
+        QFont font=btn->font();
+        font.setPointSize(24);
+
+        btn->setFont(font);
+        btn->setFocusPolicy(Qt::NoFocus);
+        btn->setObjectName(text);
+        connect(btn,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
+
+        return btn;
+
+    };
+
     QString text = "12345FCDBAEIGHJVWXYZ67890QPTNUOMRSLK";
+    QPushButton *keyButton[36];
 
     for(int i=0; i<text.size(); i++){
-        keyButton[i] = createButton(text.at(i));
+        keyButton[i] = button(text.at(i));
         int row = (i/20);
         int column = (i%20);
         main_layout->addWidget(keyButton[i], row, column);
@@ -58,7 +75,6 @@ Keyboard::Keyboard(QWidget *parent) :
     main_layout->addWidget(backspace,1,18,1,2);
     main_layout->setSpacing(0);
     main_layout->setMargin(0);
-    main_layout->setSizeConstraint( QLayout::SetFixedSize );
 
     setLayout(main_layout);
     setWindowFlags(Qt::FramelessWindowHint);
@@ -67,22 +83,6 @@ Keyboard::Keyboard(QWidget *parent) :
     palette.setColor(QPalette::ButtonText,QColor(0,0,0,150));
     palette.setColor(QPalette::Base,Qt::gray);
     setPalette(palette);
-}
-
-QPushButton * Keyboard::createButton( const QString &text){
-
-   auto button = new QPushButton(text, this);
-    button->setMaximumSize(QSize(48,48));
-
-    QFont font;
-    font.setPointSize(24);
-
-    button->setFont(font);
-    button->setFocusPolicy(Qt::NoFocus);
-    button->setObjectName(text);
-    connect(button,&QPushButton::pressed,this,&Keyboard::onButtonClicked);
-
-    return button;
 }
 
 void Keyboard::onButtonClicked(){

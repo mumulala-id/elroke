@@ -56,6 +56,7 @@ mainWindow::mainWindow(QWidget *parent)
 void mainWindow::createWidgets()
 {
     resize(desktop_width, desktop_height);
+
     auto layout_main = new QVBoxLayout;
    auto layout_top = new QHBoxLayout;
    QPalette transparent_button;
@@ -68,12 +69,12 @@ void mainWindow::createWidgets()
     connect(pb_menu,&QPushButton::pressed,this,&mainWindow::dialogLogin);
 
     le_search = new CLineEdit(this);
-//    le_search->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    le_search->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
     le_search->setPlaceholderText(tr("SEARCH"));
 
     QPalette button_cat_palette;
-    button_cat_palette.setColor(QPalette::Button, QColor("#4DB6AC"));
-   button_cat_palette.setColor(QPalette::ButtonText,Qt::white);
+    button_cat_palette.setColor(QPalette::Button, theme.backgroundColor());
+   button_cat_palette.setColor(QPalette::ButtonText,theme.textColor());
 
     auto cat_button = [this,button_cat_palette](const QString &title){
         auto button = new QPushButton(title, this);
@@ -139,7 +140,7 @@ void mainWindow::createWidgets()
 
     auto widget_top = new QWidget(this);
     QPalette top_widget_palette;
-    top_widget_palette.setBrush(QPalette::Background, QColor("#00796B"));
+    top_widget_palette.setBrush(QPalette::Background, theme.primaryColor());
 
     widget_top->setAutoFillBackground(1);
     widget_top->setPalette(top_widget_palette);
@@ -190,13 +191,18 @@ void mainWindow::createWidgets()
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new NoFocusDelegate());
     table->setSortingEnabled(1);
+    table->setAutoFillBackground(true);
     proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
-    header_palette.setColor(QPalette::Button, QColor("#009688"));
+    header_palette.setColor(QPalette::Button, theme.secondaryColor());
     header_palette.setColor(QPalette::ButtonText, Qt::white);
     header_palette.setColor(QPalette::Background, Qt::white);
     table->horizontalHeader()->setPalette(header_palette);
+
+    auto table_palet = table->palette();
+    table_palet.setColor(QPalette::Base,theme.backgroundColor());
+    table->setPalette(table_palet);
 
 //space vertical each item prevent too close beetween items
     QHeaderView *vertical = table->verticalHeader();
@@ -220,6 +226,13 @@ void mainWindow::createWidgets()
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
     playlist_widget->setAutoScroll(1);
     playlist_widget->setItemDelegate(new itemDelegate);
+    playlist_widget->setAutoFillBackground(true);
+
+    QPalette p = playlist_widget->palette();
+    p.setColor(QPalette::Base,theme.backgroundColor());
+//    p.setColor(QPalette::ButtonText,Qt::white);
+
+    playlist_widget->setPalette(p);
 
     connect(playlist_widget,&ListWidget::doubleClicked,this,&mainWindow::playPlayer);
 
@@ -308,7 +321,7 @@ void mainWindow::createWidgets()
 
     widget_control_playlist->setLayout(layout_button_playlist);
     QPalette palt;
-    palt.setBrush(QPalette::Background, QColor("#009688"));
+    palt.setBrush(QPalette::Background, theme.secondaryColor());
     widget_control_playlist->setPalette(palt);
 
     layout_playlist->addWidget(widget_control_playlist);
@@ -341,6 +354,7 @@ void mainWindow::createWidgets()
 
     spinner_progress = new spinnerProgress(this);
     spinner_progress->setFixedSize(64,64);
+    spinner_progress->setAutoFillBackground(true);
 
     auto buttonControl = [this,transparent_button](QIcon icon)
     {
@@ -350,6 +364,7 @@ void mainWindow::createWidgets()
         btn->setIconSize(QSize(48,48));
         btn->setFocusPolicy(Qt::NoFocus);
         btn->setPalette(transparent_button);
+        btn->setAutoFillBackground(true);
         return btn;
     };
 
@@ -447,10 +462,10 @@ void mainWindow::createWidgets()
     layout_player_control->setMargin(0);
 
     auto widget_bottom = new QWidget(this);
-    QPalette plt;
+    QPalette plt = widget_bottom->palette();
     plt.setBrush(QPalette::Background, QColor(255,255,255,200));
 
-    widget_bottom->setAutoFillBackground(1);
+    widget_bottom->setAutoFillBackground(true);
     widget_bottom->setPalette(plt);
     widget_bottom->setLayout(layout_player_control);
     widget_bottom->setFixedHeight(72);
@@ -479,10 +494,7 @@ void mainWindow::createShortcut()
     auto sc_quit = new QShortcut(QKeySequence("Esc"),this);
     connect(sc_quit,&QShortcut::activated,qApp,&QApplication::quit);
 }
-//void mainWindow::getCategory()
-//{
-//    QList <QString> s = listStringFileParser::parse(app_dir+"/meta/genre");
-//}
+
 
 void mainWindow::addToPlaylist()
 {
@@ -492,8 +504,15 @@ void mainWindow::addToPlaylist()
     Song *song =   db->getSong(id);
     songitemwidget *item_song_widget = new songitemwidget;
     item_song_widget->setSong(song);
+    item_song_widget->setAutoFillBackground(true);
+    QPalette p = item_song_widget->palette();
+    p.setColor(QPalette::WindowText,Qt::red);
+    item_song_widget->setPalette(p);
 
     auto item = new QListWidgetItem;
+//    QVariant c;
+//    c.setValue(song);
+//    item->setData(Qt::UserRole+1, c);
     playlist_widget->addItem(item);
     playlist_widget->setItemWidget(item, item_song_widget);
 
@@ -552,15 +571,14 @@ void mainWindow::keyPressEvent(QKeyEvent *event)
 
 void mainWindow::moveItemToTop()
 {
-    if(playlist_widget->count()==0)
+    if(playlist_widget->count()<=1)
         return;
 
     int row = playlist_widget->currentIndex().row();
 //ignore first item
     if (row==0)
-    {
         return;
-    }
+
 //copy song. i'm not sure with this way
         Song *item = new Song;
         songitemwidget *item_current = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->currentItem()));
@@ -590,14 +608,12 @@ void mainWindow::moveItemToTop()
 void mainWindow::setBackground()
 {
     QPixmap bg(background);
-    bg = bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::FastTransformation);
+    bg = bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
     QPalette pal;
-    pal.setColor(QPalette::Window,Qt::black);
-    pal.setColor(QPalette::WindowText,Qt::white);
+//    pal.setColor(QPalette::Window,Qt::black);
+//    pal.setColor(QPalette::WindowText,Qt::white);
     pal.setBrush(QPalette::Background, bg);
-    //        pal.setColor(QPalette::Button, Qt::transparent);
-
     setPalette(pal);
 }
 
@@ -1070,7 +1086,7 @@ void mainWindow::dialogAdmin()
 
     QPalette palet;
     palet.setColor(QPalette::Base, Qt::white);
-    palet.setColor(QPalette::Window, Qt::white);
+    palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text, QColor(0,0,0,128));
     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
     palet.setColor(QPalette::Button, palette().dark().color());
@@ -1182,6 +1198,8 @@ void mainWindow::dialogLogin()
         le_password->setText("elroke");
 
     auto button_admin = new QPushButton(tr("Administrator"), dialog);
+    button_admin->setFlat(true);
+    button_admin->setAutoFillBackground(true);
 
     QPalette pal_btn;
     pal_btn.setColor(QPalette::Button,QColor("#E91E63"));
@@ -1230,7 +1248,7 @@ void mainWindow::dialogLogin()
 
      QPalette palet;
      palet.setColor(QPalette::Base, palette().dark().color());
-     palet.setColor(QPalette::Window, Qt::white);
+     palet.setColor(QPalette::Window, theme.backgroundColor());
      palet.setColor(QPalette::Text, QColor(0,0,0,128));
      palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
      palet.setColor(QPalette::Button, palette().dark().color());
@@ -1269,13 +1287,13 @@ void mainWindow::scoringInstance()
 
 void mainWindow::moveItemToBottom()
 {
-    if(playlist_widget->count()==0)
+    if(playlist_widget->count()<=1)
         return;
 
     int row = playlist_widget->currentIndex().row();
 
  //ignore first item
-     if (row==0)
+     if (row==playlist_widget->count()-1)
          return;
 
  //copy song. i'm not sure with this way
@@ -1324,12 +1342,11 @@ void mainWindow::readSettings()
     if (c_font==NULL)
         c_font = "Roboto";
     background = setting.value("background").toString();
-    if (background==NULL)
-        background = ":/usr/share/elroke/background/butterfly.jpeg";
+    if (background.isEmpty())
+        background = "/usr/share/elroke/background/butterfly.jpeg";
     font_size = setting.value("font_size").toInt();
     if (font_size==0)
         font_size=16;
-    language = setting.value("language").toString();
     shortcut_item = setting.value("menu").toStringList();
     if(shortcut_item.isEmpty())
         shortcut_item = QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL";

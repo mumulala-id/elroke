@@ -30,7 +30,8 @@ HEADERS  += mainwindow.h \
     spinnerprogress.h \
     scoring.h \
     editdatabse.h \
-    themewidget.h
+    themewidget.h \
+    theme.h
 
 SOURCES += main.cpp\
     mainwindow.cpp \
@@ -49,7 +50,8 @@ SOURCES += main.cpp\
     spinnerprogress.cpp \
     scoring.cpp \
     editdatabase.cpp \
-    themewidget.cpp
+    themewidget.cpp \
+    theme.cpp
 
 
 TRANSLATIONS = file/languages/elroke_id.ts
