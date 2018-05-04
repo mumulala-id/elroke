@@ -34,10 +34,15 @@ void ThemeWidget::setBackgroundColor(QColor bColor){
     update();
 }
 
+void ThemeWidget::setButtonColor(QColor bColor){
+    _theme.setButtonColor(bColor);
+}
+void ThemeWidget::setButtontextColor(QColor btColor){
+    _theme.setButtonTextColor(btColor);
+}
 void ThemeWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-//    painter.setBrush(primaryColor));
     int w = width()/2;
     painter.setBrush(_theme.primaryColor());
     painter.drawRect(0,0,width(),w);
@@ -48,16 +53,6 @@ void ThemeWidget::paintEvent(QPaintEvent *)
     painter.drawRect(textRect);
     painter.setPen(_theme.highlightColor());
     painter.drawText(textRect,"T");
-
-
-//    painter.drawRect(w,w,w,w);
-//    painter.setBrush(Qt::green);
-//    painter.drawRect(0,w,w,w);
-//    painter.setBrush(Qt::yellow);
-//    painter.drawRect(w,0,w,w);
-//    painter.setBrush(Qt::black);
-//    painter.drawRect(w/2,w/2,w,w);
-
 
 
 }

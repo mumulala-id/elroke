@@ -140,7 +140,6 @@ private slots:
     void keyBoardInstance();
     void fontSetup();
     void videoEnds();
-    void showHits();
     void moveItemToBottom();
     void handleFavorite();
     void filterLanguageGenre();
@@ -152,7 +151,7 @@ protected :
 };
 
 // this class hide the focus of qtableview (dotted rectangle on selected item)
-class NoFocusDelegate : public QStyledItemDelegate{
+class ItemDelegate: public QStyledItemDelegate{
 
 protected:
 
@@ -164,7 +163,7 @@ protected:
                             itemOption.state = itemOption.state ^ QStyle::State_HasFocus;
 
                         if (itemOption.state & QStyle::State_Selected) {
-                                itemOption.palette.setColor(QPalette::Highlight, theme.backgroundColor());
+                                itemOption.palette.setColor(QPalette::Highlight, QColor(255,255,255));
                                 itemOption.palette.setColor(QPalette::HighlightedText, theme.highlightColor());
                                 QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
 
@@ -174,7 +173,7 @@ protected:
                             c.setAlpha(128);
                             itemOption.palette.setColor(QPalette::Text, c);
                              painter->setPen(theme.textColor());
-                             painter->fillRect(option.rect,theme.backgroundColor());
+                             painter->fillRect(option.rect,Qt::transparent);
                             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
                         }
 

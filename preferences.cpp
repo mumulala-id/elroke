@@ -15,6 +15,7 @@
 #include <QProcess>
 #include <QRadioButton>
 #include "liststringfileparser.h"
+#include <QSlider>
 
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
@@ -27,7 +28,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     auto button_system = new QPushButton(tr("System"), this);
     auto button_font = new QPushButton(tr("Font"), this);
     auto button_theme = new QPushButton(tr("Theme"), this);
-    auto button_menu = new QPushButton(tr("Menu"), this);
+    auto button_menu = new QPushButton(tr("Favorite Group"), this);
     auto button_background = new QPushButton(tr("Background"), this);
 
     layout_button->addWidget(button_system);
@@ -40,15 +41,15 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_button->setMargin(0);
     layout_button->addStretch();
 
-    auto button_ok = new QPushButton(tr("Ok"), this);
+    auto button_ok = new QPushButton(tr("Save"), this);
     connect(button_ok,&QPushButton::pressed,this,&preferences::ok);
-    auto button_apply = new QPushButton(tr("Apply"), this);
-    connect(button_apply,&QPushButton::pressed,this,&preferences::apply);
+//    auto button_apply = new QPushButton(tr("Apply"), this);
+//    connect(button_apply,&QPushButton::pressed,this,&preferences::apply);
     auto button_cancel = new QPushButton(tr("Cancel"), this);
     connect(button_cancel,&QPushButton::pressed,this,&preferences::close);
 
     layout_button->addWidget(button_ok);
-    layout_button->addWidget(button_apply);
+//    layout_button->addWidget(button_apply);
     layout_button->addWidget(button_cancel);
 
    auto stack = new QStackedLayout;
@@ -129,7 +130,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     auto layout_sub_font = new QHBoxLayout;
     auto spin_font_size = new QSpinBox(this);
-    spin_font_size->setRange(14,48);//not tested
+    spin_font_size->setRange(12,48);//not tested
     spin_font_size->setValue(font_size);
 
     layout_sub_font->addWidget(combo_font);
@@ -143,32 +144,46 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     {
         font_size = val;
     });
-
+///////////////////////////////////////////////THEME////////////////////////////////////////////////////////////////////////////////
     auto group_theme = new QGroupBox(tr("Themes"), this);
 
     auto layout_theme = new QVBoxLayout;
+
+
+    auto radio_light = new QRadioButton(tr("Light"),this);
+//    connect(radio_light,&QRadioButton::toggled,[this](){
+//        themeMode=1;
+//    });
+    auto radio_dark = new QRadioButton(tr("Dark"),this);
+//    connect(radio_dark,&QRadioButton::toggled,[this](){
+//        themeMode=2;
+//    });
+
 
     auto theme1 =new  ThemeWidget(this);
     auto theme2 = new ThemeWidget(this);
     theme2->setPrimaryColor("#FF9800");
     theme2->setSecondaryColor("#FFD180");
-    theme2->setBackgroundColor("#FFFFFF");
-    theme2->setTextColor(QColor(0,0,0));
+
     auto theme3 = new ThemeWidget(this);
     theme3->setPrimaryColor("#E91E63");
     theme3->setSecondaryColor("#FF80AB");
+    theme3->setButtonColor("#FF4081");
+    theme3->setButtontextColor("#FFFFFF");
 
     auto theme4 = new ThemeWidget(this);
     theme4->setPrimaryColor("#000000");
     theme4->setSecondaryColor("#212121");
-    theme4->setTextColor("#FFFFFF");
-    theme4->setBackgroundColor("#424242");
+    theme4->setButtonColor("#212121");
+    theme4->setButtontextColor("#FFFFFF");
+//    theme4->setTextColor("#FFFFFF");
+//    theme4->setBackgroundColor("#424242");
 
-     list_theme = new QListWidget(this);
+    list_theme = new QListWidget(this);
     list_theme->setFlow(QListView::LeftToRight);
     list_theme->setFixedHeight(78);
     list_theme->setSpacing(10);
-//    list_theme->set
+
 
     auto item = new QListWidgetItem;
     list_theme->addItem(item);
@@ -192,21 +207,53 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     auto layout_colormode = new QHBoxLayout;
 
-    auto radio_light = new QRadioButton(tr("Light"),this);
-    auto radio_dark = new QRadioButton(tr("Dark"),this);
-
     layout_colormode->addWidget(radio_light);
     layout_colormode->addWidget(radio_dark);
 
+    auto layout_transparent = new QHBoxLayout;
+
+    auto slider_transparent = new QSlider(Qt::Horizontal,this);
+    slider_transparent->setRange(0,255);
+    slider_transparent->setFocusPolicy(Qt::NoFocus);
+//    slider_transparent->setInvertedAppearance(true);
+    connect(slider_transparent,&QSlider::sliderMoved,[this](int value){
+        alpha = value;
+    });
+
+    connect(list_theme,&QListWidget::clicked,[this,slider_transparent](QModelIndex index){
+        auto tw = qobject_cast<ThemeWidget*>(list_theme->indexWidget(index));
+        slider_transparent->setValue(tw->theme().backgroundTransparency());
+    });
+
+    layout_transparent->addWidget(new QLabel(tr("Background Tranparency"), this));
+    layout_transparent->addWidget(slider_transparent);
+
     layout_theme->addLayout(layout_colormode);
     layout_theme->addWidget(list_theme);
+    layout_theme->addLayout(layout_transparent);
 
     layout_theme->addStretch();
+
+    auto button_set_theme = new QPushButton(tr("Set"), this);
+    layout_theme->addWidget(button_set_theme,0,Qt::AlignRight|Qt::AlignBottom);
+    connect(button_set_theme,&QPushButton::pressed,[this,radio_dark](){
+        ThemeWidget * themeWIdget = qobject_cast<ThemeWidget*>( list_theme->itemWidget(list_theme->currentItem()));
+        Theme theme = themeWIdget->theme();
+        qDebug()<<"alpha"<<alpha;
+        theme.setBackgroundTransprency(alpha);
+        if(radio_dark->isChecked()){
+            theme.setDark();
+        } else{
+            theme.setLight();
+        }
+        qDebug()<<theme.backgroundTransparency();
+        themeColors=theme.toList();
+    });
 
 
     group_theme->setLayout(layout_theme);
 
-    auto group_menu = new QGroupBox(tr("Menu"), this);
+    auto group_menu = new QGroupBox(tr("Favorite Group"), this);
 
     auto layout_menu_main = new QVBoxLayout;
     auto layout_menu = new QHBoxLayout;
@@ -236,16 +283,21 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     group_menu->setLayout(layout_menu_main);
 
     list_menu_all->addItems(getLanguageGenre());
-
-    connect(button_right,&QPushButton::clicked,[this,list_menu_all]()
+    auto toRight = [this,list_menu_all]()
     {
        list_menu_selected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
-    });
+    };
 
-    connect(button_left,&QPushButton::clicked,[this,list_menu_all]()
+    connect(button_right,&QPushButton::clicked,toRight);
+    connect(list_menu_all,&QListWidget::doubleClicked,toRight);
+    auto toLeft =[this,list_menu_all]()
     {
        list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
-    });
+    };
+
+    connect(button_left,&QPushButton::clicked,toLeft);
+    connect(list_menu_selected,&QListWidget::doubleClicked,toLeft);
+
 
     auto group_background = new QGroupBox(tr("Background"), this);
     group_background->setLayout(layout_background);
@@ -317,7 +369,7 @@ QStringList preferences::getLanguageGenre()
 {
     QStringList list ;
     list<< listStringFileParser::parse(app_dir+"/meta/language");
-    list<<listStringFileParser::parse(app_dir+"/meta/category");
+    list<<listStringFileParser::parse(app_dir+"/meta/genre");
 
     for(int i=0;i<shortcut_item.size();i++)
     {
@@ -365,22 +417,18 @@ shortcut_item.clear();
 
   }
 
-  auto themeWIdget =qobject_cast<ThemeWidget*>( list_theme->itemWidget(list_theme->currentItem()));
-//  QStringList theme = themeWIdget->theme().toStringList();
-  QVariantList theme = themeWIdget->theme().toList();
-//  QVariant c;
-//  c.setValue(theme);
 
    QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
-    setting.setValue("font",selected_font);
+    setting.setValue("fontName",selected_font);
     setting.setValue("background", selected_background);
-    setting.setValue("font_size", font_size);
+    setting.setValue("fontSize", font_size);
     setting.setValue("startup", startup);
     setting.setValue("language", language_index);
-    setting.setValue("menu", QVariant::fromValue(shortcut_item));
-    setting.setValue("limit", spin_limit_month_newEntries->value());
-    setting.setValue("theme",theme);
+    setting.setValue("favGroup", shortcut_item);
+    setting.setValue("monthRange", spin_limit_month_newEntries->value());
+    setting.setValue("themeMode",themeMode);
+    setting.setValue("themeColor", themeColors);
     setting.endGroup();
 }
 void preferences::ok()
@@ -391,6 +439,7 @@ void preferences::ok()
     msg.setInformativeText(tr("All change will be applied after app restarted."));
     msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
     msg.addButton(tr("RESTART"), QMessageBox::AcceptRole);
+    //RESTART
     connect(&msg,&QMessageBox::accepted,[this](){
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
@@ -406,15 +455,14 @@ void preferences::readSetting()
 {
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
-    selected_font = setting.value("font").toString();
+    selected_font = setting.value("fontName").toString();
     selected_background = setting.value("background").toString();
-    font_size = setting.value("font_size").toInt();
+    font_size = setting.value("fontSize").toInt();
     startup = setting.value("startup").toBool();
     language_index = setting.value("language").toInt();
-    shortcut_item = setting.value("menu").toStringList();
-    newEntriesLimit = setting.value("limit").toInt();
-    if(newEntriesLimit==0)
-        newEntriesLimit=3;
+    shortcut_item = setting.value("favGroup").toStringList();
+    themeColors = setting.value("themeColor").toList();
+    newEntriesLimit = setting.value("monthRange").toInt();
     setting.endGroup();
 }
 
@@ -425,6 +473,21 @@ void preferences::handleImage(QImage img)
     item->setIcon(QPixmap::fromImage(img));
     item->setData(bg_list.at(c),Qt::UserRole);
     model->setItem(c,0,item);
+}
+
+void preferences::insertToList(QPair<QString , QVariant > p)
+{
+//    p.first;
+//    auto isAlredy =[](){
+//    foreach(QPair<QString,QVariant> s, lis){
+//        if(s.first==p.first){
+
+//        break;
+//    return true;
+//    }
+//    return false;
+//    };
+
 }
 
 preferences::~preferences()

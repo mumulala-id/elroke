@@ -58,9 +58,9 @@ void mainWindow::createWidgets()
     resize(desktop_width, desktop_height);
 
     auto layout_main = new QVBoxLayout;
-   auto layout_top = new QHBoxLayout;
-   QPalette transparent_button;
-   transparent_button.setColor(QPalette::Button,Qt::transparent);
+    auto layout_top = new QHBoxLayout;
+    QPalette transparent_button;
+    transparent_button.setColor(QPalette::Button,Qt::transparent);
 
     auto pb_menu = new QPushButton(QIcon(":/usr/share/elroke/icon/menu.png"),"", this);
     pb_menu->setFlat(1);
@@ -73,8 +73,8 @@ void mainWindow::createWidgets()
     le_search->setPlaceholderText(tr("SEARCH"));
 
     QPalette button_cat_palette;
-    button_cat_palette.setColor(QPalette::Button, theme.backgroundColor());
-   button_cat_palette.setColor(QPalette::ButtonText,theme.textColor());
+    button_cat_palette.setColor(QPalette::Button, theme.buttonColor());
+   button_cat_palette.setColor(QPalette::ButtonText,theme.buttonTextColor());
 
     auto cat_button = [this,button_cat_palette](const QString &title){
         auto button = new QPushButton(title, this);
@@ -92,6 +92,9 @@ void mainWindow::createWidgets()
         proxy_model->search("");
     });
     auto button_hits = cat_button(tr("HITS"));
+    connect(button_hits,&QPushButton::pressed,[this](){
+        proxy_model->sort(6,Qt::AscendingOrder);
+    });
 
     auto button_fav = cat_button(tr("FAVORITE"));
     connect(button_fav,&QPushButton::pressed,[this]()
@@ -189,18 +192,20 @@ void mainWindow::createWidgets()
     table->model()->setHeaderData(1, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
     table->model()->setHeaderData(2, Qt::Horizontal,Qt::AlignRight, Qt::TextAlignmentRole);
     table->horizontalHeader()->setHighlightSections(0);
-    table->setItemDelegate(new NoFocusDelegate());
+    table->setItemDelegate(new ItemDelegate());
     table->setSortingEnabled(1);
     table->setAutoFillBackground(true);
     proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
     header_palette.setColor(QPalette::Button, theme.secondaryColor());
-    header_palette.setColor(QPalette::ButtonText, Qt::white);
-    header_palette.setColor(QPalette::Background, Qt::white);
+    header_palette.setColor(QPalette::ButtonText, theme.buttonTextColor());
+//    header_palette.setColor(QPalette::Background, Qt::white);
     table->horizontalHeader()->setPalette(header_palette);
 
     auto table_palet = table->palette();
+//    QColor tc = theme.backgroundColor();
+//    tc.setAlpha(60);
     table_palet.setColor(QPalette::Base,theme.backgroundColor());
     table->setPalette(table_palet);
 
@@ -229,6 +234,9 @@ void mainWindow::createWidgets()
     playlist_widget->setAutoFillBackground(true);
 
     QPalette p = playlist_widget->palette();
+//    QColor c =theme.backgroundColor();
+//    c.setAlpha(60);
+    qDebug()<<theme.backgroundColor().alpha();
     p.setColor(QPalette::Base,theme.backgroundColor());
 //    p.setColor(QPalette::ButtonText,Qt::white);
 
@@ -504,15 +512,8 @@ void mainWindow::addToPlaylist()
     Song *song =   db->getSong(id);
     songitemwidget *item_song_widget = new songitemwidget;
     item_song_widget->setSong(song);
-    item_song_widget->setAutoFillBackground(true);
-    QPalette p = item_song_widget->palette();
-    p.setColor(QPalette::WindowText,Qt::red);
-    item_song_widget->setPalette(p);
 
     auto item = new QListWidgetItem;
-//    QVariant c;
-//    c.setValue(song);
-//    item->setData(Qt::UserRole+1, c);
     playlist_widget->addItem(item);
     playlist_widget->setItemWidget(item, item_song_widget);
 
@@ -611,8 +612,8 @@ void mainWindow::setBackground()
     bg = bg.scaled(desktop->size(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
 
     QPalette pal;
-//    pal.setColor(QPalette::Window,Qt::black);
-//    pal.setColor(QPalette::WindowText,Qt::white);
+    pal.setColor(QPalette::Window,Qt::black);
+    pal.setColor(QPalette::WindowText,Qt::white);
     pal.setBrush(QPalette::Background, bg);
     setPalette(pal);
 }
@@ -691,7 +692,7 @@ void mainWindow::dialogNextSong()
 
     if (playlist_widget->count()==0)
     {
-         notif->setText(tr("Playlist Is Empty"));
+         notif->setText(tr("Playlist is empty"));
     }    else    {
         auto widget_song = qobject_cast<songitemwidget*>(playlist_widget->itemWidget(playlist_widget->item(0)));
         notif->setText(tr("Next song : ")+widget_song->song()->getTitle());
@@ -993,7 +994,6 @@ void mainWindow::videoInstance(){
         error_message.exec();
         QTimer::singleShot(3000,&error_message,SLOT(close()));
     });
-//    connect(slider_vol,&QSlider::sliderMoved,video->player(),&Player::setVolume);
 }
 
 void mainWindow::keyBoardInstance()
@@ -1018,12 +1018,21 @@ void mainWindow::dialogAdmin()
 
     auto layout_main = new QVBoxLayout;
 
-    auto button_add_to_database = new QPushButton(tr("ADD TO DATABASE"), dialog_admin);
+    auto button = [this](QString title){
+      auto btn = new QPushButton(title,dialog_admin);
+      btn->setFlat(true);
+      btn->setAutoFillBackground(true);
+      btn->setFocusPolicy(Qt::NoFocus);
+      return btn;
+
+    };
+
+    auto button_add_to_database = button(tr("ADD TO DATABASE"));
+
     connect(button_add_to_database,&QPushButton::pressed,[this]()
     {
     auto atd = new addtodatabase;
     atd->setAttribute(Qt::WA_DeleteOnClose);
-//    connect(atd,&addtodatabase::accepted,sql_model,&QSqlTableModel::select);
     connect(atd,&addtodatabase::accepted,[this]()
     {
         sql_model->select();
@@ -1037,7 +1046,7 @@ void mainWindow::dialogAdmin()
     atd->showFullScreen();
     });
 
-    auto button_manage_database = new QPushButton(tr("MANAGE DATABASE"), dialog_admin);
+    auto button_manage_database = button(tr("MANAGE DATABASE"));
     connect(button_manage_database,&QPushButton::pressed,[this]()
     {
         auto md = new managedb;
@@ -1055,7 +1064,7 @@ void mainWindow::dialogAdmin()
 
     });
 
-    auto button_preferences = new QPushButton(tr("PREFERENCES"), dialog_admin);
+    auto button_preferences = button(tr("PREFERENCES"));
     connect(button_preferences,&QPushButton::pressed,[this]()
     {
         auto pref = new preferences();
@@ -1065,13 +1074,13 @@ void mainWindow::dialogAdmin()
         pref->exec();
     });
 
-    auto button_change_password = new QPushButton(tr("CHANGE PASSWORD"), dialog_admin);
+    auto button_change_password = button(tr("CHANGE PASSWORD"));
     connect(button_change_password,&QPushButton::pressed,this,&mainWindow::dialogCreateAdmin);
 
-    auto button_close = new QPushButton(tr("CLOSE"), dialog_admin);
+    auto button_close = button(tr("CLOSE"));
     connect(button_close,&QPushButton::pressed,dialog_admin,&QDialog::close);
 
-    auto button_exit = new QPushButton(tr("QUIT APP"), dialog_admin);
+    auto button_exit = button(tr("QUIT APP"));
     connect(button_exit,&QPushButton::pressed,dialog_admin,&QDialog::close);
     connect(button_exit,&QPushButton::pressed,qApp,&QApplication::quit);
 
@@ -1089,8 +1098,8 @@ void mainWindow::dialogAdmin()
     palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text, QColor(0,0,0,128));
     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
-    palet.setColor(QPalette::Button, palette().dark().color());
-    palet.setColor(QPalette::ButtonText, Qt::white);
+    palet.setColor(QPalette::Button, theme.buttonColor());
+    palet.setColor(QPalette::ButtonText, theme.buttonTextColor());
     dialog_admin->setPalette(palet);
 
     dialog_admin->setAttribute(Qt::WA_DeleteOnClose);
@@ -1164,8 +1173,8 @@ void mainWindow::dialogCreateAdmin()
      palet.setColor(QPalette::Window, Qt::white);
      palet.setColor(QPalette::Text, QColor(0,0,0,128));
      palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
-     palet.setColor(QPalette::Button, palette().dark().color());
-     palet.setColor(QPalette::ButtonText, QColor(0,0,0,128));
+     palet.setColor(QPalette::Button,theme.buttonColor());
+     palet.setColor(QPalette::ButtonText, theme.buttonTextColor());
      dialog->setPalette(palet);
 
      dialog->setLayout(layout_main);
@@ -1250,9 +1259,9 @@ void mainWindow::dialogLogin()
      palet.setColor(QPalette::Base, palette().dark().color());
      palet.setColor(QPalette::Window, theme.backgroundColor());
      palet.setColor(QPalette::Text, QColor(0,0,0,128));
-     palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
-     palet.setColor(QPalette::Button, palette().dark().color());
-     palet.setColor(QPalette::ButtonText, palette().light().color());
+     palet.setColor(QPalette::WindowText, theme.textColor());
+     palet.setColor(QPalette::Button, theme.buttonColor());
+     palet.setColor(QPalette::ButtonText, theme.buttonTextColor());
      dialog->setPalette(palet);
 
      dialog->setMinimumSize(300,500);
@@ -1262,12 +1271,7 @@ void mainWindow::dialogLogin()
      dialog->show();
 }
 
-void mainWindow::showHits()
-{
-//    proxy_model->sort(7, ProxyModel::sortRole, Qt::AscendingOrder);
-//proxy_model->setSortRole(ProxyModel::sortRole);
-proxy_model->sort(6,Qt::AscendingOrder);
-}
+
 
 void mainWindow::videoEnds()
 {
@@ -1338,20 +1342,11 @@ void mainWindow::readSettings()
 {
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
-    c_font = setting.value("font").toString();
-    if (c_font==NULL)
-        c_font = "Roboto";
+    c_font = setting.value("fontName").toString();
     background = setting.value("background").toString();
-    if (background.isEmpty())
-        background = "/usr/share/elroke/background/butterfly.jpeg";
-    font_size = setting.value("font_size").toInt();
-    if (font_size==0)
-        font_size=16;
-    shortcut_item = setting.value("menu").toStringList();
-    if(shortcut_item.isEmpty())
-        shortcut_item = QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL";
-    if(newEntriesLimit==0)
-        newEntriesLimit=3;
+    font_size = setting.value("fontSize").toInt();
+    shortcut_item = setting.value("favGroup").toStringList();
+    newEntriesLimit=setting.value("monthRange").toInt();
     setting.endGroup();
 }
 
@@ -1368,10 +1363,8 @@ void mainWindow::handleFavorite(){
 mainWindow::~mainWindow()
 {
     delete video;
-    if(playlist_widget->count()>0){
     if (autosave_playlist->isChecked())
         writePlaylist();
-    }
 }
 
 void mainWindow::filterLanguageGenre(){

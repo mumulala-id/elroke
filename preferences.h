@@ -11,6 +11,7 @@
 #include <QStandardItemModel>
 #include <QLabel>
 #include <themewidget.h>
+#include <QPair>
 #include <QListWidget>
 
 class resizer : public QObject
@@ -64,13 +65,20 @@ private :
     QListWidget *list_theme;
     uint newEntriesLimit;
     QSpinBox *spin_limit_month_newEntries ;
+    int themeMode=0;
+    QVariantList themeColors;
+    int alpha;
 //    Language lang;
+    QList<QPair<QString, QVariant>> list_change;
+
+};
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);
     void apply();
     void ok();
     void readSetting();
+    void insertToList();
 
 };
 

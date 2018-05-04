@@ -40,6 +40,7 @@ void songitemwidget::setSong(Song * _song)
     song_ = _song;
     label_title->setText(song_->getTitle());
     label_singer->setText(song_->getSinger());
+    update();
 }
 
 Song *songitemwidget::song()

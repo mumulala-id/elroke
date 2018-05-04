@@ -20,6 +20,8 @@ public slots:
     void setSecondaryColor(QColor sColor);
     void setTextColor(QColor);
     void setBackgroundColor(QColor);
+    void setButtonColor(QColor);
+    void setButtontextColor(QColor);
 private slots :
     void setTheme(Theme theme);
 

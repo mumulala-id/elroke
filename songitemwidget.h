@@ -39,7 +39,7 @@ class itemDelegate : public QStyledItemDelegate{
 //             painter->setPen(blackPen);
 //             itemOption.palette.setBrush(QPalette::HighlightedText,Qt::white);
 ////             itemOption.widget->setPalette(QPalette::Highlight,Qt::red);
-            painter->fillRect(option.rect, theme.backgroundColor());
+            painter->fillRect(option.rect,Qt::transparent);
             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
 //            painter->drawText(option.rect,"TESTTTTT");
             QStyledItemDelegate::paint(painter, option, index);
