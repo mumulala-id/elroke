@@ -40,6 +40,10 @@ void ThemeWidget::setButtonColor(QColor bColor){
 void ThemeWidget::setButtontextColor(QColor btColor){
     _theme.setButtonTextColor(btColor);
 }
+
+void ThemeWidget::setHighlightTextColor(QColor hColor){
+    _theme.setHighlightTextColor(hColor);
+}
 void ThemeWidget::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);

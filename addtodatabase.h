@@ -16,6 +16,7 @@
 #include "youtube_downloader.h"
 #include <QDragMoveEvent>
 #include <QRadioButton>
+#include <theme.h>
 class myListWidget :  public QListWidget
 {
     Q_OBJECT
@@ -70,6 +71,7 @@ private :
     QString default_genre="UNKNOWN";
     QString default_audio="UNKNOWN";
     myListWidget *view_pattern;
+    Theme theme;
 
      bool title_first=true;
      bool singer_first=false;

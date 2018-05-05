@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QStackedLayout>
+#include "theme.h"
 
 class about : public QDialog
 {
@@ -12,6 +13,7 @@ public:
 
 private :
     QStackedLayout *stack;
+    Theme theme;
 
 };
 

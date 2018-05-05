@@ -16,7 +16,7 @@
 #include <QRadioButton>
 #include "liststringfileparser.h"
 #include <QSlider>
-
+#include <QLineEdit>
 preferences::preferences(QWidget *parent) : QDialog(parent)
 {
     readSetting();
@@ -44,14 +44,11 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     auto button_ok = new QPushButton(tr("Save"), this);
     connect(button_ok,&QPushButton::pressed,this,&preferences::ok);
 
-//    auto button_apply = new QPushButton(tr("Apply"), this);
-//    connect(button_apply,&QPushButton::pressed,this,&preferences::apply);
     auto button_cancel = new QPushButton(tr("Cancel"), this);
     connect(button_cancel,&QPushButton::pressed,this,&preferences::close);
 
     layout_button->addWidget(button_ok);
 
-//    layout_button->addWidget(button_apply);
     layout_button->addWidget(button_cancel);
 
    auto stack = new QStackedLayout;
@@ -94,15 +91,28 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(background_view,&QListView::clicked,[this,background_view](const QModelIndex &index)
    {
        selected_background = background_view->model()->data(index,Qt::UserRole).toString();
+        insertToListchange("background", selected_background);
     });
 
-    auto button_add = new QPushButton(QIcon::fromTheme("add"),"", this);
+    auto customBackgroundLayout = new QHBoxLayout;
+    customBackgroundLayout->addWidget(new QLabel(tr("Custom"), this));
+
+    auto leditBackground = new QLineEdit(this);
+    leditBackground->setReadOnly(true);
+    auto button_add = new QPushButton("...", this);
+    customBackgroundLayout->addWidget(leditBackground);
+    customBackgroundLayout->addWidget(button_add);
 
     layout_background->addWidget(background_view);
-    layout_background->addWidget(button_add,0,Qt::AlignLeft);
-    connect(button_add,&QPushButton::pressed,[this]()
+    layout_background->addLayout(customBackgroundLayout);
+    connect(button_add,&QPushButton::pressed,[this,leditBackground]()
     {
-         QStringList f_list =  QFileDialog::getOpenFileNames(nullptr,tr("Choose image"), QDir::homePath(),tr("Image Files (*.auto .auto .auto .auto .auto .JPEG)"));
+         QString customBackground =  QFileDialog::getOpenFileName(nullptr,tr("Choose image"), QDir::homePath(),tr("Image Files (*.png *.jpeg *.jpg *.jpe)"));
+         if(!customBackground.isEmpty()){
+             leditBackground->setText(customBackground);
+             selected_background=customBackground;
+             insertToListchange("background", selected_background);
+         }
     });
 
     auto group_system = new QGroupBox(tr("System"),this);
@@ -115,6 +125,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(check_startapp,&QCheckBox::toggled,[this](bool d)
     {
         startup = d;
+        insertToListchange("startup", startup);
     });
 
     auto group_font = new QGroupBox(tr("Font"), this);
@@ -128,16 +139,15 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(combo_font,static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::activated),[this](const QString &s_font)
     {
         selected_font = s_font;
+        insertToListchange("fontName", s_font);
     });
 
     auto layout_sub_font = new QHBoxLayout;
 
     auto spin_fontSize = new QSpinBox(this);
-    spin_fontSize->setRange(12,48);//not tested
+    spin_fontSize->setRange(12,48);
     spin_fontSize->setValue(fontSize);
-//    auto spin_font_size = new QSpinBox(this);
-//    spin_font_size->setRange(12,48);//not tested
-//    spin_font_size->setValue(fontSize);
+
 
     layout_sub_font->addWidget(combo_font);
     layout_sub_font->addWidget(spin_fontSize);
@@ -149,6 +159,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(spin_fontSize,static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),[this](int val)
     {
         fontSize = val;
+        insertToListchange("fontSize",val);
     });
 ///////////////////////////////////////////////THEME////////////////////////////////////////////////////////////////////////////////
     auto group_theme = new QGroupBox(tr("Themes"), this);
@@ -157,29 +168,37 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
 
     auto radio_light = new QRadioButton(tr("Light"),this);
-    radio_light->setChecked(true);
-    theme.setLight();
 
     auto radio_dark = new QRadioButton(tr("Dark"),this);
 
     auto theme1 =new  ThemeWidget(this);
+    theme1->setPrimaryColor("#009688");
+    theme1->setSecondaryColor("#00BFA5");
+    theme1->setButtonColor("#E0F2F1");
+    theme1->setButtontextColor("#009688");
+//    theme1->setTextColor(QColor(0,0,0,128));
+     theme1->setHighlightTextColor("#E91E63");
     auto theme2 = new ThemeWidget(this);
     theme2->setPrimaryColor("#FF9800");
-    theme2->setSecondaryColor("#FFD180");
+    theme2->setSecondaryColor("#FFAB40");
+    theme2->setButtonColor("#FFF3E0");
+    theme2->setButtontextColor("#000000");
+     theme2->setHighlightTextColor("#E91E63");
 
     auto theme3 = new ThemeWidget(this);
     theme3->setPrimaryColor("#E91E63");
     theme3->setSecondaryColor("#FF80AB");
     theme3->setButtonColor("#FF4081");
     theme3->setButtontextColor("#FFFFFF");
+     theme3->setHighlightTextColor("#E91E63");
 
     auto theme4 = new ThemeWidget(this);
     theme4->setPrimaryColor("#000000");
     theme4->setSecondaryColor("#212121");
-    theme4->setButtonColor("#212121");
+    theme4->setButtonColor("#E91E63");
     theme4->setButtontextColor("#FFFFFF");
-//    theme4->setTextColor("#FFFFFF");
-//    theme4->setBackgroundColor("#424242");
+    theme4->setTextColor("#FFFFFF");
+    theme4->setHighlightTextColor("#E91E63");
 
     list_theme = new QListWidget(this);
     list_theme->setFlow(QListView::LeftToRight);
@@ -227,12 +246,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_transparent->addWidget(new QLabel(tr("Background Tranparency"), this));
     layout_transparent->addWidget(slider_transparent);
 
-
-
-    layout_transparent->addWidget(slider_transparent);
-
-
-
     auto preview = new previewer(this);
     preview->setFixedSize(64,64);
 
@@ -261,6 +274,13 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     });
 
+    auto buttonSetTheme = new QPushButton(tr("Set Theme"), this);
+    connect(buttonSetTheme,&QPushButton::pressed,[this](){
+
+        insertToListchange("themeColor",theme.toList());
+
+    });
+
 
     layout_theme->addLayout(layout_colormode);
     layout_theme->addWidget(list_theme);
@@ -268,10 +288,11 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_theme->addWidget(preview);
 
     layout_theme->addStretch();
+    layout_theme->addWidget(buttonSetTheme,0,Qt::AlignRight|Qt::AlignBottom);
 
     group_theme->setLayout(layout_theme);
-
-    auto group_menu = new QGroupBox(tr("Favorite Group"), this);
+/////////////////////////////////////////////// fav group////////////////////////////////////////////////////////
+    auto group_favorite = new QGroupBox(tr("Favorite Group"), this);
 
     auto layout_menu_main = new QVBoxLayout;
     auto layout_menu = new QHBoxLayout;
@@ -295,10 +316,21 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_menu->addLayout(layout_move_button);
     layout_menu->addWidget(list_menu_selected,0,Qt::AlignVCenter);
 
+    auto buttonSetFavGroup = new QPushButton(tr("Set"), this);
+    connect( buttonSetFavGroup,&QPushButton::pressed,[this](){
+
+        favGroup.clear();
+          for(int i=0;i<list_menu_selected->count();i++){
+              favGroup<< list_menu_selected->item(i)->text();
+
+          }
+          insertToListchange("favGroup",favGroup);
+    });
 
     layout_menu_main->addLayout(layout_menu);
+    layout_menu_main->addWidget(buttonSetFavGroup,0,Qt::AlignRight|Qt::AlignBottom);
 
-    group_menu->setLayout(layout_menu_main);
+    group_favorite->setLayout(layout_menu_main);
 
     list_menu_all->addItems(getLanguageGenre());
     auto toRight = [this,list_menu_all]()
@@ -327,7 +359,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(combo_language,static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),[this](int index)
     {
        language_index=index;
-
+       insertToListchange("language",language_index);
     });
 
     auto layout_language = new QHBoxLayout;
@@ -336,12 +368,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     layout_system->addLayout(layout_language);
 
     auto layout_limit = new QHBoxLayout;
-    monthRange = new QSpinBox(this);
-    monthRange->setRange(1,12);
-    monthRange->setValue(newEntriesLimit);
+    spinMonthRange = new QSpinBox(this);
+    spinMonthRange->setRange(1,12);
+    spinMonthRange->setValue(monthRange);
 
-    layout_limit->addWidget(new QLabel("Month Limit New Entries", this));
-    layout_limit->addWidget(monthRange);
+    layout_limit->addWidget(new QLabel("Month Range New Entries", this));
+    layout_limit->addWidget(spinMonthRange);
 
     layout_system->addLayout(layout_limit);
     layout_system->addStretch();
@@ -350,7 +382,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     stack->addWidget(group_system);
     stack->addWidget(group_font);
     stack->addWidget(group_theme);
-    stack->addWidget(group_menu);
+    stack->addWidget(group_favorite);
     stack->addWidget(group_background);
 
     //create connection
@@ -368,13 +400,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
 
     QPalette palet;
-    palet.setColor(QPalette::Base, Qt::white);
-    palet.setColor(QPalette::Window, Qt::white);
-    palet.setColor(QPalette::Text, QColor(0,0,0,128));
-    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
-    palet.setColor(QPalette::Button, palette().dark().color());
+    palet.setColor(QPalette::Base, theme.backgroundColor());
+    palet.setColor(QPalette::Window, theme.backgroundColor());
+    palet.setColor(QPalette::Text, theme.textColor());
+    palet.setColor(QPalette::WindowText, theme.textColor());
+    palet.setColor(QPalette::Button, Qt::gray);
     palet.setColor(QPalette::ButtonText, Qt::white);
-
     setPalette(palet);
 
     main_layout->addLayout(layout_button);
@@ -429,24 +460,14 @@ void preferences::apply()
        file.remove();
    }
 
-favGroup.clear();
-  for(int i=0;i<list_menu_selected->count();i++){
-      favGroup<< list_menu_selected->item(i)->text();
-
-  }
-
-
    QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
-    setting.setValue("fontName",selected_font);
-    setting.setValue("background", selected_background);
-    setting.setValue("fontSize", fontSize);
-    setting.setValue("startup", startup);
-    setting.setValue("language", language_index);
-    setting.setValue("favGroup", favGroup);
-    setting.setValue("monthRange", monthRange->value());
-//    setting.setValue("themeMode",themeMode);
-    setting.setValue("themeColor", theme.toList());
+
+    for(int i=0;i<listOfChange.size();i++){
+        QPair<QString,QVariant> pair = listOfChange.at(i);
+         setting.setValue(pair.first,pair.second);
+
+    }
 
     setting.endGroup();
 }
@@ -476,13 +497,11 @@ void preferences::readSetting()
     setting.beginGroup("Preferences");
     selected_font = setting.value("fontName").toString();
     selected_background = setting.value("background").toString();
-
     fontSize = setting.value("fontSize").toInt();
     startup = setting.value("startup").toBool();
     language_index = setting.value("language").toInt();
     favGroup = setting.value("favGroup").toStringList();
-//    themeColors = setting.value("themeColor").toList();
-    newEntriesLimit = setting.value("monthRange").toInt();
+    monthRange = setting.value("monthRange").toInt();
     setting.endGroup();
 }
 
@@ -495,6 +514,19 @@ void preferences::handleImage(QImage img)
     model->setItem(c,0,item);
 }
 
+void preferences::insertToListchange(QString p, QVariant v)
+{
+       for(int i=0;i<listOfChange.size();i++){
+           QPair<QString,QVariant> x = listOfChange.at(i);
+           if(p==x.first){
+               listOfChange.removeAt(i);
+               break;
+           }
+
+
+    }
+  listOfChange<<QPair<QString,QVariant>(p,v);
+}
 
 
 preferences::~preferences()

@@ -11,6 +11,7 @@
 #include <QTableView>
 #include <QLabel>
 #include <QSqlTableModel>
+#include <theme.h>
 
 class managedb : public QDialog
 {
@@ -31,6 +32,7 @@ private :
     VideoWidget *video;
     QString app_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     bool anyChange = false;
+    Theme theme;
 
 private slots:
     void swapItem(const int, const int);

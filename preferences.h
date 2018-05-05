@@ -74,7 +74,6 @@ class preferences : public QDialog
 public:
     explicit preferences(QWidget *parent = nullptr);
     ~preferences();
-//    enum Language{English=0,Indonesian=1};
 private :
     QString selected_font,selected_background;
     unsigned short  int fontSize;
@@ -86,22 +85,15 @@ private :
     QStandardItemModel *model ;
     resizer *img_resizer;
     bool startup=false;
-//    QString language;
     unsigned int short language_index;
     QListWidget *list_menu_selected;
     QListWidget *list_theme;
-    uint newEntriesLimit;
-    QSpinBox *monthRange ;
+    uint monthRange;
+    QSpinBox *spinMonthRange ;
     Theme theme;
+//    QSpinBox *spin_limit_month_newEntries ;
 
-
-
-    QSpinBox *spin_limit_month_newEntries ;
-//    int themeMode=0;
-//    QVariantList themeColors;
-//    int alpha;
-//    Language lang;
-    QList<QPair<QString, QVariant>> list_change;
+    QList<QPair<QString, QVariant>> listOfChange;
 
 
 private slots:
@@ -110,6 +102,7 @@ private slots:
     void apply();
     void ok();
     void readSetting();
+    void insertToListchange(QString, QVariant);
 
 };
 

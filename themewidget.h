@@ -22,6 +22,7 @@ public slots:
     void setBackgroundColor(QColor);
     void setButtonColor(QColor);
     void setButtontextColor(QColor);
+    void setHighlightTextColor(QColor);
 private slots :
     void setTheme(Theme theme);
 

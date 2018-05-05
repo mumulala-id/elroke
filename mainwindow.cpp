@@ -194,7 +194,7 @@ void mainWindow::createWidgets()
     table->horizontalHeader()->setHighlightSections(0);
     table->setItemDelegate(new ItemDelegate());
     table->setSortingEnabled(1);
-    table->setAutoFillBackground(true);
+//    table->setAutoFillBackground(true);
     proxy_model->sort(1,Qt::AscendingOrder);
 
     QPalette header_palette = table->horizontalHeader()->palette();
@@ -231,12 +231,12 @@ void mainWindow::createWidgets()
     playlist_widget->setDragDropMode(QAbstractItemView::InternalMove);
     playlist_widget->setAutoScroll(1);
     playlist_widget->setItemDelegate(new itemDelegate);
-    playlist_widget->setAutoFillBackground(true);
+//    playlist_widget->setAutoFillBackground(true);
 
     QPalette p = playlist_widget->palette();
 //    QColor c =theme.backgroundColor();
 //    c.setAlpha(60);
-    qDebug()<<theme.backgroundColor().alpha();
+//    qDebug()<<theme.backgroundColor().alpha();
     p.setColor(QPalette::Base,theme.backgroundColor());
 //    p.setColor(QPalette::ButtonText,Qt::white);
 
@@ -744,7 +744,7 @@ bool mainWindow::eventFilter(QObject *target, QEvent *event)
 
 void mainWindow::dialogSavePlaylist()
 {
-    auto dialog_save_playlist = new QDialog;
+    auto dialog_save_playlist = new QDialog(this);
     auto layout_main = new QVBoxLayout;
 
     auto le_playlist_name = new CLineEdit(dialog_save_playlist);
@@ -775,7 +775,8 @@ void mainWindow::dialogSavePlaylist()
 
    le_playlist_name->setFocus();
    dialog_save_playlist->adjustSize();
-   dialog_save_playlist->setAutoFillBackground(1);
+   dialog_save_playlist->setFont(this->font());
+//   dialog_save_playlist->setAutoFillBackground(1);
 
    connect(dialog_save_playlist,&QDialog::accepted,[this,le_playlist_name]()
    {
@@ -786,7 +787,7 @@ void mainWindow::dialogSavePlaylist()
 
 void mainWindow::dialogLoadPlaylist(){
 
-    auto dialog_load_playlist = new QDialog;
+    auto dialog_load_playlist = new QDialog(this);
 
     QDirIterator it(app_dir+"/playlist", QDir::Files | QDir::NoDotAndDotDot, QDirIterator::NoIteratorFlags);
     QList<QString> list_play;
@@ -825,7 +826,8 @@ void mainWindow::dialogLoadPlaylist(){
     dialog_load_playlist->setWindowFlags(Qt::Popup);
     dialog_load_playlist->setAttribute(Qt::WA_DeleteOnClose);
     dialog_load_playlist->setMinimumSize(300,200);
-       dialog_load_playlist->setAutoFillBackground(1);
+//       dialog_load_playlist->setAutoFillBackground(1);
+    dialog_load_playlist->setFont(this->font());
 
     connect(dialog_load_playlist,&QDialog::accepted,[this,_list](){
          loadPlaylist(_list->currentItem()->text());

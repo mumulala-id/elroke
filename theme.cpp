@@ -4,7 +4,6 @@ Theme::Theme(){
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     QVariantList colors = setting.value("themeColor").toList();
-
     setting.endGroup();
 
         _primaryColor =QColor::fromRgba(colors.at(0).toUInt());
@@ -14,8 +13,6 @@ Theme::Theme(){
         _backgroundColor =QColor::fromRgba(colors.at(4).toUInt());
         _buttonColor =QColor::fromRgba(colors.at(5).toUInt());
         _buttonTextColor = QColor::fromRgba(colors.at(6).toUInt());
-
-
 
 }
 void Theme::setPrimaryColor(QColor pColor){
@@ -65,7 +62,7 @@ void Theme::setDark(){
 }
 
 void Theme::setLight(){
-    _backgroundColor =QColor(255,255,255,255);
+    _backgroundColor =QColor(255,255,255);
     _textColor =QColor(0,0,0,128);
 }
 void Theme::setButtonColor(QColor btnColor){

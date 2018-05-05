@@ -449,10 +449,10 @@ managedb::managedb(QWidget *parent) :
 
 
     QPalette palet;
-    palet.setColor(QPalette::Base, Qt::white);
-    palet.setColor(QPalette::Window, Qt::white);
-    palet.setColor(QPalette::Text, QColor(0,0,0,128));
-    palet.setColor(QPalette::WindowText, QColor(0,0,0,128));
+    palet.setColor(QPalette::Base, theme.backgroundColor());
+    palet.setColor(QPalette::Window, theme.backgroundColor());
+    palet.setColor(QPalette::Text, theme.textColor());
+    palet.setColor(QPalette::WindowText, theme.textColor());
     palet.setColor(QPalette::Button, palette().dark().color());
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
