@@ -12,10 +12,7 @@
 #include <QLabel>
 #include <themewidget.h>
 #include <QPair>
-<<<<<<< HEAD
 #include <QPainter>
-=======
->>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 #include <QListWidget>
 
 class previewer : public QWidget
@@ -94,29 +91,25 @@ private :
     QListWidget *list_menu_selected;
     QListWidget *list_theme;
     uint newEntriesLimit;
-<<<<<<< HEAD
     QSpinBox *monthRange ;
     Theme theme;
 
 
 
-=======
     QSpinBox *spin_limit_month_newEntries ;
-    int themeMode=0;
-    QVariantList themeColors;
-    int alpha;
+//    int themeMode=0;
+//    QVariantList themeColors;
+//    int alpha;
 //    Language lang;
     QList<QPair<QString, QVariant>> list_change;
 
-};
->>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
+
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);
     void apply();
     void ok();
     void readSetting();
-    void insertToList();
 
 };
 

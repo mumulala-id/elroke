@@ -28,10 +28,9 @@ public:
     QColor buttonTextColor();
     void setBackgroundTransprency(int transparency);
     int backgroundTransparency();
-<<<<<<< HEAD
+
     void setBasic(Theme t);
-=======
->>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
+
 private:
     QColor _primaryColor;
     QColor _seCondaryColor;
@@ -40,12 +39,6 @@ private:
     QColor _backgroundColor;
     QColor _buttonColor;
     QColor _buttonTextColor;
-<<<<<<< HEAD
-
 };
-=======
-    int alpha=255;
 
-
->>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 #endif // THEME_H
