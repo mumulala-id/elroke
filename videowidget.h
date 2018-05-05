@@ -17,8 +17,6 @@ public:
     ~VideoWidget();
 private :
     Player *_player;
-//    QString _title;
-//    QString _singer;
     QDesktopWidget *desktop = QApplication::desktop();
     unsigned short int desktop_width = desktop->width();
     unsigned short int desktop_height = desktop->height();

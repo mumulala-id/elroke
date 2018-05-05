@@ -86,13 +86,11 @@ private :
     resizer *img_resizer;
     bool startup=false;
     unsigned int short language_index;
-    QListWidget *list_menu_selected;
+//    QListWidget *list_menu_selected;
     QListWidget *list_theme;
     uint monthRange;
     QSpinBox *spinMonthRange ;
     Theme theme;
-//    QSpinBox *spin_limit_month_newEntries ;
-
     QList<QPair<QString, QVariant>> listOfChange;
 
 

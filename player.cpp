@@ -99,7 +99,7 @@ void Player::signalAlmostEnd()
 
 void Player::setAudioChannelStereo()
 {
-    if(!_isplaying)
+    if(!_isplaying || !isPausing())
         return;
 
       libvlc_audio_set_channel(media_player, 1);
@@ -107,19 +107,22 @@ void Player::setAudioChannelStereo()
 
 void Player::setAudioChannelLeft()
 {
-    if(!_isplaying)        return;
+    if(!_isplaying || !isPausing())
+        return;
     libvlc_audio_set_channel(media_player, 3);
 }
 
 void Player::setAudioChannelRight()
 {
-    if(!_isplaying)        return;
+    if(!_isplaying ||!isPausing())
+        return;
     libvlc_audio_set_channel(media_player, 4);
 }
 
 void Player::setMute(bool mute)
 {
-    if(!_isplaying)        return;
+    if(!_isplaying || !isPausing())
+        return;
     libvlc_audio_set_mute(media_player, mute);
 }
 
@@ -198,11 +201,9 @@ Player::~Player()
 
 void Player::resume()
 {
-
     libvlc_media_player_play(media_player);
     _isplaying=1;
     _isPausing=0;
-
 }
 
 void Player::setWinId(WId _wid)
