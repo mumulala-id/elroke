@@ -70,7 +70,7 @@ bool dbmanager::openDB()
 bool dbmanager::createTable()
 {
     QSqlQuery query(db);
-    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, PLAYTIMES INT, PATH TEXT NOT NULL , DATE TEXT, FAVORITE TEXT, UNIQUE (PATH))");
+    query.prepare("CREATE TABLE IF NOT EXISTS ELROKE123 (ID INTEGER UNIQUE PRIMARY KEY, TITLE TEXT, SINGER TEXT, LANGUAGE TEXT, GENRE TEXT,CHANNEL TEXT, HITS INT, PATH TEXT NOT NULL , DATE TEXT, FAVORITE TEXT, UNIQUE (PATH))");
 
     if(query.exec())
         return true;
@@ -105,14 +105,14 @@ void dbmanager::rollBack()
 bool dbmanager::insertIntoTable(const QVariantList &data)
 {
     QSqlQuery  query(db);
-    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , GENRE, CHANNEL, PLAYTIMES, PATH, DATE, FAVORITE ) VALUES (:Title, :Singer, :Language, :Genre, :Channel, :Playtimes, :Path , :Date, :Favorite)");
+    query.prepare("INSERT INTO ELROKE123 (  TITLE , SINGER, LANGUAGE , GENRE, CHANNEL, HITS, PATH, DATE, FAVORITE ) VALUES (:Title, :Singer, :Language, :Genre, :Channel, :HITS, :Path , :Date, :Favorite)");
 
      query.bindValue(":Title", data[0].toString());
      query.bindValue(":Singer", data[1].toString());
      query.bindValue(":Language", data[2].toString());
      query.bindValue(":Genre", data[3].toString());
      query.bindValue(":Channel", data[4].toString());
-     query.bindValue(":Playtimes", 0);
+     query.bindValue(":HITS", 0);
      query.bindValue(":Path", data[5].toString());
      query.bindValue(":Date", QDate::currentDate().toString("yyyy-MM-dd"));
      query.bindValue(":Favorite", "NO");
@@ -126,7 +126,7 @@ void dbmanager::updatePlayedTime(const QString &id)
 {
     QSqlQuery query(db);
     uint value=0;
-    query.prepare("SELECT PLAYTIMES FROM ELROKE123 WHERE ID = "+id);
+    query.prepare("SELECT HITS FROM ELROKE123 WHERE ID = "+id);
 
     if(query.exec())
     {
@@ -134,7 +134,7 @@ void dbmanager::updatePlayedTime(const QString &id)
         value = query.value(0).toInt()+1;
     }
     query.clear();
-    query.prepare("UPDATE ELROKE123 SET PLAYTIMES ="+QString::number(value)+" WHERE ID = "+id);
+    query.prepare("UPDATE ELROKE123 SET HITS ="+QString::number(value)+" WHERE ID = "+id);
 
     if(!query.exec())
         qDebug()<<"cant update played time";

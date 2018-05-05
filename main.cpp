@@ -28,11 +28,11 @@
 #include <QThread>
 #include <QSettings>
 
-class  I : public QThread
-{
-public:
-    static void sleep (unsigned long secs){QThread::sleep(secs);}
-};
+//class  I : public QThread
+//{
+//public:
+//    static void sleep (unsigned long secs){QThread::sleep(secs);}
+//};
 
 int main(int argc, char *argv[])
 {
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     QPixmap pic(":/usr/share/elroke/icon/logo.png");
     QSplashScreen splash(pic);
      splash.show();
-    I::sleep(5);
+//    I::sleep(5);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
             qDebug()<<"SQLITE is not installed";
@@ -57,13 +57,31 @@ int main(int argc, char *argv[])
     QSqlDatabase::addDatabase("QSQLITE","elroke_add");
     QSqlDatabase::addDatabase("QSQLITE", "elroke_edit");
 
+
     QSettings setting("elroke", "elroke");
     setting.beginGroup("Preferences");
-    QString language = setting.value("language").toString();
+
+    auto setDefault = [&setting](QString name, QVariant variant){
+
+        if(!setting.contains(name))
+            setting.setValue(name, variant);
+    };
+    setDefault("monthRange",3);
+    setDefault("fontSize",12);
+    setDefault("background","/usr/share/elroke/background/butterfly.jpeg");
+    setDefault("fontName","Roboto");
+    setDefault("favGroup",QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL");
+//    QVariantList l =QVariantList()<<QColor(4293467747).rgba()<< QColor(4294934699).rgba()<<QColor(2147483648).rgba()<< QColor(4278190080).rgba()<<QColor(4294967295)<< QColor(4294918273).rgba()<<QColor(4294967295).rgba();
+
+//    setDefault("themeColor",l);
+
+
+    int language = setting.value("language").toInt();
     setting.endGroup();
 
+
     QTranslator t;
-    if(language!="english"&&language!=NULL)
+    if(language!=0)
     {
         t.load(":/usr/share/elroke/languages/elroke_id.qm");
         a.installTranslator(&t);

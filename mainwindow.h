@@ -43,13 +43,14 @@
 #include <QListWidget>
 #include <QDrag>
 #include <QMimeData>
+#include <theme.h>
 
 
 class ListWidget : public QListWidget
 {
 //list for playlist
 public :
-    ListWidget(QWidget *parent=0) :
+    ListWidget(QWidget *parent=nullptr) :
         QListWidget(parent){}
 
 protected :
@@ -104,11 +105,11 @@ private :
     QAction *autosave_playlist;
     QPointer <QDialog> dialog_admin=nullptr;
     QString c_font;
-    QString language;
    unsigned short  int font_size;
    Scoring *scoring;
    QPushButton *buttonFavorite;
    uint newEntriesLimit;
+   Theme theme;
 
 private slots:
     void dialogAdmin();
@@ -139,7 +140,6 @@ private slots:
     void keyBoardInstance();
     void fontSetup();
     void videoEnds();
-    void showHits();
     void moveItemToBottom();
     void handleFavorite();
     void filterLanguageGenre();
@@ -151,26 +151,28 @@ protected :
 };
 
 // this class hide the focus of qtableview (dotted rectangle on selected item)
-class NoFocusDelegate : public QStyledItemDelegate{
+class ItemDelegate: public QStyledItemDelegate{
 
 protected:
 
             void paint(QPainter* painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
                     {
+                        Theme theme;
                         QStyleOptionViewItem itemOption(option);
                         if (itemOption.state & QStyle::State_HasFocus)
                             itemOption.state = itemOption.state ^ QStyle::State_HasFocus;
 
                         if (itemOption.state & QStyle::State_Selected) {
-                                itemOption.palette.setColor(QPalette::Highlight, QColor("#F5F5F5"));
-                                itemOption.palette.setColor(QPalette::HighlightedText, QColor("#E91E63"));
+                                itemOption.palette.setColor(QPalette::Highlight, QColor(255,255,255));
+                                itemOption.palette.setColor(QPalette::HighlightedText, theme.highlightColor());
                                 QApplication::style()->drawControl(QStyle::CE_ItemViewItem, &itemOption, painter, nullptr);
 
                      }
                         else{
-                            itemOption.palette.setColor(QPalette::Text, QColor(0,0,0,128));
-                             painter->setPen(QColor(0,0,0,128));
-                             painter->fillRect(option.rect,QColor(255,255,255));
+
+                            itemOption.palette.setColor(QPalette::Text, theme.textColor());
+                             painter->setPen(theme.textColor());
+                             painter->fillRect(option.rect,Qt::transparent);
                             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
                         }
 

@@ -29,7 +29,7 @@ QString Player::getFile()
 
 void Player::play()
 {
-    if(getFile()==NULL)
+    if(getFile().isEmpty())
     {
         qDebug()<<"file may not be empty";
         return;
@@ -42,9 +42,7 @@ void Player::play()
         libvlc_media_player_play(media_player);
         _isplaying=1;
         _isPausing=0;
-    }
-    else
-    {
+    }    else    {
         libvlc_media_player_play(media_player);
         _isplaying=1;
         _isPausing=0;

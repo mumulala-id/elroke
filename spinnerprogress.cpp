@@ -14,11 +14,12 @@ spinnerProgress::spinnerProgress(QWidget *parent)
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(100);
 
-//    QPalette pal;
-//    pal.setColor(QPalette::Background,Qt::transparent);
-//    setPalette(pal);
+    QPalette pal;
+    pal.setColor(QPalette::Background,Qt::transparent);
+    setPalette(pal);
     setWindowTitle(tr("Analog Clock"));
     resize(100, 100);
+//    setAutoFillBackground(true);
 //    setMinimumSize(100,100);
 }
 

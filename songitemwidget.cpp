@@ -30,7 +30,7 @@ songitemwidget::songitemwidget(QWidget *parent) : QWidget(parent)
     main_layout->setSpacing(4);
     QPalette pal;
     pal.setColor(QPalette::Text,QColor(0,0,0,128));
-    pal.setBrush(QPalette::HighlightedText,Qt::red);
+    pal.setBrush(QPalette::HighlightedText,Qt::yellow);
     setPalette(pal);
     setLayout(main_layout);
 }
@@ -40,6 +40,7 @@ void songitemwidget::setSong(Song * _song)
     song_ = _song;
     label_title->setText(song_->getTitle());
     label_singer->setText(song_->getSinger());
+    update();
 }
 
 Song *songitemwidget::song()
