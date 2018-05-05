@@ -363,7 +363,9 @@ managedb::managedb(QWidget *parent) :
     connect(scroll_bottom,&QPushButton::pressed,table,&QTableView::scrollToBottom);
 
     auto reset = new QPushButton(tr("Show All"), this);
-    connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
+    connect(reset,&QPushButton::pressed,[this](){
+        proxy_model->search("");
+    });
 
     auto to_be_fixed = new QPushButton(tr("To Be Fixed"), this);
     connect(to_be_fixed,&QPushButton::pressed,proxy_model,&ProxyModel::toBeFixed);

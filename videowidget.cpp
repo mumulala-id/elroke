@@ -50,6 +50,8 @@ void VideoWidget::setFullscreenMode()
 }
 void VideoWidget::play()
 {
+    if(_player->isPausing() || _player->isPlaying())
+        _player->stop();
     showFullScreen();
 
     singer_animation->setStartValue(QRect(0,0, width(),height()-label_singer->height()));

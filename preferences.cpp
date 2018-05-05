@@ -463,17 +463,22 @@ void preferences::apply()
 void preferences::ok()
 {
     apply();
+    int count = listOfChange.count();
     QMessageBox msg(this);
+    if(count>0){
     msg.setInformativeText(tr("All change will be applied after app restarted."));
     msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
     msg.addButton(tr("RESTART"), QMessageBox::AcceptRole);
+    }else{
+        msg.setInformativeText(tr("No Change have been made."));
+        msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
+    }
     //RESTART
     connect(&msg,&QMessageBox::accepted,[this](){
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
 
     });
-    msg.setWindowFlag(Qt::FramelessWindowHint);
     msg.exec();
 
     accept();

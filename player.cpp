@@ -14,7 +14,8 @@ Player::Player(QObject *parent) : QObject(parent)
 
     poller = new QTimer(this);
     connect(poller,&QTimer::timeout,this,&Player::signalAlmostEnd);
-    poller->start(1000);
+    poller->setInterval(1000);
+    poller->start();
 }
 
 void Player::setFile(QString file)
@@ -35,18 +36,15 @@ void Player::play()
         return;
     }
 
-    if(!_isPausing)
-    {
-        media = libvlc_media_new_path(vlc, getFile().toLatin1());
-        libvlc_media_player_set_media(media_player, media);
-        libvlc_media_player_play(media_player);
-        _isplaying=1;
-        _isPausing=0;
-    }    else    {
-        libvlc_media_player_play(media_player);
-        _isplaying=1;
-        _isPausing=0;
-    }
+    if(isPlaying() || isPausing())
+    stop();
+
+    media = libvlc_media_new_path(vlc, getFile().toLatin1());
+    libvlc_media_player_set_media(media_player, media);
+    libvlc_media_player_play(media_player);
+    _isplaying=true;
+    _isPausing=false;
+
 }
 
 void Player::pause()
@@ -59,8 +57,8 @@ void Player::pause()
 void Player::stop()
 {
     _isplaying=false;
+    _isPausing=false;
     libvlc_media_player_stop(media_player);
-    poller->stop();
 }
 
 void Player::setVolume(int newVolume)
@@ -72,7 +70,7 @@ void Player::changePosition(int newPosition)
 {
     libvlc_media_t *curMedia = libvlc_media_player_get_media(media_player);
 
-    if(curMedia == NULL)
+    if(curMedia == nullptr)
         return;
 
     float pos = (float)(newPosition)/(float)POSITION_RESOLUTION;
@@ -170,7 +168,7 @@ int Player::volume()
 int Player::position()
 {
        float pos = libvlc_media_player_get_position(media_player);
-        return (int)(pos * (float)(100));
+        return (int)(pos * 100.0);
 }
 
 int Player::getAudioChannel()
@@ -195,6 +193,15 @@ Player::~Player()
     libvlc_media_player_stop(media_player);
     libvlc_media_player_release(media_player);
     libvlc_release(vlc);
+
+}
+
+void Player::resume()
+{
+
+    libvlc_media_player_play(media_player);
+    _isplaying=1;
+    _isPausing=0;
 
 }
 
