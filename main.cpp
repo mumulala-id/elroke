@@ -71,9 +71,15 @@ int main(int argc, char *argv[])
     setDefault("background","/usr/share/elroke/background/butterfly.jpeg");
     setDefault("fontName","Roboto");
     setDefault("favGroup",QStringList()<<"POP"<<"ROCK"<<"JAZZ"<<"DANGDUT"<<"TRADITIONAL");
+<<<<<<< HEAD
 //    QVariantList l =QVariantList()<<QColor(4293467747).rgba()<< QColor(4294934699).rgba()<<QColor(2147483648).rgba()<< QColor(4278190080).rgba()<<QColor(4294967295)<< QColor(4294918273).rgba()<<QColor(4294967295).rgba();
 
 //    setDefault("themeColor",l);
+=======
+    QVariantList l =QVariantList()<<QColor(4293467747).rgba()<< QColor(4294934699).rgba()<<QColor(2147483648).rgba()<< QColor(4278190080).rgba()<<QColor(4294967295)<< QColor(4294918273).rgba()<<QColor(4294967295).rgba();
+
+    setDefault("themeColor",l);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
 
     int language = setting.value("language").toInt();

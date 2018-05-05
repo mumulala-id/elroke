@@ -12,7 +12,10 @@
 #include <QLabel>
 #include <themewidget.h>
 #include <QPair>
+<<<<<<< HEAD
 #include <QPainter>
+=======
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 #include <QListWidget>
 
 class previewer : public QWidget
@@ -70,9 +73,11 @@ signals :
 class preferences : public QDialog
 {
     Q_OBJECT
+    Q_ENUMS(Language)
 public:
     explicit preferences(QWidget *parent = nullptr);
     ~preferences();
+//    enum Language{English=0,Indonesian=1};
 private :
     QString selected_font,selected_background;
     unsigned short  int fontSize;
@@ -89,17 +94,29 @@ private :
     QListWidget *list_menu_selected;
     QListWidget *list_theme;
     uint newEntriesLimit;
+<<<<<<< HEAD
     QSpinBox *monthRange ;
     Theme theme;
 
 
 
+=======
+    QSpinBox *spin_limit_month_newEntries ;
+    int themeMode=0;
+    QVariantList themeColors;
+    int alpha;
+//    Language lang;
+    QList<QPair<QString, QVariant>> list_change;
+
+};
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 private slots:
     QStringList getLanguageGenre();
     void handleImage(QImage);
     void apply();
     void ok();
     void readSetting();
+    void insertToList();
 
 };
 

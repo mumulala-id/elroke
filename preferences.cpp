@@ -43,11 +43,20 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     auto button_ok = new QPushButton(tr("Save"), this);
     connect(button_ok,&QPushButton::pressed,this,&preferences::ok);
+<<<<<<< HEAD
 
+=======
+//    auto button_apply = new QPushButton(tr("Apply"), this);
+//    connect(button_apply,&QPushButton::pressed,this,&preferences::apply);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
     auto button_cancel = new QPushButton(tr("Cancel"), this);
     connect(button_cancel,&QPushButton::pressed,this,&preferences::close);
 
     layout_button->addWidget(button_ok);
+<<<<<<< HEAD
+=======
+//    layout_button->addWidget(button_apply);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
     layout_button->addWidget(button_cancel);
 
    auto stack = new QStackedLayout;
@@ -127,9 +136,15 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     });
 
     auto layout_sub_font = new QHBoxLayout;
+<<<<<<< HEAD
     auto spin_fontSize = new QSpinBox(this);
     spin_fontSize->setRange(12,48);//not tested
     spin_fontSize->setValue(fontSize);
+=======
+    auto spin_font_size = new QSpinBox(this);
+    spin_font_size->setRange(12,48);//not tested
+    spin_font_size->setValue(font_size);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
     layout_sub_font->addWidget(combo_font);
     layout_sub_font->addWidget(spin_fontSize);
@@ -149,11 +164,21 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
 
     auto radio_light = new QRadioButton(tr("Light"),this);
+<<<<<<< HEAD
     radio_light->setChecked(true);
     theme.setLight();
 
     auto radio_dark = new QRadioButton(tr("Dark"),this);
 
+=======
+//    connect(radio_light,&QRadioButton::toggled,[this](){
+//        themeMode=1;
+//    });
+    auto radio_dark = new QRadioButton(tr("Dark"),this);
+//    connect(radio_dark,&QRadioButton::toggled,[this](){
+//        themeMode=2;
+//    });
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
 
     auto theme1 =new  ThemeWidget(this);
@@ -185,6 +210,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     list_theme->addItem(item);
     list_theme->setItemWidget(item, theme1);
     item->setSizeHint(theme1->size());
+<<<<<<< HEAD
 
     auto item1 = new QListWidgetItem;
     list_theme->addItem(item1);
@@ -195,6 +221,68 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     list_theme->addItem(item2);
     list_theme->setItemWidget(item2, theme3);
     item2->setSizeHint(theme3->size());
+=======
+
+    auto item1 = new QListWidgetItem;
+    list_theme->addItem(item1);
+    list_theme->setItemWidget(item1, theme2);
+    item1->setSizeHint(theme2->size());
+
+    auto item2 = new QListWidgetItem;
+    list_theme->addItem(item2);
+    list_theme->setItemWidget(item2, theme3);
+    item2->setSizeHint(theme3->size());
+
+    auto item3 = new QListWidgetItem;
+    list_theme->addItem(item3);
+    list_theme->setItemWidget(item3, theme4);
+    item3->setSizeHint(theme4->size());
+
+    auto layout_colormode = new QHBoxLayout;
+
+    layout_colormode->addWidget(radio_light);
+    layout_colormode->addWidget(radio_dark);
+
+    auto layout_transparent = new QHBoxLayout;
+
+    auto slider_transparent = new QSlider(Qt::Horizontal,this);
+    slider_transparent->setRange(0,255);
+    slider_transparent->setFocusPolicy(Qt::NoFocus);
+//    slider_transparent->setInvertedAppearance(true);
+    connect(slider_transparent,&QSlider::sliderMoved,[this](int value){
+        alpha = value;
+    });
+
+    connect(list_theme,&QListWidget::clicked,[this,slider_transparent](QModelIndex index){
+        auto tw = qobject_cast<ThemeWidget*>(list_theme->indexWidget(index));
+        slider_transparent->setValue(tw->theme().backgroundTransparency());
+    });
+
+    layout_transparent->addWidget(new QLabel(tr("Background Tranparency"), this));
+    layout_transparent->addWidget(slider_transparent);
+
+    layout_theme->addLayout(layout_colormode);
+    layout_theme->addWidget(list_theme);
+    layout_theme->addLayout(layout_transparent);
+
+    layout_theme->addStretch();
+
+    auto button_set_theme = new QPushButton(tr("Set"), this);
+    layout_theme->addWidget(button_set_theme,0,Qt::AlignRight|Qt::AlignBottom);
+    connect(button_set_theme,&QPushButton::pressed,[this,radio_dark](){
+        ThemeWidget * themeWIdget = qobject_cast<ThemeWidget*>( list_theme->itemWidget(list_theme->currentItem()));
+        Theme theme = themeWIdget->theme();
+        qDebug()<<"alpha"<<alpha;
+        theme.setBackgroundTransprency(alpha);
+        if(radio_dark->isChecked()){
+            theme.setDark();
+        } else{
+            theme.setLight();
+        }
+        qDebug()<<theme.backgroundTransparency();
+        themeColors=theme.toList();
+    });
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
     auto item3 = new QListWidgetItem;
     list_theme->addItem(item3);
@@ -421,6 +509,7 @@ favGroup.clear();
     setting.beginGroup("Preferences");
     setting.setValue("fontName",selected_font);
     setting.setValue("background", selected_background);
+<<<<<<< HEAD
     setting.setValue("fontSize", fontSize);
     setting.setValue("startup", startup);
     setting.setValue("language", language_index);
@@ -428,6 +517,15 @@ favGroup.clear();
     setting.setValue("monthRange", monthRange->value());
 //    setting.setValue("themeMode",themeMode);
     setting.setValue("themeColor", theme.toList());
+=======
+    setting.setValue("fontSize", font_size);
+    setting.setValue("startup", startup);
+    setting.setValue("language", language_index);
+    setting.setValue("favGroup", shortcut_item);
+    setting.setValue("monthRange", spin_limit_month_newEntries->value());
+    setting.setValue("themeMode",themeMode);
+    setting.setValue("themeColor", themeColors);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
     setting.endGroup();
 }
 void preferences::ok()
@@ -456,11 +554,19 @@ void preferences::readSetting()
     setting.beginGroup("Preferences");
     selected_font = setting.value("fontName").toString();
     selected_background = setting.value("background").toString();
+<<<<<<< HEAD
     fontSize = setting.value("fontSize").toInt();
     startup = setting.value("startup").toBool();
     language_index = setting.value("language").toInt();
     favGroup = setting.value("favGroup").toStringList();
 //    theme= setting.value("themeColor").toList();
+=======
+    font_size = setting.value("fontSize").toInt();
+    startup = setting.value("startup").toBool();
+    language_index = setting.value("language").toInt();
+    shortcut_item = setting.value("favGroup").toStringList();
+    themeColors = setting.value("themeColor").toList();
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
     newEntriesLimit = setting.value("monthRange").toInt();
     setting.endGroup();
 }
@@ -474,6 +580,7 @@ void preferences::handleImage(QImage img)
     model->setItem(c,0,item);
 }
 
+<<<<<<< HEAD
 //void preferences::insertToList(QPair<QString , QVariant > p)
 //{
 ////    p.first;
@@ -488,6 +595,22 @@ void preferences::handleImage(QImage img)
 ////    };
 
 //}
+=======
+void preferences::insertToList(QPair<QString , QVariant > p)
+{
+//    p.first;
+//    auto isAlredy =[](){
+//    foreach(QPair<QString,QVariant> s, lis){
+//        if(s.first==p.first){
+
+//        break;
+//    return true;
+//    }
+//    return false;
+//    };
+
+}
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
 preferences::~preferences()
 {

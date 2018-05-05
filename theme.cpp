@@ -4,6 +4,7 @@ Theme::Theme(){
     QSettings setting("elroke","elroke");
     setting.beginGroup("Preferences");
     QVariantList colors = setting.value("themeColor").toList();
+<<<<<<< HEAD
     setting.endGroup();
 
     _primaryColor =QColor::fromRgba(colors.at(0).toUInt());
@@ -13,6 +14,20 @@ Theme::Theme(){
     _backgroundColor =QColor::fromRgba(colors.at(4).toUInt());
     _buttonColor =QColor::fromRgba(colors.at(5).toUInt());
     _buttonTextColor = QColor::fromRgba(colors.at(6).toUInt());
+=======
+    alpha = setting.value("alpha").toInt();
+    setting.endGroup();
+
+        _primaryColor =QColor::fromRgba(colors.at(0).toUInt());
+        _seCondaryColor =QColor::fromRgba(colors.at(1).toUInt());
+        _textColor = QColor::fromRgba(colors.at(2).toUInt());
+        _highlightTextColor =QColor::fromRgba(colors.at(3).toUInt());
+        _backgroundColor =QColor::fromRgba(colors.at(4).toUInt());
+        _buttonColor =QColor::fromRgba(colors.at(5).toUInt());
+        _buttonTextColor = QColor::fromRgba(colors.at(6).toUInt());
+
+
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
 
 }
 void Theme::setPrimaryColor(QColor pColor){
@@ -83,6 +98,7 @@ QColor Theme::buttonTextColor(){
 
 void Theme::setBackgroundTransprency(int transparency){
     _backgroundColor.setAlpha(transparency);
+<<<<<<< HEAD
 }
 int Theme::backgroundTransparency(){
     return _backgroundColor.alpha();
@@ -98,3 +114,13 @@ void Theme::setBasic(Theme t){
     _buttonTextColor =t.buttonTextColor();
 
 }
+=======
+    qDebug()<<"BB"<<_backgroundColor.alpha();
+}
+int Theme::backgroundTransparency(){
+    _backgroundColor.rgba();
+    //? why icant get alpha value, its alwasy return 255
+      qDebug()<<"BB"<<_backgroundColor.alpha();
+    return _backgroundColor.alpha();
+}
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349

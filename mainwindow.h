@@ -169,8 +169,14 @@ protected:
 
                      }
                         else{
+<<<<<<< HEAD
 
                             itemOption.palette.setColor(QPalette::Text, theme.textColor());
+=======
+                            QColor c = theme.textColor();
+                            c.setAlpha(128);
+                            itemOption.palette.setColor(QPalette::Text, c);
+>>>>>>> 0fcf4733f1b81e83c79e07dd2487ea1cff017349
                              painter->setPen(theme.textColor());
                              painter->fillRect(option.rect,Qt::transparent);
                             painter->drawLine(option.rect.bottomLeft(),option.rect.bottomRight());
