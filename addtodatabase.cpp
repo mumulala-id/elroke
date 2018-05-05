@@ -351,7 +351,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
     palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text,theme.textColor());
     palet.setColor(QPalette::WindowText, theme.textColor());
-    palet.setColor(QPalette::Button, Qt::gray);
+    palet.setColor(QPalette::Button, Qt::darkGray);
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
     setLayout(layout_main);

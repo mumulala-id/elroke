@@ -197,7 +197,7 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     theme4->setSecondaryColor("#212121");
     theme4->setButtonColor("#E91E63");
     theme4->setButtontextColor("#FFFFFF");
-    theme4->setTextColor("#FFFFFF");
+//    theme4->setTextColor("#FFFFFF");
     theme4->setHighlightTextColor("#E91E63");
 
     list_theme = new QListWidget(this);
@@ -271,16 +271,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     connect(list_theme,&QListWidget::clicked,[this,slider_transparent,preview,radio_dark](QModelIndex index){
         auto tw = qobject_cast<ThemeWidget*>(list_theme->indexWidget(index));
         theme.setBasic(tw->theme());
-
     });
 
     auto buttonSetTheme = new QPushButton(tr("Set Theme"), this);
     connect(buttonSetTheme,&QPushButton::pressed,[this](){
-
         insertToListchange("themeColor",theme.toList());
-
     });
-
 
     layout_theme->addLayout(layout_colormode);
     layout_theme->addWidget(list_theme);
@@ -301,7 +297,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     auto layout_move_button = new QVBoxLayout;
 
     auto button_right = new QPushButton(QIcon::fromTheme("go-next"),"",this);
-
     auto button_left = new QPushButton(QIcon::fromTheme("go-previous"),"", this);
 
     layout_move_button->addStretch();
@@ -318,7 +313,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     auto buttonSetFavGroup = new QPushButton(tr("Set"), this);
     connect( buttonSetFavGroup,&QPushButton::pressed,[this](){
-
         favGroup.clear();
           for(int i=0;i<list_menu_selected->count();i++){
               favGroup<< list_menu_selected->item(i)->text();
@@ -347,7 +341,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 
     connect(button_left,&QPushButton::clicked,toLeft);
     connect(list_menu_selected,&QListWidget::doubleClicked,toLeft);
-
 
     auto group_background = new QGroupBox(tr("Background"), this);
     group_background->setLayout(layout_background);
@@ -398,13 +391,12 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     con(button_menu,3);
     con(button_background,4);
 
-
     QPalette palet;
     palet.setColor(QPalette::Base, theme.backgroundColor());
     palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text, theme.textColor());
     palet.setColor(QPalette::WindowText, theme.textColor());
-    palet.setColor(QPalette::Button, Qt::gray);
+    palet.setColor(QPalette::Button, Qt::darkGray);
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
 
@@ -424,13 +416,11 @@ QStringList preferences::getLanguageGenre()
     {
         list.removeAll(favGroup.at(i));
     }
-
     return list;
 }
 
 void preferences::apply()
 {
-
     QDir dir(QDir::homePath()+"/.config/autostart");
     QFile file(dir.path()+"/elroke.desktop");
    if(startup)
@@ -466,14 +456,12 @@ void preferences::apply()
     for(int i=0;i<listOfChange.size();i++){
         QPair<QString,QVariant> pair = listOfChange.at(i);
          setting.setValue(pair.first,pair.second);
-
     }
 
     setting.endGroup();
 }
 void preferences::ok()
 {
-
     apply();
     QMessageBox msg(this);
     msg.setInformativeText(tr("All change will be applied after app restarted."));
@@ -522,8 +510,6 @@ void preferences::insertToListchange(QString p, QVariant v)
                listOfChange.removeAt(i);
                break;
            }
-
-
     }
   listOfChange<<QPair<QString,QVariant>(p,v);
 }

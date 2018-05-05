@@ -14,10 +14,12 @@ public:
 private:
     float value=0;
     bool play=false;
+    QColor lineColor;
 public slots:
     void setValue(uint val);
     void start();
     void stop();
+    void setLineColor(QColor);
 
 
 protected :

@@ -15,8 +15,7 @@ QSortFilterProxyModel(parent),text_search(""),md(_md)
 
 void ProxyModel::search(QString s){
 
-    if(text_search!=s)
-    text_search=s;
+       text_search=s.trimmed();
     md = ProxyModel::smart;
     invalidateFilter();
 

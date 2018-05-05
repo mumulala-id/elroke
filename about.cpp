@@ -40,8 +40,8 @@ about::about(QWidget *parent) :
     palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text,theme.textColor());
     palet.setColor(QPalette::WindowText, theme.textColor());
-    palet.setColor(QPalette::Button, theme.buttonColor());
-    palet.setColor(QPalette::ButtonText,theme.buttonTextColor());
+    palet.setColor(QPalette::Button, Qt::darkGray);
+    palet.setColor(QPalette::ButtonText,Qt::white);
 
     auto lo_main = new QVBoxLayout;
 

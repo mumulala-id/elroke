@@ -13,14 +13,14 @@ spinnerProgress::spinnerProgress(QWidget *parent)
     auto timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(update()));
     timer->start(100);
+    lineColor=QColor("#E91E63");
 
     QPalette pal;
     pal.setColor(QPalette::Background,Qt::transparent);
     setPalette(pal);
     setWindowTitle(tr("Analog Clock"));
     resize(100, 100);
-//    setAutoFillBackground(true);
-//    setMinimumSize(100,100);
+
 }
 
 void spinnerProgress::setValue(uint val)
@@ -37,6 +37,11 @@ void spinnerProgress::stop()
 {
     play = false;
 }
+
+void spinnerProgress::setLineColor(QColor color){
+    lineColor =color;
+}
+
 void spinnerProgress::paintEvent(QPaintEvent *)
 {
     QTime time = QTime::currentTime();
@@ -68,7 +73,7 @@ void spinnerProgress::paintEvent(QPaintEvent *)
            markPen.setCapStyle(Qt::FlatCap);
            markPen.setJoinStyle(Qt::RoundJoin);
            markPen.setStyle(Qt::SolidLine);
-           markPen.setColor(Qt::white);
+           markPen.setColor(lineColor);
            markPen.setWidth(arcWidth);
            painter.setPen(markPen);
            painter.drawArc(bounds, startAngle_, angleSpan_);

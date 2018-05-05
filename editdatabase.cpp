@@ -252,7 +252,7 @@ managedb::managedb(QWidget *parent) :
    auto le_set_category = new QLineEdit(this);
     le_set_category->setPlaceholderText(tr("Genre"));
 
-    auto button_set_category = new QPushButton(tr("Set Category"), this);
+    auto button_set_category = new QPushButton(tr("Set Genre"), this);
     connect(button_set_category,&QPushButton::pressed,[this, le_set_category]()
     {
         if(!le_set_category->text().isEmpty())
@@ -453,7 +453,7 @@ managedb::managedb(QWidget *parent) :
     palet.setColor(QPalette::Window, theme.backgroundColor());
     palet.setColor(QPalette::Text, theme.textColor());
     palet.setColor(QPalette::WindowText, theme.textColor());
-    palet.setColor(QPalette::Button, palette().dark().color());
+    palet.setColor(QPalette::Button, Qt::darkGray);
     palet.setColor(QPalette::ButtonText, Qt::white);
     setPalette(palet);
     setLayout(lo_main);
