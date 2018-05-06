@@ -99,7 +99,7 @@ void Player::signalAlmostEnd()
 
 void Player::setAudioChannelStereo()
 {
-    if(!_isplaying || !isPausing())
+    if(!_isplaying)
         return;
 
       libvlc_audio_set_channel(media_player, 1);
@@ -107,14 +107,14 @@ void Player::setAudioChannelStereo()
 
 void Player::setAudioChannelLeft()
 {
-    if(!_isplaying || !isPausing())
+    if(!_isplaying)
         return;
     libvlc_audio_set_channel(media_player, 3);
 }
 
 void Player::setAudioChannelRight()
 {
-    if(!_isplaying ||!isPausing())
+    if(!_isplaying)
         return;
     libvlc_audio_set_channel(media_player, 4);
 }

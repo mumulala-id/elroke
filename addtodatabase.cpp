@@ -47,6 +47,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    //get mounted drive
     getDrive();
 
+
     auto button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
     connect(button_refresh,&QPushButton::pressed,this,&addtodatabase::getDrive);
@@ -79,6 +80,8 @@ addtodatabase::addtodatabase(QWidget *parent) :
      connect(combo_drive, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive)
      {
         treeview->setRootIndex(dir_model->index(drive));
+        currentDrive = drive;
+        getItem();
      });
 
      file_model = new QFileSystemModel(this);
@@ -107,6 +110,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
         if(list.count()>0)
             button_start->setEnabled(true);
      });
+
+     currentDirectory = combo_drive->currentText();
+     getItem();
 
      layout_top_left->addLayout(layout_drive);
      layout_top_left->addWidget(treeview);
@@ -456,6 +462,7 @@ void addtodatabase::saveToDatabase()
             else
                 genre = default_genre;
 
+            qDebug()<<singer;
 
         QStringList p = _pattern.split(splitter);
 
@@ -477,20 +484,27 @@ void addtodatabase::saveToDatabase()
            {
                splitted = filename.split(splitter);
 
-               if(titlePos!=-1)
+               if(titlePos!=-1 && titlePos<splitted.count())
+
                   title = splitted.at(titlePos);
 
-               if(singerPos!=-1)
+               if(singerPos!=-1 && singerPos<splitted.count()){
+                   if(singer=="UNKNOWN")
                    singer = splitted.at(singerPos);
+               else
+                       singer = default_singer;
+               }
 
 
-               if(languagePos!=-1)
+               if(languagePos!=-1 && languagePos<splitted.count())
+//                   if(language=="UNKNOWN")
                     language = splitted.at(languagePos);
 
-               if(genrePos!=-1)
+               if(genrePos!=-1&&genrePos<splitted.count())
+//                   if(genre=="UNKNOWN")
                 genre = splitted.at(genrePos);
 
-               if(audioPos!=-1)
+               if(audioPos!=-1&&audioPos<splitted.count())
                a_channel = splitted.at(audioPos);
 
            } else {
@@ -502,6 +516,7 @@ void addtodatabase::saveToDatabase()
                singer = filename.split('-').at(1);
                }
            }
+           qDebug()<<singer<<"2";
 
         set_singer.insert(singer.toUpper());
         set_language.insert(language.toUpper());

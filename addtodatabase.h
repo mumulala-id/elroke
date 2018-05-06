@@ -64,7 +64,7 @@ private :
     QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
-    QStringList supported_video = QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov";
+    QStringList supported_video {"*.mp4","*.avi","*.dat","*.mkv","*.mpg","*.mov"};
     QComboBox *combo_drive;
     QString default_singer="UNKNOWN";
     QString default_language="UNKNOWN";
