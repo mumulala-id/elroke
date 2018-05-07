@@ -33,8 +33,6 @@
 about::about(QWidget *parent) :
     QDialog(parent)
 {
-
-
     QPalette palet;
     palet.setColor(QPalette::Base, theme.backgroundColor());
     palet.setColor(QPalette::Window, theme.backgroundColor());

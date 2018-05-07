@@ -471,9 +471,8 @@ void preferences::ok()
     connect(&msg,&QMessageBox::accepted,[this](){
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
-
     });
-    msg.setWindowFlag(Qt::FramelessWindowHint);
+
     msg.exec();
 
     accept();
@@ -513,7 +512,6 @@ void preferences::insertToListchange(QString p, QVariant v)
     }
   listOfChange<<QPair<QString,QVariant>(p,v);
 }
-
 
 preferences::~preferences()
 {

@@ -218,13 +218,11 @@ addtodatabase::addtodatabase(QWidget *parent) :
    auto layout_additional_item = new QVBoxLayout;
 
    le_singer = new QLineEdit(this);
-   le_singer->setText(default_singer);
    le_language = new QLineEdit(this);
-   le_language->setText(default_language);
    le_genre = new QLineEdit(this);
-   le_genre->setText(default_genre);
 
    auto radio_audio_left = new QRadioButton(tr("Left"), this);
+   radio_audio_left->setChecked(true);
    auto radio_audio_right = new QRadioButton(tr("Right"), this);
    auto radio_audio_stereo = new QRadioButton(tr("Stereo"), this);
 
@@ -409,6 +407,8 @@ void addtodatabase::saveToDatabase()
    QSet<QString>set_genre;
    QSet<QString>set_folder;
 
+   QString default_singer, default_language, default_genre, default_audio;
+
     QStringList splitted;
     QString title, singer, language, genre, a_channel, path,folder;
     QString filename;
@@ -426,19 +426,25 @@ void addtodatabase::saveToDatabase()
             message.exec();
             return;
     }
-            singer="UNKNOWN";
-            title="UNKNOWN";
-            language="UNKNOWN";
-            genre="UNKNOWN";
-            a_channel="UNKNOWN";
 
-            if(!le_singer->text().isEmpty())
+            if(!le_singer->text().isEmpty()){
                  default_singer = le_singer->text();
-            if(!le_language->text().isEmpty())
+            } else {
+                default_singer="UNKNOWN";
+            }
+            if(!le_language->text().isEmpty()){
                   default_language = le_language->text();
-            if(!le_genre->text().isEmpty())
+            } else {
+                default_language="UNKNOWN";
+            }
+            if(!le_genre->text().isEmpty()){
                    default_genre = le_genre->text();
-
+            } else {
+                default_genre="UNKNOWN";
+            }
+            if(default_audio.isEmpty()){
+                default_audio="LEFT";
+            }
 
         QStringList p = _pattern.split(splitter);
 
@@ -454,6 +460,10 @@ void addtodatabase::saveToDatabase()
             info.setFile(path);
             filename = info.completeBaseName();
             folder = info.absolutePath();
+
+            singer = default_singer;
+            language = default_language;
+            genre = default_genre;
 
            if(filename.contains(splitter))
            {
@@ -480,12 +490,12 @@ void addtodatabase::saveToDatabase()
                }
 
                if(genrePos<splitted.count()){
-                genre = splitted.at(genrePos);
+                    genre = splitted.at(genrePos);
                } else {
                    genre = default_genre;
                }
                if(audioPos<splitted.count()){
-               a_channel = splitted.at(audioPos);
+                    a_channel = splitted.at(audioPos);
                } else {
                    a_channel = default_audio;
                }
@@ -513,7 +523,6 @@ void addtodatabase::saveToDatabase()
 
         sql_ok =  db->insertIntoTable(data);
         data.clear();
-
         }
     }
     else//automatic

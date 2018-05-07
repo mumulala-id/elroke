@@ -66,10 +66,7 @@ private :
     QString splitter{"#"};
     QStringList supported_video = QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov";
     QComboBox *combo_drive;
-    QString default_singer="UNKNOWN";
-    QString default_language="UNKNOWN";
-    QString default_genre="UNKNOWN";
-    QString default_audio="UNKNOWN";
+    QString default_audio;
     myListWidget *view_pattern;
     Theme theme;
 

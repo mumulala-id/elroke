@@ -15,10 +15,7 @@ public:
         QList<QString>list;
 
         if(!f.exists())
-        {
-            qDebug()<<file+" not found";
             return list;
-        }
 
         if(!f.open(QIODevice::ReadOnly | QIODevice::Text))
                qDebug()<<"cant read singer";
@@ -27,8 +24,8 @@ public:
         QString line = stream.readLine();
         while(!stream.atEnd())
         {
-            list<<line;
-            line=stream.readLine();
+            list << line;
+            line = stream.readLine();
         }
 
         qSort(list.begin(), list.end());
