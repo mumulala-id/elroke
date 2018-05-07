@@ -49,12 +49,12 @@ public:
 
 private :
     QString currentDrive;
-    QString current_dir;
+    QString currentDirectory;
     QString data_dir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
     QFileSystemModel *dir_model;
     QTreeView *treeview;
     QFileSystemModel *file_model;
-    QLabel *label_current_dir;
+    QLabel *label_currentDirectory;
     QTableView *view;
     QStandardItemModel *model;
     QLineEdit *le_singer;
@@ -64,7 +64,7 @@ private :
     QPushButton *button_start;
     QLineEdit *le_splitter;
     QString splitter{"#"};
-    QStringList supported_video = QStringList()<<"*.mp4"<<"*.avi"<<"*.dat"<<"*.mkv"<<"*.mpg"<<"*.mov";
+    QStringList supported_video {"*.mp4","*.avi","*.dat","*.mkv","*.mpg","*.mov"};
     QComboBox *combo_drive;
     QString default_audio;
     myListWidget *view_pattern;
@@ -77,7 +77,6 @@ private :
 
 
 private slots:
-//     void splitterChange(const QString &);
      void saveToDatabase();
      void getDrive();
      void writeTextStream(const QString &file, QSet<QString> set);

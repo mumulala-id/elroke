@@ -362,7 +362,8 @@ void mainWindow::createWidgets()
 
     spinner_progress = new spinnerProgress(this);
     spinner_progress->setFixedSize(64,64);
-    spinner_progress->setAutoFillBackground(true);
+//    spinner_progress->setAutoFillBackground(true);
+    spinner_progress->setLineColor(theme.primaryColor());
 
     auto buttonControl = [this,transparent_button](QIcon icon)
     {
@@ -389,7 +390,7 @@ void mainWindow::createWidgets()
          }
 
          else if(video->player()->isPausing()){
-             video->player()->play();
+             video->player()->resume();
              button_play_pause->setIcon(QIcon(":/usr/share/elroke/icon/pause.png"));
          }
          else{

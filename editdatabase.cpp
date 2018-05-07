@@ -316,10 +316,7 @@ managedb::managedb(QWidget *parent) :
     glo_button->addWidget(button_language_audio,4,0);
     glo_button->addWidget(button_genre_audio,4,1);
     glo_button->addWidget(le_set_title,5,0);
-
-
     glo_button->addWidget(button_set_title,5,1);
-
     glo_button->addWidget(button_set_singer,6,1);
     glo_button->addWidget(le_set_singer,6,0);
     glo_button->addWidget(button_set_language,7,1);
@@ -363,7 +360,9 @@ managedb::managedb(QWidget *parent) :
     connect(scroll_bottom,&QPushButton::pressed,table,&QTableView::scrollToBottom);
 
     auto reset = new QPushButton(tr("Show All"), this);
-    connect(reset,SIGNAL(pressed()),proxy_model,SLOT(reset()));
+    connect(reset,&QPushButton::pressed,[this](){
+        proxy_model->search("");
+    });
 
     auto to_be_fixed = new QPushButton(tr("To Be Fixed"), this);
     connect(to_be_fixed,&QPushButton::pressed,proxy_model,&ProxyModel::toBeFixed);
@@ -389,6 +388,7 @@ managedb::managedb(QWidget *parent) :
     table->setSelectionMode( QAbstractItemView::ExtendedSelection);
     table->setEditTriggers(QAbstractItemView::NoEditTriggers);
     table->model()->setHeaderData(6, Qt::Horizontal,Qt::AlignLeft, Qt::TextAlignmentRole);
+
     connect(table->selectionModel(),&QItemSelectionModel::selectionChanged,[this](){
         QModelIndexList list = table->selectionModel()->selectedRows();
         selected_count_label->setText(QString::number(list.count()));
@@ -628,7 +628,8 @@ managedb::~managedb()
     db->closeDB();
 }
 
-void managedb::writeTextStream(const QString &file, QList<QString>set){
+void managedb::writeTextStream(const QString &file, QList<QString>set)
+{
     QFileInfo info;
     info.setFile(file);
     if(!info.dir().exists())

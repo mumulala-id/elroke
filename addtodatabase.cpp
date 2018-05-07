@@ -47,6 +47,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
    //get mounted drive
     getDrive();
 
+
     auto button_refresh = new QPushButton(QIcon::fromTheme("stock_refresh"),"", this);
     button_refresh->setFixedWidth(40);
     connect(button_refresh,&QPushButton::pressed,this,&addtodatabase::getDrive);
@@ -71,14 +72,16 @@ addtodatabase::addtodatabase(QWidget *parent) :
 
      connect(treeview,&QTreeView::clicked,[this](const QModelIndex &index)
      {
-         current_dir = dir_model->fileInfo(index).absoluteFilePath();
-         label_current_dir->setText(current_dir);
+         currentDirectory = dir_model->fileInfo(index).absoluteFilePath();
+         label_currentDirectory->setText(currentDirectory);
          getItem();
      });
 
      connect(combo_drive, static_cast<void (QComboBox::*)(const QString &)> (&QComboBox::activated),[this](const QString &drive)
      {
         treeview->setRootIndex(dir_model->index(drive));
+        currentDrive = drive;
+        getItem();
      });
 
      file_model = new QFileSystemModel(this);
@@ -87,7 +90,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      file_model->setNameFilterDisables(false);
      file_model->setRootPath(getCurrentDrive());
 
-     label_current_dir = new QLabel(this);
+     label_currentDirectory = new QLabel(this);
 
      model = new QStandardItemModel;
      model->setColumnCount(2);
@@ -107,6 +110,9 @@ addtodatabase::addtodatabase(QWidget *parent) :
         if(list.count()>0)
             button_start->setEnabled(true);
      });
+
+     currentDirectory = combo_drive->currentText();
+     getItem();
 
      layout_top_left->addLayout(layout_drive);
      layout_top_left->addWidget(treeview);
@@ -136,7 +142,7 @@ addtodatabase::addtodatabase(QWidget *parent) :
      layout_below_view->addWidget(button_select_all);
 
      auto layout_list = new QVBoxLayout;
-     layout_list->addWidget(label_current_dir);
+     layout_list->addWidget(label_currentDirectory);
      layout_list->addWidget(view);
      layout_list->addLayout(layout_below_view);
 
@@ -198,11 +204,25 @@ addtodatabase::addtodatabase(QWidget *parent) :
     view_pattern->setFixedHeight(view_pattern->fontMetrics().height()+4);
     connect(view_choose_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
     connect(view_pattern,&myListWidget::dropped,this,&addtodatabase::pattern);
+
     label_pattern = new QLabel(this);
     QPalette p = label_pattern->palette();
     p.setColor(QPalette::WindowText,Qt::red);
     label_pattern->setPalette(p);
 
+    connect(le_splitter,&QLineEdit::textChanged,[this](QString text){
+        if(text.isEmpty())
+            return;
+        splitter=text;
+        QStringList p;
+        label_pattern->setText("");
+        for(int i=0; i < view_pattern->count();i++)
+        {
+            auto item = view_pattern->item(i);
+           p<<item->data(Qt::DisplayRole).toString();
+        }
+        label_pattern->setText(p.join(splitter));
+    });
     layout_pattern->addWidget(new QLabel(tr("Select Pattern (Drag)"), this));
     layout_pattern->addWidget(view_choose_pattern);
     layout_pattern->addWidget(new QLabel("Drop here\t\u25BC\u25B2", this));
@@ -331,8 +351,8 @@ addtodatabase::addtodatabase(QWidget *parent) :
     connect(ydownloader,&YoutubeDownloader::finished,
            [this,stack,ydownloader](){
                                    stack->setCurrentIndex(0);
-                                   current_dir = ydownloader->getPath();
-                                   label_current_dir->setText(current_dir);
+                                   currentDirectory = ydownloader->getPath();
+                                   label_currentDirectory->setText(currentDirectory);
                                    getItem();
 
              });
@@ -361,7 +381,7 @@ void addtodatabase::getItem()
     model->clear();
 
     int row = 0;
-    QDirIterator it(current_dir,supported_video, QDir::Files,getSubDirFlag());
+    QDirIterator it(currentDirectory,supported_video, QDir::Files,getSubDirFlag());
       while (it.hasNext())
       {
           model->setRowCount(model->rowCount()+1);
@@ -422,11 +442,12 @@ void addtodatabase::saveToDatabase()
             setCursor(Qt::ArrowCursor);
             QMessageBox message;
             message.setInformativeText(tr("Pattern not set yet"));
-            message.setWindowFlags(Qt::Popup);
+//            message.setWindowFlags(Qt::Popup);
             message.exec();
             return;
     }
 
+<<<<<<< HEAD
             if(!le_singer->text().isEmpty()){
                  default_singer = le_singer->text();
             } else {
@@ -445,6 +466,24 @@ void addtodatabase::saveToDatabase()
             if(default_audio.isEmpty()){
                 default_audio="LEFT";
             }
+=======
+            if(!le_singer->text().isEmpty())
+                 singer = le_singer->text();
+            else
+                singer = default_singer;
+
+            if(!le_language->text().isEmpty())
+                  language = le_language->text();
+            else
+                language = default_language;
+
+            if(!le_genre->text().isEmpty())
+                   genre = le_genre->text();
+            else
+                genre = default_genre;
+
+            qDebug()<<singer;
+>>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
 
         QStringList p = _pattern.split(splitter);
 
@@ -453,6 +492,7 @@ void addtodatabase::saveToDatabase()
         uint short languagePos = p.indexOf("Language");
         uint short genrePos = p.indexOf("Genre");
         uint short audioPos = p.indexOf("Audio");
+
 
         foreach (QModelIndex index, list)
         {
@@ -469,26 +509,23 @@ void addtodatabase::saveToDatabase()
            {
                splitted = filename.split(splitter);
 
-               if(titlePos<splitted.count()){
+               if(titlePos!=-1 && titlePos<splitted.count())
+
                   title = splitted.at(titlePos);
-               } else {
-                   title = "UNKNOWN";
-               }
 
-               if(singerPos<splitted.count())
-               {
+               if(singerPos!=-1 && singerPos<splitted.count()){
+                   if(singer=="UNKNOWN")
                    singer = splitted.at(singerPos);
-               } else {
-                   singer = default_singer;
+               else
+                       singer = default_singer;
                }
 
-               if(languagePos<splitted.count())
-               {
+
+               if(languagePos!=-1 && languagePos<splitted.count())
+//                   if(language=="UNKNOWN")
                     language = splitted.at(languagePos);
-               } else {
-                   language = default_language;
-               }
 
+<<<<<<< HEAD
                if(genrePos<splitted.count()){
                     genre = splitted.at(genrePos);
                } else {
@@ -499,6 +536,15 @@ void addtodatabase::saveToDatabase()
                } else {
                    a_channel = default_audio;
                }
+=======
+               if(genrePos!=-1&&genrePos<splitted.count())
+//                   if(genre=="UNKNOWN")
+                genre = splitted.at(genrePos);
+
+               if(audioPos!=-1&&audioPos<splitted.count())
+               a_channel = splitted.at(audioPos);
+
+>>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
            } else {
 
                //generally filename pattern title - singer
@@ -508,6 +554,7 @@ void addtodatabase::saveToDatabase()
                singer = filename.split('-').at(1);
                }
            }
+           qDebug()<<singer<<"2";
 
         set_singer.insert(singer.toUpper());
         set_language.insert(language.toUpper());
@@ -671,7 +718,6 @@ void addtodatabase::getDrive()
             combo_drive->addItem(storage.rootPath());
         }
     }
-
 }
 
 QString addtodatabase::getSplitter(const QString &filename)
@@ -687,7 +733,7 @@ QString addtodatabase::getSplitter(const QString &filename)
     }
 
     QSet<QString>s;
-    s=s.fromList(symbol);
+    s = s.fromList(symbol);
 
     int x = 0;
     QString d;
@@ -705,12 +751,15 @@ QString addtodatabase::getSplitter(const QString &filename)
 
 void addtodatabase::pattern(){
    QString obj = sender()->objectName();
-   QStringList p;
-        for(int i=0; i < view_pattern->count();i++)
-        {
-            auto item = view_pattern->item(i);
-            p<<item->data(Qt::DisplayRole).toString();
-        }
+   //   QStringList p;
+   QStringList listPattern;
+
+    for(int i=0; i < view_pattern->count();i++)
+    {
+        auto item = view_pattern->item(i);
+        listPattern<<item->data(Qt::DisplayRole).toString();
+    }
+
     if(obj == "sender"){
         myListWidget *sdr = qobject_cast<myListWidget*>(sender());
         QStringList ori ;
@@ -721,8 +770,8 @@ void addtodatabase::pattern(){
         }
 
         foreach (QString s, ori ) {
-            p.removeAll(s);
+                    listPattern.removeAll(s);
         }
     }
-   label_pattern->setText(p.join(splitter));
+   label_pattern->setText(listPattern.join(splitter));
 }

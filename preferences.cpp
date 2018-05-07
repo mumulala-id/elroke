@@ -176,8 +176,8 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     theme1->setSecondaryColor("#00BFA5");
     theme1->setButtonColor("#E0F2F1");
     theme1->setButtontextColor("#009688");
-//    theme1->setTextColor(QColor(0,0,0,128));
      theme1->setHighlightTextColor("#E91E63");
+
     auto theme2 = new ThemeWidget(this);
     theme2->setPrimaryColor("#FF9800");
     theme2->setSecondaryColor("#FFAB40");
@@ -197,7 +197,6 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
     theme4->setSecondaryColor("#212121");
     theme4->setButtonColor("#E91E63");
     theme4->setButtontextColor("#FFFFFF");
-//    theme4->setTextColor("#FFFFFF");
     theme4->setHighlightTextColor("#E91E63");
 
     list_theme = new QListWidget(this);
@@ -290,57 +289,57 @@ preferences::preferences(QWidget *parent) : QDialog(parent)
 /////////////////////////////////////////////// fav group////////////////////////////////////////////////////////
     auto group_favorite = new QGroupBox(tr("Favorite Group"), this);
 
-    auto layout_menu_main = new QVBoxLayout;
+    auto layoutFavGroup = new QVBoxLayout;
     auto layout_menu = new QHBoxLayout;
 
     auto list_menu_all = new QListWidget(this);
-    auto layout_move_button = new QVBoxLayout;
+    auto layoutButtonExchange = new QVBoxLayout;
 
     auto button_right = new QPushButton(QIcon::fromTheme("go-next"),"",this);
     auto button_left = new QPushButton(QIcon::fromTheme("go-previous"),"", this);
 
-    layout_move_button->addStretch();
-    layout_move_button->addWidget(button_right);
-    layout_move_button->addWidget(button_left);
-    layout_move_button->addStretch();
+    layoutButtonExchange->addStretch();
+    layoutButtonExchange->addWidget(button_right);
+    layoutButtonExchange->addWidget(button_left);
+    layoutButtonExchange->addStretch();
 
-    list_menu_selected = new QListWidget(this);
-    list_menu_selected->addItems(favGroup);
+    auto listFavGroupSelected = new QListWidget(this);
+    listFavGroupSelected->addItems(favGroup);
 
     layout_menu->addWidget(list_menu_all,0,Qt::AlignVCenter);
-    layout_menu->addLayout(layout_move_button);
-    layout_menu->addWidget(list_menu_selected,0,Qt::AlignVCenter);
+    layout_menu->addLayout(layoutButtonExchange);
+    layout_menu->addWidget(listFavGroupSelected,0,Qt::AlignVCenter);
 
     auto buttonSetFavGroup = new QPushButton(tr("Set"), this);
-    connect( buttonSetFavGroup,&QPushButton::pressed,[this](){
+    connect( buttonSetFavGroup,&QPushButton::pressed,[this,listFavGroupSelected](){
         favGroup.clear();
-          for(int i=0;i<list_menu_selected->count();i++){
-              favGroup<< list_menu_selected->item(i)->text();
+          for(int i=0;i<listFavGroupSelected->count();i++){
+              favGroup<< listFavGroupSelected->item(i)->text();
 
           }
           insertToListchange("favGroup",favGroup);
     });
 
-    layout_menu_main->addLayout(layout_menu);
-    layout_menu_main->addWidget(buttonSetFavGroup,0,Qt::AlignRight|Qt::AlignBottom);
+    layoutFavGroup->addLayout(layout_menu);
+    layoutFavGroup->addWidget(buttonSetFavGroup,0,Qt::AlignRight|Qt::AlignBottom);
 
-    group_favorite->setLayout(layout_menu_main);
+    group_favorite->setLayout(layoutFavGroup);
 
     list_menu_all->addItems(getLanguageGenre());
-    auto toRight = [this,list_menu_all]()
+    auto toRight = [this,listFavGroupSelected,list_menu_all]()
     {
-       list_menu_selected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
+       listFavGroupSelected->addItem(list_menu_all->takeItem(list_menu_all->currentRow()));
     };
 
     connect(button_right,&QPushButton::clicked,toRight);
     connect(list_menu_all,&QListWidget::doubleClicked,toRight);
-    auto toLeft =[this,list_menu_all]()
+    auto toLeft =[this,list_menu_all,listFavGroupSelected]()
     {
-       list_menu_all->addItem(list_menu_selected->takeItem(list_menu_selected->currentRow()));
+       list_menu_all->addItem(listFavGroupSelected->takeItem(listFavGroupSelected->currentRow()));
     };
 
     connect(button_left,&QPushButton::clicked,toLeft);
-    connect(list_menu_selected,&QListWidget::doubleClicked,toLeft);
+    connect(listFavGroupSelected,&QListWidget::doubleClicked,toLeft);
 
     auto group_background = new QGroupBox(tr("Background"), this);
     group_background->setLayout(layout_background);
@@ -463,16 +462,25 @@ void preferences::apply()
 void preferences::ok()
 {
     apply();
+    int count = listOfChange.count();
     QMessageBox msg(this);
+    if(count>0){
     msg.setInformativeText(tr("All change will be applied after app restarted."));
     msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
     msg.addButton(tr("RESTART"), QMessageBox::AcceptRole);
+    }else{
+        msg.setInformativeText(tr("No Change have been made."));
+        msg.addButton(tr("CLOSE"), QMessageBox::RejectRole);
+    }
     //RESTART
     connect(&msg,&QMessageBox::accepted,[this](){
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
     });
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
     msg.exec();
 
     accept();

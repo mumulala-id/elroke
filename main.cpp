@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     QPixmap pic(":/usr/share/elroke/icon/logo.png");
     QSplashScreen splash(pic);
      splash.show();
-//    I::sleep(5);
+    QThread::sleep(5);
 
     if(!QSqlDatabase::isDriverAvailable("QSQLITE"))
             qDebug()<<"SQLITE is not installed";

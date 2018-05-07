@@ -32,6 +32,7 @@ public slots:
     QString getFile();
     void play();
     void pause();
+    void resume();
     void stop();
     void setMute(bool mute);
     bool isMute();    
