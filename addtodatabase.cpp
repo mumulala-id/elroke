@@ -442,31 +442,11 @@ void addtodatabase::saveToDatabase()
             setCursor(Qt::ArrowCursor);
             QMessageBox message;
             message.setInformativeText(tr("Pattern not set yet"));
-//            message.setWindowFlags(Qt::Popup);
             message.exec();
             return;
     }
 
-<<<<<<< HEAD
-            if(!le_singer->text().isEmpty()){
-                 default_singer = le_singer->text();
-            } else {
-                default_singer="UNKNOWN";
-            }
-            if(!le_language->text().isEmpty()){
-                  default_language = le_language->text();
-            } else {
-                default_language="UNKNOWN";
-            }
-            if(!le_genre->text().isEmpty()){
-                   default_genre = le_genre->text();
-            } else {
-                default_genre="UNKNOWN";
-            }
-            if(default_audio.isEmpty()){
-                default_audio="LEFT";
-            }
-=======
+
             if(!le_singer->text().isEmpty())
                  singer = le_singer->text();
             else
@@ -481,9 +461,6 @@ void addtodatabase::saveToDatabase()
                    genre = le_genre->text();
             else
                 genre = default_genre;
-
-            qDebug()<<singer;
->>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
 
         QStringList p = _pattern.split(splitter);
 
@@ -525,18 +502,18 @@ void addtodatabase::saveToDatabase()
 //                   if(language=="UNKNOWN")
                     language = splitted.at(languagePos);
 
-<<<<<<< HEAD
-               if(genrePos<splitted.count()){
-                    genre = splitted.at(genrePos);
-               } else {
-                   genre = default_genre;
-               }
-               if(audioPos<splitted.count()){
-                    a_channel = splitted.at(audioPos);
-               } else {
-                   a_channel = default_audio;
-               }
-=======
+//<<<<<<< HEAD
+//               if(genrePos<splitted.count()){
+//                    genre = splitted.at(genrePos);
+//               } else {
+//                   genre = default_genre;
+//               }
+//               if(audioPos<splitted.count()){
+//                    a_channel = splitted.at(audioPos);
+//               } else {
+//                   a_channel = default_audio;
+//               }
+//=======
                if(genrePos!=-1&&genrePos<splitted.count())
 //                   if(genre=="UNKNOWN")
                 genre = splitted.at(genrePos);
@@ -544,7 +521,7 @@ void addtodatabase::saveToDatabase()
                if(audioPos!=-1&&audioPos<splitted.count())
                a_channel = splitted.at(audioPos);
 
->>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
+//>>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
            } else {
 
                //generally filename pattern title - singer

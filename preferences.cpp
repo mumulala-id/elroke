@@ -477,10 +477,7 @@ void preferences::ok()
         qApp->quit();
         QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
     });
-<<<<<<< HEAD
 
-=======
->>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
     msg.exec();
 
     accept();
