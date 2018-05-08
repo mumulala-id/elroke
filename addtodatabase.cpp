@@ -444,23 +444,23 @@ void addtodatabase::saveToDatabase()
             message.setInformativeText(tr("Pattern not set yet"));
             message.exec();
             return;
-    }
+        }
 
 
             if(!le_singer->text().isEmpty())
-                 singer = le_singer->text();
+                 default_singer = le_singer->text();
             else
-                singer = default_singer;
+                default_singer="UNKNOWN";
 
             if(!le_language->text().isEmpty())
-                  language = le_language->text();
+                 default_language = le_language->text();
             else
-                language = default_language;
+               default_language="UKNOWN";
 
             if(!le_genre->text().isEmpty())
-                   genre = le_genre->text();
+                  default_genre = le_genre->text();
             else
-                genre = default_genre;
+               default_genre = "UNKNOWN";
 
         QStringList p = _pattern.split(splitter);
 
@@ -490,30 +490,13 @@ void addtodatabase::saveToDatabase()
 
                   title = splitted.at(titlePos);
 
-               if(singerPos!=-1 && singerPos<splitted.count()){
-                   if(singer=="UNKNOWN")
-                   singer = splitted.at(singerPos);
-               else
-                       singer = default_singer;
-               }
-
+               if(singerPos!=-1 && singerPos<splitted.count())
+                       singer = splitted.at(singerPos);
 
                if(languagePos!=-1 && languagePos<splitted.count())
 //                   if(language=="UNKNOWN")
                     language = splitted.at(languagePos);
 
-//<<<<<<< HEAD
-//               if(genrePos<splitted.count()){
-//                    genre = splitted.at(genrePos);
-//               } else {
-//                   genre = default_genre;
-//               }
-//               if(audioPos<splitted.count()){
-//                    a_channel = splitted.at(audioPos);
-//               } else {
-//                   a_channel = default_audio;
-//               }
-//=======
                if(genrePos!=-1&&genrePos<splitted.count())
 //                   if(genre=="UNKNOWN")
                 genre = splitted.at(genrePos);
@@ -521,7 +504,6 @@ void addtodatabase::saveToDatabase()
                if(audioPos!=-1&&audioPos<splitted.count())
                a_channel = splitted.at(audioPos);
 
-//>>>>>>> 5c24600b1a9eaede96a2ad94ebfec0b8fc3405f6
            } else {
 
                //generally filename pattern title - singer
@@ -531,7 +513,7 @@ void addtodatabase::saveToDatabase()
                singer = filename.split('-').at(1);
                }
            }
-           qDebug()<<singer<<"2";
+
 
         set_singer.insert(singer.toUpper());
         set_language.insert(language.toUpper());
